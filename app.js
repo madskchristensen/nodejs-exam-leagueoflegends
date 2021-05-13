@@ -2,7 +2,7 @@
 const dotenvResult = require("dotenv").config();
 
 if (dotenvResult.error) {
-    throw dotenvResult.error
+    throw dotenvResult.error;
 }
 
 // express setup
@@ -19,13 +19,13 @@ app.use(helmet());
 
 // socket.io setup
 // wrap express in plain node.js http server
-const server = require("http").createServer(app)
+const server = require("http").createServer(app);
 
 // atttach socket.io to http server
-const io = require("socket.io")(server)
+const io = require("socket.io")(server);
 
 // escapehtml setup
-const escapeHTML = require("html-escaper").escape
+const escapeHTML = require("html-escaper").escape;
 
 app.get("/", (req, res) => {
     res.send("index");
