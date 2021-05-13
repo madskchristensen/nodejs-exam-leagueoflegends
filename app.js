@@ -5,7 +5,7 @@ if (dotenvResult.error) {
     throw dotenvResult.error
 }
 
-// express init
+// express setup
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 8080;
@@ -15,12 +15,13 @@ app.use(express.static("public"));
 
 // use helmet for better security
 const helmet = require ("helmet");
-
-// express configuration
 app.use(helmet());
 
 // socket.io setup
+// wrap express in plain node.js http server
 const server = require("http").createServer(app)
+
+// atttach socket.io to http server
 const io = require("socket.io")(server)
 
 // escapehtml setup
