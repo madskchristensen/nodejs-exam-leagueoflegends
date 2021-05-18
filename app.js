@@ -27,15 +27,21 @@ const io = require("socket.io")(server);
 // escapehtml setup
 const escapeHTML = require("html-escaper").escape;
 
+// mongodb util module.
+// Can be called with .query() to perform operations like insert, find etc.
+const db = require("./mongodb/db");
+
 app.get("/", (req, res) => {
     res.send("index");
 })
 
 // listen at specified port
-server.listen(port, (err) => {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log("Express listening at port", port);
-    }
+db.connect(() => {
+    server.listen(port, (err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("Express listening at port", port);
+        }
+    })
 })
