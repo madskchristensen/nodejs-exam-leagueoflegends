@@ -53,6 +53,9 @@ const fs = require('fs');
 const frontpage = fs.readFileSync(__dirname + "/public/frontpage/frontpage.html", "utf-8")
 const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8")
 
+// mongodb util module.
+// Can be called with .query() to perform operations like insert, find etc.
+const db = require("./mongodb/db");
 
 app.get("/", (req, res) => {
     res.send(frontpage);
@@ -63,10 +66,12 @@ app.get("/login", (req, res) => {
 })
 
 // listen at specified port
-server.listen(port, (err) => {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log("Express listening at port ", port);
-    }
+db.connect(() => {
+    server.listen(port, (err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("Express listening at port", port);
+        }
+    })
 })
