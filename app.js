@@ -55,19 +55,20 @@ const fs = require('fs');
 const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8");
 
 // pages
-const frontpage = fs.readFileSync(__dirname + "/public/frontpage/frontpage.html", "utf-8")
-const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8")
+const frontpage = fs.readFileSync(__dirname + "/public/frontpage/frontpage.html", "utf-8");
+const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8");
+const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8");
 
 // mongodb util module.
 // Can be called with .query() to perform operations like insert, find etc.
 const db = require("./mongodb/db");
 
 app.get("/", (req, res) => {
-    res.send(header + frontpage);
+    res.send(header + frontpage + footer);
 })
 
 app.get("/login", (req, res) => {
-    res.send(header + login);
+    res.send(header + login + footer);
 })
 
 // listen at specified port
