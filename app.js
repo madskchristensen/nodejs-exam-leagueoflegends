@@ -50,16 +50,21 @@ const sessionRouter = require("./router/session.js");
 app.use(sessionRouter.router);
 
 const fs = require('fs');
+
+// components
+const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8");
+
+// pages
 const frontpage = fs.readFileSync(__dirname + "/public/frontpage/frontpage.html", "utf-8")
 const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8")
 
 
 app.get("/", (req, res) => {
-    res.send(frontpage);
+    res.send(header + frontpage);
 })
 
 app.get("/login", (req, res) => {
-    res.send(login);
+    res.send(header + login);
 })
 
 // listen at specified port
