@@ -4,7 +4,7 @@ router.get("/getSession", (req, res) => {
     res.send({ session: req.session });
 });
 
-router.post("/api/login", (req, res) => {
+router.post("/api/auth/login", (req, res) => {
     // TO DO
     // fetch req.body and validate login
 
@@ -14,7 +14,7 @@ router.post("/api/login", (req, res) => {
     res.redirect("/");
 });
 
-router.post("/api/signout", (req, res) => {
+router.post("/api/auth/signout", (req, res) => {
     // standin signout validation. Just sets ression.loggedin to false
     console.log("Client successfully logged out using sessionID: " + req.session.id);
     req.session.loggedIn = false;
