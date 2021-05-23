@@ -1,19 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Welcome to login</h1>
-    <form method="POST" action="/api/auth/login">
-        <label for="fname">Username:</label><br>
-        <input type="text" id="username" name="username"><br>
-        <label for="lname">Email:</label><br>
-        <input type="text" id="email" name="email" ><br><br>
-        <input type="submit" value="Submit">
-    </form> 
-</body>
-</html>
+<link rel="stylesheet" href="../login/login.css"/>
+
+<div class="container">
+    <div class="row">
+
+        <div class="col d-flex justify-content-center">
+
+            <!--            Sign up/sign in wrapper-->
+            <div id="signinup" class="row bg-white w-75 px-5 mt-5 text-center d-flex align-items-center">
+
+                <!--                Sign in wrapper needed for proper length of border seperating the 2 divs -->
+                <div id="signin-border-right" class="col-6 py-5">
+
+                    <!--                 Sign in -->
+                    <div id="signin" class="me-3">
+                        <h1 class="mb-5">Sign In</h1>
+                        <form method="POST" action="/api/auth/login">
+
+                            <!--                            Username -->
+                            <div class="form-floating mb-5">
+                                <input type="email" class="form-control form-control-sm" id="floatingUsername"
+                                       name="username" placeholder="Email">
+                                <label for="floatingUsername">Email</label>
+                            </div>
+
+                            <!--                            Password -->
+                            <div class="form-floating mb-5">
+                                <input type="password" class="form-control" id="floatingPassword"
+                                       name="email" placeholder="Password">
+                                <label for="floatingPassword">Password</label>
+                            </div>
+                            <input type="submit" value="Sign in" class="btn btn-primary">
+                        </form>
+                    </div>
+                </div>
+
+                <!--                Sign up -->
+                <div id="signup" class="col-6 py-5">
+                    <h2 class="mb-3">Don't have an account?</h2>
+                    <p class="mb-4 w-75 mx-auto">Link your league of legends account to LeagueBook today!</p>
+                    <a href="/signup"><button type="button" class="btn btn-primary">Link account</button></a>
+                </div>
+            </div>
+        </div>
+
+        <!--            <div id="div1" class="col-6">
+                        <p>Sign in</p>
+                    </div>
+                    <div id="div2" class="col-6">
+                        Sign up
+                    </div>-->
+    </div>
+</div>

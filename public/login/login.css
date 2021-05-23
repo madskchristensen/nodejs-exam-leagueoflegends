@@ -1,0 +1,8 @@
+#signinup {
+    border-radius: 50px 50px 50px 50px;
+    border: #ced4da 1px solid;
+}
+
+#signin-border-right {
+    border-right: #ced4da 1px solid;
+}
