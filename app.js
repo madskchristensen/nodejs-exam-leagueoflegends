@@ -63,12 +63,43 @@ const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8"
 // Can be called with .query() to perform operations like insert, find etc.
 const db = require("./mongodb/db");
 
+// paths for all users to access
 app.get("/", (req, res) => {
     res.send(header + frontpage + footer);
 })
 
 app.get("/login", (req, res) => {
     res.send(header + login + footer);
+})
+
+// intercept all incoming requests with login check except above, as they are allowed for all users
+app.get("/*", (req, res, next) => {
+    // check if path is valid
+    if (!paths.includes(req.path)) {
+        res.status(404).send(header + "<h4>Sorry the page doesnt exist </h1>");
+    }
+    // check if user is authorized
+    else if (!(req.session.loggedIn === true)) {
+        res.status(401).send(header + "<h4>Sorry but you are not authorized to view this page </h1>")
+    }
+    else {
+        next();
+    }
+})
+
+// paths allowed for logged in users only 
+app.get("/test", (req, res) => {
+    res.send(header + footer);
+})
+
+// register all valid paths
+const paths = [];
+
+// loop through all defined paths and add to array
+app._router.stack.forEach( (r) => {
+    if (r.route && r.route.path){
+      paths.push(r.route.path);
+    }
 })
 
 // listen at specified port
