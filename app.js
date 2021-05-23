@@ -96,9 +96,9 @@ app.get("/test", (req, res) => {
 const paths = [];
 
 // loop through all defined paths and add to array
-app._router.stack.forEach( (r) => {
-    if (r.route && r.route.path){
-      paths.push(r.route.path);
+app._router.stack.forEach( (router) => {
+    if (router.route && router.route.path){
+      paths.push(router.route.path);
     }
 })
 
