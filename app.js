@@ -14,8 +14,18 @@ const port = process.env.PORT || 8080;
 app.use(express.static("public"));
 
 // use helmet for better security
+// contentSecurityPolicy needs to be configured, otherwise scripts, styles etc. wont be allowed from cdns
 const helmet = require ("helmet");
-app.use(helmet());
+app.use(
+    helmet.contentSecurityPolicy({
+        useDefaults: true,
+        directives: {
+            "script-src": ["'self'", "*.fontawesome.com", "*.jquery.com", "*.jsdelivr.net"],
+            "connect-src": ["'self'", "ka-f.fontawesome.com"],
+            "style-src": ["'self'", "*.fontawesome.com", "*.jsdelivr.net", "'unsafe-inline'"], // unsafe-inline needed to allow fontawesome icons
+            "font-src": ["'self'", "*.fontawesome.com"]
+        }
+    }));
 
 // socket.io setup
 // wrap express in plain node.js http server

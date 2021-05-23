@@ -1,7 +1,3 @@
-.search-bar-base input[type="text"] {
-    -webkit-appearance:none;
-}
-
 #search-div {
-    height: 200px;!important;
+    height: 4em;
 }
