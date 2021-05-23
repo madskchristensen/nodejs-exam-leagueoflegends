@@ -1,19 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Welcome to frontpage</h1>
-    
-    <div id="frontpage">
+<link rel="stylesheet" href="../frontpage/frontpage.css"/>
 
+<div class="container">
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <div id="welcome" class="text-center mt-5 w-50">
+                <h1 class="text-uppercase">Leaguebook</h1>
+                <p class="mt-4 fs-1">Your one stop shop for all things league of legends gamers</p>
+            </div>
+        </div>
     </div>
+    <div class="row m-5">
+        <div class="col d-flex justify-content-center">
+<!--            <div class="search-bar-base input-group rounded">
+                    <input class="w-100" type="text" autocomplete="off" placeholder="Search for a summoner">
 
-    <script src="/frontpage/frontpage.js"></script>
+            </div>-->
 
-</body>
-</html>
+            <div id="search-div" class="input-group rounded-pill w-75 px-3 align-items-center">
+                <i class="fas fa-search px-2"></i>
+                <input type="search" class="form-control rounded ms-1" placeholder="Search for a summoner" aria-label="Search"
+                       aria-describedby="search-addon"/>
+                <div id="select-div" class="w-25 ms-2">
+
+                <select class="form-select form-select-sm">
+                    <option selected>EUW</option>
+                    <option>NA</option>
+                    <option>EUNE</option>
+                    <option>KR</option>
+                    <option>BR</option>
+                    <option>LAN</option>
+                    <option>LAS</option>
+                    <option>OCE</option>
+                    <option>RU</option>
+                    <option>TR</option>
+                    <option>JP</option>
+                </select>
+                </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="/frontpage/frontpage.js"></script>
