@@ -1,3 +1,17 @@
 #search-div {
     height: 4em;
+    background-color: white;
+    border: #ced4da solid 1px;
+}
+
+#search-div input[type="search"] {
+    border: none;
+}
+
+#search-div i {
+    font-size: 1.5em;
+}
+
+#select-div {
+
 }
