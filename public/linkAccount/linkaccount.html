@@ -1,0 +1,49 @@
+<link rel="stylesheet" href="../linkAccount/linkaccount.css"/>
+
+<div class="container">
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <div class="bg-white text-center w-50 mt-5 py-5 rounded-div">
+                <div class="mb-5">
+                    <h1>Link Account</h1>
+                    <p>Link your Riot account</p>
+                </div>
+
+                <div class="d-flex flex-column align-items-center">
+                    <!-- UUID -->
+                    <div class="form-floating mb-5 w-50">
+                        <input type="text" readonly class="form-control-plaintext border rounded p-2" id="floatingUUID"
+                               name="uuid" placeholder="UUID" value="UUID">
+                    </div>
+                    <!-- Summoner name -->
+                    <div class="form-floating mb-2 w-50">
+                        <input type="text" class="form-control" id="floatingSummonerName"
+                               name="summonerName" placeholder="Summoner Name">
+                        <label for="floatingSummonerName">Summoner Name</label>
+                    </div>
+
+                    <!-- Region -->
+                    <div id="select-div" class="mb-5">
+                        <select id="region" class="form-select form-select-sm">
+                            <option selected>EUW</option>
+                            <option name="na1">NA</option>
+                            <option>EUNE</option>
+                            <option>KR</option>
+                            <option>BR</option>
+                            <option>LAN</option>
+                            <option>LAS</option>
+                            <option>OCE</option>
+                            <option>RU</option>
+                            <option>TR</option>
+                            <option>JP</option>
+                        </select>
+                    </div>
+
+                    <input type="submit" value="Link Account" onclick="sendFormData()" class="btn btn-outline-primary">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/linkAccount/linkaccount.js"></script>

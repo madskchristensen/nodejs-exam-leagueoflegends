@@ -23,7 +23,8 @@ app.use(
             "script-src": ["'self'", "*.fontawesome.com", "*.jquery.com", "*.jsdelivr.net"],
             "connect-src": ["'self'", "ka-f.fontawesome.com"],
             "style-src": ["'self'", "*.fontawesome.com", "*.jsdelivr.net", "'unsafe-inline'"], // unsafe-inline needed to allow fontawesome icons
-            "font-src": ["'self'", "*.fontawesome.com"]
+            "font-src": ["'self'", "*.fontawesome.com"],
+            "script-src-attr": ["'self'", "'unsafe-inline'"]
         }
     }));
 
@@ -51,15 +52,31 @@ app.use(session({
     saveUninitialized: true,
     cookie: { 
         secure: false, // dont require HTTPS connection
+        httpOnly: false, // cookie inaccessible to the JavaScript Document.cookie API. Cookie is only sent to server
         sameSite: true, // block CORS req
         maxAge: 600000 // Time in miliseconds - 10 minutes
     }
 }));
 
+// allow express to parse form data from requests
+app.use(express.urlencoded({
+    extended: true
+}));
+
+app.use(express.json());
+
 const sessionRouter = require("./router/session.js");
 app.use(sessionRouter.router);
 
+const riotRouter = require("./router/riot");
+app.use(riotRouter.router);
+
+// synchronous file read for loading html pages on express start
 const fs = require('fs');
+
+// mongodb util module.
+// Can be called with .query() to perform operations like insert, find etc.
+const db = require("./mongodb/db");
 
 // components
 const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8");
@@ -68,10 +85,8 @@ const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8"
 const frontpage = fs.readFileSync(__dirname + "/public/frontpage/frontpage.html", "utf-8");
 const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8");
 const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8");
-
-// mongodb util module.
-// Can be called with .query() to perform operations like insert, find etc.
-const db = require("./mongodb/db");
+const signup = fs.readFileSync(__dirname + "/public/signup/signup.html", "utf-8");
+const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html")
 
 // paths for all users to access
 app.get("/", (req, res) => {
@@ -82,8 +97,17 @@ app.get("/login", (req, res) => {
     res.send(header + login + footer);
 })
 
+app.get("/signup", (req, res) => {
+    res.send(header + signup + footer);
+})
+
+app.get("/link-account", (req, res) => {
+
+    res.send(header + linkAccount + footer);
+})
+
 // intercept all incoming requests with login check except above, as they are allowed for all users
-app.get("/*", (req, res, next) => {
+app.get("/!*", (req, res, next) => {
     // check if path is valid
     if (!paths.includes(req.path)) {
         res.status(404).send(header + "<h4>Sorry the page doesnt exist </h1>");
@@ -97,7 +121,7 @@ app.get("/*", (req, res, next) => {
     }
 })
 
-// paths allowed for logged in users only 
+// paths allowed for logged in users only
 app.get("/test", (req, res) => {
     res.send(header + footer);
 })

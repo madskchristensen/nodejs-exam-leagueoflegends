@@ -1,0 +1,31 @@
+<link rel="stylesheet" href="../signup/signup.css"/>
+
+<div class="container">
+  <div class="row">
+    <div class="col d-flex justify-content-center">
+      <div class="bg-white text-center w-50 mt-5 py-5 rounded-div">
+        <div class="mb-5">
+          <h1>Sign up</h1>
+          <p>Sign up using your riot account</p>
+        </div>
+
+        <form method="POST" action="/api/auth/signup" class="d-flex flex-column align-items-center">
+          <!-- Email -->
+          <div class="form-floating mb-5 w-50">
+            <input type="email" class="form-control form-control-sm" id="floatingEmail"
+                   name="email" placeholder="Email">
+            <label for="floatingEmail">Email</label>
+          </div>
+          <!-- Password -->
+          <div class="form-floating mb-5 w-50">
+            <input type="password" class="form-control" id="floatingPassword"
+                   name="password" placeholder="Password">
+            <label for="floatingPassword">Password</label>
+          </div>
+
+          <input type="submit" value="Sign up" class="btn btn-outline-primary">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

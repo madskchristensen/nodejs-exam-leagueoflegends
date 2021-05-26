@@ -1,12 +1,7 @@
-  // const express = require("express").Router;
-  //const router = express.Router();
-
 (async function getFrontpageFromSession() {
     try {
         const response = await fetch("/getSession");
         const result = await response.json();
-
-        console.log(result);
 
         // create frontpage
         const frontpageDiv = document.getElementById("frontpage");

@@ -5,7 +5,7 @@
         <div class="col d-flex justify-content-center">
 
             <!-- Sign up/sign in wrapper-->
-            <div id="signinup" class="row bg-white w-75 px-4 mt-5 text-center d-flex align-items-center">
+            <div id="signinup" class="row bg-white w-75 px-4 mt-5 text-center d-flex align-items-center rounded-div">
 
                 <!-- Sign in wrapper needed for proper length of border seperating the 2 divs -->
                 <div id="signin-border-right" class="col-6 py-5">
@@ -15,17 +15,17 @@
                         <h1 class="mb-5">Sign in</h1>
                         <form method="POST" action="/api/auth/login">
 
-                            <!-- Username -->
+                            <!-- Email -->
                             <div class="form-floating mb-5">
-                                <input type="email" class="form-control form-control-sm" id="floatingUsername"
-                                       name="username" placeholder="Email">
-                                <label for="floatingUsername">Email</label>
+                                <input type="email" class="form-control form-control-sm" id="floatingEmail"
+                                       name="email" placeholder="Email">
+                                <label for="floatingEmail">Email</label>
                             </div>
 
                             <!-- Password -->
                             <div class="form-floating mb-5">
                                 <input type="password" class="form-control" id="floatingPassword"
-                                       name="email" placeholder="Password">
+                                       name="password" placeholder="Password">
                                 <label for="floatingPassword">Password</label>
                             </div>
                             <input type="submit" value="Sign in" class="btn btn-outline-primary">
