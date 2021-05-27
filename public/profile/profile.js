@@ -16,7 +16,7 @@
             },
             riot: {
               summonerName: "Jens",
-              summonerIcon: "502",
+              summonerIcon: "4301",
               summonerPicture: "picture8413",
               summonerLevel: "65",
               rank: "Silver V 85LP",
