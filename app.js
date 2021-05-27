@@ -87,6 +87,7 @@ const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8");
 const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8");
 const signup = fs.readFileSync(__dirname + "/public/signup/signup.html", "utf-8");
 const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html")
+const profile = fs.readFileSync(__dirname + "/public/profile/profile.html")
 
 // paths for all users to access
 app.get("/", (req, res) => {
@@ -107,7 +108,7 @@ app.get("/link-account", (req, res) => {
 })
 
 // intercept all incoming requests with login check except above, as they are allowed for all users
-app.get("/!*", (req, res, next) => {
+app.get("/*", (req, res, next) => {
     // check if path is valid
     if (!paths.includes(req.path)) {
         res.status(404).send(header + "<h4>Sorry the page doesnt exist </h1>");
@@ -126,13 +127,17 @@ app.get("/test", (req, res) => {
     res.send(header + footer);
 })
 
+app.get("/profile", (req, res) => {
+    res.send(header + profile + footer);
+})
+
 // register all valid paths
 const paths = [];
 
 // loop through all defined paths and add to array
 app._router.stack.forEach( (router) => {
     if (router.route && router.route.path){
-      paths.push(router.route.path);
+      paths.push(router.route.path + "/");
     }
 })
 

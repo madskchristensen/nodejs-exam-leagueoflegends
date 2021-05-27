@@ -1,0 +1,30 @@
+#left-section {
+    border: 1px solid;
+    border-color: darkgray;
+    background-color: white;   
+}
+
+#right-section {
+    border: 1px solid;
+    border-color: darkgray;
+    background-color: white;
+}
+
+#description-section {
+    border: 1px solid;
+    border-color: darkgray;
+    background-color: white;
+    margin-top: 1em;
+}
+
+.image-container{
+    border: 1px solid;
+    border-color: darkgray;
+    background-color: white;
+}
+
+#champion-stats{
+    border: 1px solid;
+    border-color: darkgray;
+    background-color: white;
+}
