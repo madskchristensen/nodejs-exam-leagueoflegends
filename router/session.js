@@ -1,3 +1,5 @@
+const bcrypt = require("bcrypt");
+
 const router = require("express").Router();
 
 router.get("/getSession", (req, res) => {
@@ -21,25 +23,27 @@ router.post("/api/auth/signout", (req, res) => {
     res.redirect("/");
 });
 
-router.post("/api/auth/signup", (req, res) => {
-    req.session.newAccount = {
-        email: req.body.email,
-        password: req.body.password
-    }
+router.post("/api/auth/signup", (req, res, next) => {
+    bcrypt.hash(req.body.password, 10,(err, hashedPassword) => {
+        // let express handle the error and show it to the user.
+        // if NODE_ENV is set to development the stack trace will be shown in browser
+        // if set to production a "500 internal server error" will be displayed
+        if(err) {
+            next(err);
 
-    res.redirect("/link-account");
+        } else {
+            req.session.newAccount = {
+                email: req.body.email,
+                password: hashedPassword
+            }
+
+            res.redirect("/link-account");
+        }
+    });
 })
 
 router.post("/api/auth/link-account", (req, res) => {
-    // kald /lol/summoner/v4/summoners/by-name/{summonerName}
-        // modtag SummonerDTO som indeholder id (encrypted Summoner id)
-    // kald /lol/platform/v4/third-party-code/by-summoner/{encryptedSummonerId}
-        // modtag string som bruger har indtastet i sin league client under verification
-    // check om string matcher med string i UUID input
-        // Hvis ja
-            // Gem account i db
-        // Hvis nej
-            // Vis fejl
+
 })
 
 

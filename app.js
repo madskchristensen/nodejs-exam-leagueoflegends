@@ -20,7 +20,7 @@ app.use(
     helmet.contentSecurityPolicy({
         useDefaults: true,
         directives: {
-            "script-src": ["'self'", "*.fontawesome.com", "*.jquery.com", "*.jsdelivr.net"],
+            "script-src": ["'self'", "*.fontawesome.com", "*.jquery.com", "*.jsdelivr.net", "*.cloudflare.com", "'unsafe-inline'"],
             "connect-src": ["'self'", "ka-f.fontawesome.com"],
             "style-src": ["'self'", "*.fontawesome.com", "*.jsdelivr.net", "'unsafe-inline'"], // unsafe-inline needed to allow fontawesome icons
             "font-src": ["'self'", "*.fontawesome.com"],
@@ -65,7 +65,7 @@ app.use(express.urlencoded({
 
 app.use(express.json());
 
-const sessionRouter = require("./router/session.js");
+const sessionRouter = require("./router/session");
 app.use(sessionRouter.router);
 
 const riotRouter = require("./router/riot");
@@ -142,7 +142,9 @@ db.connect(() => {
         if (err) {
             console.log(err);
         } else {
-            console.log("Express listening at port", port);
+            console.log("")
+            console.log("[express] running in", process.env.NODE_ENV, "mode");
+            console.log("[express] listening at port", port);
         }
     })
 })

@@ -7,6 +7,12 @@
 // Gem account i db
 // Hvis nej
 // Vis fejl
+
+document.addEventListener("DOMContentLoaded", function() {
+    const uuidInput = document.getElementById("floatingUUID");
+    uuidInput.value = uuidv4();
+})
+
 async function sendFormData() {
     const uuidInput = document.getElementById("floatingUUID");
     const uuid = uuidInput.value;
@@ -23,9 +29,9 @@ async function sendFormData() {
     await fetchValidationString(summonerId, region)
         .then(res => {
             if (res.validationString === uuid) {
-                console.log("Validation OK")
+                console.log("Validation OK");
             } else {
-                console.log("Validation failed")
+                console.log("Validation failed");
             }
         });
 }

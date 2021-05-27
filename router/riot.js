@@ -1,8 +1,8 @@
 const router = require("express").Router();
 const fetch = require("node-fetch");
 
-const protocol = "https://"
-const baseUrl = ".api.riotgames.com/lol/"
+const protocol = "https://";
+const baseUrl = ".api.riotgames.com/lol/";
 
 router.get("/api/riot/summoners/by-name/:summonerName/:region", (req, res) => {
     const url = protocol + req.params.region + baseUrl + "summoner/v4/summoners/by-name/" + req.params.summonerName;
@@ -17,7 +17,7 @@ router.get("/api/riot/summoners/by-name/:summonerName/:region", (req, res) => {
             .then(summonerDTO => res.send(summonerDTO))
             .catch(err => {
                 res.sendStatus(500);
-            })
+            });
     }
 
     if (!req.params.summonerName || !req.params.region) {
@@ -25,7 +25,7 @@ router.get("/api/riot/summoners/by-name/:summonerName/:region", (req, res) => {
     } else {
         fetchSummonerDTO();
     }
-})
+});
 
 router.get("/api/riot/third-party-code/by-summoner/:encryptedId/:region", (req, res) => {
     const url = protocol + req.params.region + baseUrl + "platform/v4/third-party-code/by-summoner/" + req.params.encryptedId;
@@ -48,7 +48,7 @@ router.get("/api/riot/third-party-code/by-summoner/:encryptedId/:region", (req, 
     } else {
         fetchValidation();
     }
-})
+});
 
 module.exports = {
     router
