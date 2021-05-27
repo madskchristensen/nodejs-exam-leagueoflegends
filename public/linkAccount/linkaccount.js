@@ -1,19 +1,14 @@
-// kald /lol/summoner/v4/summoners/by-name/{summonerName}
-// modtag SummonerDTO som indeholder id (encrypted Summoner id)
-// kald /lol/platform/v4/third-party-code/by-summoner/{encryptedSummonerId}
-// modtag string som bruger har indtastet i sin league client under verification
-// check om string matcher med string i UUID input
-// Hvis ja
-// Gem account i db
-// Hvis nej
-// Vis fejl
-
+// use uuid module from cdn to generate a UUID on document load, that
+// the user can paste into their client for verification
 document.addEventListener("DOMContentLoaded", function() {
     const uuidInput = document.getElementById("floatingUUID");
     uuidInput.value = uuidv4();
 })
 
-async function sendFormData() {
+// fetches encrypted summoner id and then checks if user has inputted correct UUID in lol client
+// if correct UUID is entered we can be certain the user has access to the specified summoner name
+// and it is safe to save the user details
+async function handleInputData() {
     const uuidInput = document.getElementById("floatingUUID");
     const uuid = uuidInput.value;
 
@@ -36,12 +31,14 @@ async function sendFormData() {
         });
 }
 
+// fetches validation string from API
 async function fetchValidationString(summonerId, region) {
     const response = await fetch("/api/riot/third-party-code/by-summoner/" + summonerId + "/" + region);
 
     return await response.json();
 }
 
+// fetches encrypted summoner id from API
 async function fetchEncryptedId(summonerName, region) {
     const response = await fetch("/api/riot/summoners/by-name/" + summonerName + "/" + region);
 
@@ -49,6 +46,8 @@ async function fetchEncryptedId(summonerName, region) {
 }
 
 // should be refactored into riot api or something later on...
+// matches value of selected option in the region <select> element
+// and returns a region code that can be used with the riot api
 // https://leagueoflegends.fandom.com/wiki/Servers
 function getRegionCode(region) {
     switch(region) {
