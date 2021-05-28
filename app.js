@@ -76,11 +76,15 @@ app.use(express.urlencoded({
 
 app.use(express.json());
 
-const sessionRouter = require("./router/session");
+// routers
+const sessionRouter = require("./routers/session");
 app.use(sessionRouter.router);
 
-const riotRouter = require("./router/riot");
+const riotRouter = require("./routers/riot");
 app.use(riotRouter.router);
+
+const authRouter = require("./routers/auth");
+app.use(authRouter.router);
 
 // synchronous file read for loading html pages on express start
 const fs = require('fs');
@@ -91,11 +95,11 @@ const db = require("./mongodb/db");
 
 // components
 const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8");
+const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8");
 
 // pages
 const frontpage = fs.readFileSync(__dirname + "/public/frontpage/frontpage.html", "utf-8");
 const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8");
-const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8");
 const signup = fs.readFileSync(__dirname + "/public/signup/signup.html", "utf-8");
 const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html")
 const profile = fs.readFileSync(__dirname + "/public/profile/profile.html")

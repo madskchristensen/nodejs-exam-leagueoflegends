@@ -2,11 +2,7 @@ const bcrypt = require("bcrypt");
 
 const router = require("express").Router();
 
-router.get("/getSession", (req, res) => {
-    res.send({ session: req.session });
-});
-
-router.post("/api/auth/login", (req, res) => {
+router.post("/auth/login", (req, res) => {
     // TO DO
     // fetch req.body and validate login
 
@@ -16,14 +12,14 @@ router.post("/api/auth/login", (req, res) => {
     res.redirect("/");
 });
 
-router.post("/api/auth/signout", (req, res) => {
+router.post("/auth/signout", (req, res) => {
     // standin signout validation. Just sets ression.loggedin to false
     console.log("Client successfully logged out using sessionID: " + req.session.id);
     req.session.loggedIn = false;
     res.redirect("/");
 });
 
-router.post("/api/auth/signup", (req, res, next) => {
+router.post("/auth/signup", (req, res, next) => {
     bcrypt.hash(req.body.password, 10,(err, hashedPassword) => {
         // let express handle the error and show it to the user.
         // if NODE_ENV is set to development the stack trace will be shown in browser
@@ -42,10 +38,9 @@ router.post("/api/auth/signup", (req, res, next) => {
     });
 })
 
-router.post("/api/auth/link-account", (req, res) => {
-
+router.get("/auth/link-account", (req, res) => {
+    console.log("hey")
 })
-
 
 module.exports = {
     router
