@@ -45,6 +45,15 @@ const fetch = require("node-fetch");
 // create session 
 const session = require("express-session");
 
+// middleware that sets needed variables in the session
+const sessionInitializer = function (req, res, next) {
+    if(!req.session.loggedIn) {
+        req.session.loggedIn = false;
+    }
+
+    next();
+}
+
 app.use(session({
     secret: process.env.SESSION_SECRET.split(","), // used to compute hash. split to process dotenv variable as array
     name: process.env.SESSION_NAME, // hidden custom name to avoid fingerprinting
@@ -54,9 +63,11 @@ app.use(session({
         secure: false, // dont require HTTPS connection
         httpOnly: false, // cookie inaccessible to the JavaScript Document.cookie API. Cookie is only sent to server
         sameSite: true, // block CORS req
-        maxAge: 600000 // Time in miliseconds - 10 minutes
+        maxAge: 600000, // Time in miliseconds - 10 minutes
     }
 }));
+
+app.use(sessionInitializer);
 
 // allow express to parse form data from requests
 app.use(express.urlencoded({
@@ -90,6 +101,7 @@ const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount
 
 // paths for all users to access
 app.get("/", (req, res) => {
+    console.log(req.session)
     res.send(header + frontpage + footer);
 })
 
@@ -107,14 +119,14 @@ app.get("/link-account", (req, res) => {
 })
 
 // intercept all incoming requests with login check except above, as they are allowed for all users
-app.get("/!*", (req, res, next) => {
+app.get("/*", (req, res, next) => {
     // check if path is valid
     if (!paths.includes(req.path)) {
-        res.status(404).send(header + "<h4>Sorry the page doesnt exist </h1>");
+        res.status(404).send(header + "<h4>Sorry the page doesnt exist</h1>");
     }
     // check if user is authorized
     else if (!(req.session.loggedIn === true)) {
-        res.status(401).send(header + "<h4>Sorry but you are not authorized to view this page </h1>")
+        res.status(401).send(header + "<h4>Sorry but you are not authorized to view this page</h1>")
     }
     else {
         next();
