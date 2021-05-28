@@ -32,6 +32,36 @@ async function handleInputData() {
         });
 }
 
+async function verifySummoner() {
+    const uuidInput = document.getElementById("floatingUUID");
+    const uuid = uuidInput.value;
+
+    const summonerNameInput = document.getElementById("floatingSummonerName");
+    const summonerName = summonerNameInput.value;
+
+    const regionInput = document.getElementById("region");
+    const region = getRegionCode(regionInput.value);
+
+    const data = {
+        uuid,
+        summonerName,
+        region
+    }
+
+    console.log(data)
+
+    // fetch validation
+    const response = await fetch("/auth/verify-summoner", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }).then(res => res.json());
+
+    console.log(response)
+}
+
 // fetches validation string from API
 async function fetchValidationString(summonerId, region) {
     const response = await fetch("/api/riot/third-party-code/by-summoner/" + summonerId + "/" + region);
