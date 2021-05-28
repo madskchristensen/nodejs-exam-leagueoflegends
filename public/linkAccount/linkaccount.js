@@ -24,6 +24,7 @@ async function handleInputData() {
     await fetchValidationString(summonerId, region)
         .then(res => {
             if (res.validationString === uuid) {
+                window.location.replace("/auth/link-account")
                 console.log("Validation OK");
             } else {
                 console.log("Validation failed");

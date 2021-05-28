@@ -45,6 +45,15 @@ const fetch = require("node-fetch");
 // create session 
 const session = require("express-session");
 
+// middleware that sets needed variables in the session
+const sessionInitializer = function (req, res, next) {
+    if(!req.session.loggedIn) {
+        req.session.loggedIn = false;
+    }
+
+    next();
+}
+
 app.use(session({
     secret: process.env.SESSION_SECRET.split(","), // used to compute hash. split to process dotenv variable as array
     name: process.env.SESSION_NAME, // hidden custom name to avoid fingerprinting
@@ -54,9 +63,11 @@ app.use(session({
         secure: false, // dont require HTTPS connection
         httpOnly: false, // cookie inaccessible to the JavaScript Document.cookie API. Cookie is only sent to server
         sameSite: true, // block CORS req
-        maxAge: 600000 // Time in miliseconds - 10 minutes
+        maxAge: 600000, // Time in miliseconds - 10 minutes
     }
 }));
+
+app.use(sessionInitializer);
 
 // allow express to parse form data from requests
 app.use(express.urlencoded({
@@ -65,11 +76,15 @@ app.use(express.urlencoded({
 
 app.use(express.json());
 
-const sessionRouter = require("./router/session");
+// routers
+const sessionRouter = require("./routers/session");
 app.use(sessionRouter.router);
 
-const riotRouter = require("./router/riot");
+const riotRouter = require("./routers/riot");
 app.use(riotRouter.router);
+
+const authRouter = require("./routers/auth");
+app.use(authRouter.router);
 
 // synchronous file read for loading html pages on express start
 const fs = require('fs');
@@ -80,17 +95,18 @@ const db = require("./mongodb/db");
 
 // components
 const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8");
+const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8");
 
 // pages
 const frontpage = fs.readFileSync(__dirname + "/public/frontpage/frontpage.html", "utf-8");
 const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8");
-const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8");
 const signup = fs.readFileSync(__dirname + "/public/signup/signup.html", "utf-8");
 const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html")
 const profile = fs.readFileSync(__dirname + "/public/profile/profile.html")
 
 // paths for all users to access
 app.get("/", (req, res) => {
+    console.log(req.session)
     res.send(header + frontpage + footer);
 })
 
@@ -111,11 +127,11 @@ app.get("/link-account", (req, res) => {
 app.get("/*", (req, res, next) => {
     // check if path is valid
     if (!paths.includes(req.path)) {
-        res.status(404).send(header + "<h4>Sorry the page doesnt exist </h1>");
+        res.status(404).send(header + "<h4>Sorry the page doesnt exist</h1>");
     }
     // check if user is authorized
     else if (!(req.session.loggedIn === true)) {
-        res.status(401).send(header + "<h4>Sorry but you are not authorized to view this page </h1>")
+        res.status(401).send(header + "<h4>Sorry but you are not authorized to view this page</h1>")
     }
     else {
         next();

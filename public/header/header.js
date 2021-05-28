@@ -39,7 +39,7 @@
             
             const signoutForm = document.createElement("form");
             signoutForm.method = "POST";
-            signoutForm.action = "/api/auth/signout";
+            signoutForm.action = "/auth/signout";
 
             const signoutButton = document.createElement("button");
             signoutButton.type = "submit";
