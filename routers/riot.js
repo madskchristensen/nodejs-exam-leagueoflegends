@@ -50,6 +50,21 @@ router.get("/api/riot/third-party-code/by-summoner/:encryptedId/:region", (req, 
     }
 });
 
+// get id, accountid, puuid, name, icon, level from summoner name:
+// example:
+/*{
+    "id": "BEsb46AqqiMs_uErSzdKVhXcXGlXjG8K0VQNqDukDHpcFok",
+    "accountId": "IyErNlkxHxxXNuZ5V9NGecGfcW8rX_6iCrzII-JDldrThQ",
+    "puuid": "vF0MzlklDjeCaUK-UHrMU-GtYjvn43TFamn-S6DrGjkS7oFg-G5WzqJcsBTC4jKEGFTylh0Q2CwOeQ",
+    "name": "MichaelMedStortM",
+    "profileIconId": 556,
+    "revisionDate": 1621974698000,
+    "summonerLevel": 167
+}*/
+// /lol/summoner/v4/summoners/by-name/{summonerName}
+
+
+
 module.exports = {
     router
 }

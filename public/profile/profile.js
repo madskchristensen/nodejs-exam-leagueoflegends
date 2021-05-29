@@ -107,7 +107,7 @@
         // summoner icon
         const summonerIcon = document.getElementById("summoner-icon");
         const summonerIconFromDB = testSummoner.riot.summonerIcon;
-        summonerIcon.src = "../assets/riot/profileicon/" + summonerIconFromDB + ".png";
+        summonerIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/" + summonerIconFromDB + ".png";
         
         // summoner stats
         const championStatsDiv = document.getElementById("champion-stats");
@@ -124,7 +124,7 @@
             // champion icon
             const championIcon = document.createElement("img")
             championIcon.classList.add("img-fluid", "w-100");
-            championIcon.src = "../assets/riot/champion/" + champion.champion + ".png";
+            championIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/champion/" + champion.champion + ".png";
 
             iconDiv.appendChild(championIcon);
             championDiv.appendChild(iconDiv);
