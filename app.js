@@ -22,7 +22,7 @@ app.use(
         directives: {
             "script-src": ["'self'", "*.fontawesome.com", "*.jquery.com", "*.jsdelivr.net", "*.cloudflare.com", "'unsafe-inline'"],
             "connect-src": ["'self'", "ka-f.fontawesome.com"],
-            "style-src": ["'self'", "*.fontawesome.com", "*.jsdelivr.net", "'unsafe-inline'"], // unsafe-inline needed to allow fontawesome icons
+            "style-src": ["'self'", "*.fontawesome.com", "*.jsdelivr.net", "*.cloudflare.com", "'unsafe-inline'"], // unsafe-inline needed to allow fontawesome icons
             "font-src": ["'self'", "*.fontawesome.com"],
             "script-src-attr": ["'self'", "'unsafe-inline'"]
         }
@@ -106,7 +106,6 @@ const profile = fs.readFileSync(__dirname + "/public/profile/profile.html")
 
 // paths for all users to access
 app.get("/", (req, res) => {
-    console.log(req.session)
     res.send(header + frontpage + footer);
 })
 
@@ -163,9 +162,9 @@ db.connect(() => {
         if (err) {
             console.log(err);
         } else {
-            console.log("")
             console.log("[express] running in", process.env.NODE_ENV, "mode");
             console.log("[express] listening at port", port);
+            console.log("")
         }
     })
 })

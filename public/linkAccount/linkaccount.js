@@ -3,7 +3,22 @@
 document.addEventListener("DOMContentLoaded", function() {
     const uuidInput = document.getElementById("floatingUUID");
     uuidInput.value = uuidv4();
+
+
+    toastr.options.closeButton = true;
+    toastr.options.timeOut = 3000;
+    toastr.options.extendedTimeOut = 3000;
+    toastr.options.progressBar = true;
+
+    toastr.options.showMethod = 'slideDown';
+    toastr.options.hideMethod = 'slideUp';
+    toastr.options.closeMethod = 'slideUp';
 })
+
+function test() {
+    console.log("clicked test")
+    toastr.success("hey it works")
+}
 
 // fetches encrypted summoner id and then checks if user has inputted correct UUID in lol client
 // if correct UUID is entered we can be certain the user has access to the specified summoner name
@@ -32,6 +47,22 @@ async function handleInputData() {
         });
 }
 
+async function linkAccount() {
+    // boolean describing whether verification of summoner was successful or not
+    const verified = await verifySummoner().then(res => res);
+
+    console.log(verified);
+
+    if(verified) {
+        toastr.success("Verification succeeded!")
+
+        window.location.href = "/auth/create-user"
+
+    } else {
+        toastr.error("Verification failed.")
+    }
+}
+
 async function verifySummoner() {
     const uuidInput = document.getElementById("floatingUUID");
     const uuid = uuidInput.value;
@@ -48,18 +79,14 @@ async function verifySummoner() {
         region
     }
 
-    console.log(data)
-
     // fetch validation
-    const response = await fetch("/auth/verify-summoner", {
+    return await fetch("/auth/verify-summoner", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
     }).then(res => res.json());
-
-    console.log(response)
 }
 
 // fetches validation string from API

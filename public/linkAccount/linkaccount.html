@@ -1,3 +1,9 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
+        integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+        crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css"
+      integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g=="
+      crossorigin="anonymous"/>
 <link rel="stylesheet" href="../linkAccount/linkaccount.css"/>
 
 <div class="container">
@@ -18,7 +24,7 @@
                     <!-- Summoner name -->
                     <div class="form-floating mb-2 w-50">
                         <input type="text" class="form-control" id="floatingSummonerName"
-                               name="summonerName" placeholder="Summoner Name">
+                               name="summonerName" placeholder="Summoner Name" required>
                         <label for="floatingSummonerName">Summoner Name</label>
                     </div>
 
@@ -39,12 +45,14 @@
                         </select>
                     </div>
 
-                    <input type="submit" value="Link Account" onclick="verifySummoner()" class="btn btn-outline-primary">
+                    <input type="submit" value="Link Account" onclick="linkAccount()" class="btn btn-outline-primary">
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<button type="button" onclick="test()">test</button>
 
 <script src="/linkAccount/linkaccount.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"

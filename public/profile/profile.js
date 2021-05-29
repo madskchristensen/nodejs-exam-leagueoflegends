@@ -115,7 +115,7 @@
 
             // div
             const championDiv = document.createElement("div");
-            championDiv.classList.add("row", "border", "my-3", "mx-1");
+            championDiv.classList.add("row", "border", "my-3", "mx-1", "align-items-center");
             
             // div for champion icon
             const iconDiv = document.createElement("div");

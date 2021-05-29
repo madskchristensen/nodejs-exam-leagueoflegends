@@ -39,7 +39,7 @@ router.get("/api/riot/third-party-code/by-summoner/:encryptedId/:region", (req, 
             }
         })
             .then(res => res.json())
-            .then(validationString => res.send({string: validationString}))
+            .then(validationString => res.send({data: validationString}))
             .catch(err => {
                 res.sendStatus(500);
             })
