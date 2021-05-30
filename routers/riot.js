@@ -50,7 +50,7 @@ router.get("/api/riot/third-party-code/by-summoner/:encryptedId/:region", (req, 
     }
 });
 
-// get id, accountid, puuid, name, icon, level from summoner name:
+// get id (encryptedSummonerId), accountid, puuid, name, icon, level from summoner name:
 // example:
 /*{
     "id": "BEsb46AqqiMs_uErSzdKVhXcXGlXjG8K0VQNqDukDHpcFok",
@@ -63,6 +63,42 @@ router.get("/api/riot/third-party-code/by-summoner/:encryptedId/:region", (req, 
 }*/
 // /lol/summoner/v4/summoners/by-name/{summonerName}
 
+
+// get league rank, tier, lp etc.
+//Example:
+/*[
+    {
+        "leagueId": "fdce77e3-710c-466c-81ac-8f295b7605ba",
+        "queueType": "RANKED_FLEX_SR",
+        "tier": "GOLD",
+        "rank": "II",
+        "summonerId": "wCuECY9FEPllFCbNZssm4uELjaWp93k0WZRDjbx2WzhKRi0",
+        "summonerName": "Lycate",
+        "leaguePoints": 68,
+        "wins": 21,
+        "losses": 13,
+        "veteran": false,
+        "inactive": false,
+        "freshBlood": false,
+        "hotStreak": false
+    },
+    {
+        "leagueId": "546a3222-84e1-4143-93ff-0d7db3cb58f9",
+        "queueType": "RANKED_SOLO_5x5",
+        "tier": "PLATINUM",
+        "rank": "IV",
+        "summonerId": "wCuECY9FEPllFCbNZssm4uELjaWp93k0WZRDjbx2WzhKRi0",
+        "summonerName": "Lycate",
+        "leaguePoints": 1,
+        "wins": 32,
+        "losses": 20,
+        "veteran": false,
+        "inactive": false,
+        "freshBlood": false,
+        "hotStreak": true
+    }
+]*/
+// /lol/league/v4/entries/by-summoner/{encryptedSummonerId}
 
 
 module.exports = {

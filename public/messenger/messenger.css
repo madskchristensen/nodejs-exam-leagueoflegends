@@ -1,0 +1,35 @@
+#chats-div {
+  border: 1px solid;
+  border-color: darkgray;
+  background-color: white;  
+    min-height: calc(100vh - 230px);   
+}
+
+#messenger-div {
+  min-height: calc(100vh - 230px);   
+
+}
+
+#messenger {
+  border: 1px solid;
+  border-color: darkgray;
+  background-color: white;   
+  min-height: calc(100vh - 230px);   
+}
+
+.chat-left{
+  background: #eee;
+  margin-left: 1em;
+}
+
+.chat-right{
+  background: #0084ff;
+  color: #fff;
+  padding-right: 0;
+}
+
+.message-text {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  margin-right: 0.5em;
+}

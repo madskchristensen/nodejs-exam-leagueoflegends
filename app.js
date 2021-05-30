@@ -104,6 +104,7 @@ const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8");
 const signup = fs.readFileSync(__dirname + "/public/signup/signup.html", "utf-8");
 const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html")
 const profile = fs.readFileSync(__dirname + "/public/profile/profile.html")
+const messenger = fs.readFileSync(__dirname + "/public/messenger/messenger.html")
 
 // paths for all users to access
 app.get("/", (req, res) => {
@@ -138,7 +139,7 @@ app.get("/*", (req, res, next) => {
     }
     // check if user is authorized
     else if (!(req.session.loggedIn === true)) {
-        res.status(401).send(header + "<h4>Sorry but you are not authorized to view this page</h1>")
+        res.status(401).send(header + "<h4>Please login to view this page</h1>")
     }
     else {
         next();
@@ -152,6 +153,10 @@ app.get("/test", (req, res) => {
 
 app.get("/profile", (req, res) => {
     res.send(header + profile + footer);
+})
+
+app.get("/messenger", (req, res) => {
+    res.send(header + messenger + footer);
 })
 
 // register all valid paths
