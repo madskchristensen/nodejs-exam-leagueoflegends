@@ -24,7 +24,8 @@ app.use(
             "connect-src": ["'self'", "ka-f.fontawesome.com"],
             "style-src": ["'self'", "*.fontawesome.com", "*.jsdelivr.net", "*.cloudflare.com", "'unsafe-inline'"], // unsafe-inline needed to allow fontawesome icons
             "font-src": ["'self'", "*.fontawesome.com"],
-            "script-src-attr": ["'self'", "'unsafe-inline'"]
+            "script-src-attr": ["'self'", "'unsafe-inline'"],
+            "img-src": ["'self'", "ddragon.leagueoflegends.com"]
         }
     }));
 
@@ -114,7 +115,13 @@ app.get("/login", (req, res) => {
 })
 
 app.get("/signup", (req, res) => {
-    res.send(header + signup + footer);
+    // check is user is already signed in
+    if (req.session.loggedIn === true) {
+        res.status(401).send(header + "<h4>You are already logged in. Please logout before signing up as a new user</h1>")
+    }
+    else {
+        res.send(header + signup + footer);
+    }
 })
 
 app.get("/link-account", (req, res) => {
