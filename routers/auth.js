@@ -135,6 +135,9 @@ router.get("/auth/create-user", async (req, res) => {
 
         create.user(data);
 
+        // delete the newUser object from session as it will no longer be used
+        delete req.session.newUser;
+
         res.redirect("/");
 
     } else {

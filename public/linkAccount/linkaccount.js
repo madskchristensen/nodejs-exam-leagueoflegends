@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const uuidInput = document.getElementById("floatingUUID");
     uuidInput.value = uuidv4();
 
-
     toastr.options.closeButton = true;
     toastr.options.timeOut = 3000;
     toastr.options.extendedTimeOut = 3000;
@@ -22,6 +21,7 @@ async function linkAccount() {
     console.log(verified);
 
     if(verified) {
+        toastr.success("Verification succeeded!")
         window.location.href = "/auth/create-user"
 
     } else {
