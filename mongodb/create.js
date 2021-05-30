@@ -7,7 +7,6 @@ function user(data) {
             if (error) {
                 throw new Error(error);
             }
-            console.log(data);
         }
     );
 }

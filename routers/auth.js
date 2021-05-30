@@ -80,6 +80,7 @@ router.post("/auth/verify-summoner", async (req, res) => {
         req.session.newUser.region = region;
         req.session.newUser.profileIconId = summonerDTO.profileIconId;
         req.session.newUser.summonerLevel = summonerDTO.summonerLevel;
+        req.session.newUser.encryptedId = summonerDTO.id;
 
         res.send(true);
 
@@ -88,8 +89,21 @@ router.post("/auth/verify-summoner", async (req, res) => {
     }
 });
 
-router.get("/auth/create-user", (req, res) => {
+router.get("/auth/create-user", async (req, res) => {
     const newUser = req.session.newUser;
+    const region = newUser.region;
+    const id = newUser.encryptedId;
+
+    const baseUrl = req.protocol + "://" + req.get("host");
+
+    async function getLeagueEntryDTO() {
+        const response = await fetch(baseUrl + "/api/riot/league/entries/by-summoner/" + id + "/" + region)
+
+        return await response.json();
+    }
+
+    const leagueEntryDTO = await getLeagueEntryDTO().then(leagueEntryDTO => leagueEntryDTO);
+    const rankedSolo = leagueEntryDTO.find(element => element.queueType === "RANKED_SOLO_5x5");
 
     if(req.session.newUser.verified) {
         const data = {
@@ -104,7 +118,14 @@ router.get("/auth/create-user", (req, res) => {
                 summonerName: newUser.summonerName,
                 profileIconId: newUser.profileIconId,
                 summonerLevel: newUser.summonerLevel,
-                region: newUser.region
+                region: newUser.region,
+                rankedSolo5x5: {
+                    tier: rankedSolo.tier,
+                    rank: rankedSolo.rank,
+                    leaguePoints: rankedSolo.leaguePoints,
+                    wins: rankedSolo.wins,
+                    losses: rankedSolo.losses
+                }
             },
             details: {
                 email: req.session.newUser.email,
@@ -119,8 +140,6 @@ router.get("/auth/create-user", (req, res) => {
     } else {
         res.sendStatus(401);
     }
-
-
 })
 
 module.exports = {
