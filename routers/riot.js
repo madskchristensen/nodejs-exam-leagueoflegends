@@ -4,6 +4,7 @@ const fetch = require("node-fetch");
 const protocol = "https://";
 const baseUrl = ".api.riotgames.com/lol/";
 
+// fetches summonerDTO (containing encrypted id etc.)
 router.get("/api/riot/summoners/by-name/:summonerName/:region", (req, res) => {
     const url = protocol + req.params.region + baseUrl + "summoner/v4/summoners/by-name/" + req.params.summonerName;
 
@@ -27,6 +28,7 @@ router.get("/api/riot/summoners/by-name/:summonerName/:region", (req, res) => {
     }
 });
 
+// fetches verification string that a league of legends user has inputted in their client
 router.get("/api/riot/third-party-code/by-summoner/:encryptedId/:region", (req, res) => {
     const url = protocol + req.params.region + baseUrl + "platform/v4/third-party-code/by-summoner/" + req.params.encryptedId;
 
@@ -37,10 +39,8 @@ router.get("/api/riot/third-party-code/by-summoner/:encryptedId/:region", (req, 
             }
         })
             .then(res => res.json())
-            .then(validationString => res.send({ validationString }))
-            .catch(err => {
-                res.sendStatus(500);
-            })
+            .then(validationString => res.send({data: validationString}))
+            .catch(err => res.sendStatus(500));
     }
 
     if (!req.params.encryptedId || !req.params.region) {
@@ -50,20 +50,26 @@ router.get("/api/riot/third-party-code/by-summoner/:encryptedId/:region", (req, 
     }
 });
 
-// get id, accountid, puuid, name, icon, level from summoner name:
-// example:
-/*{
-    "id": "BEsb46AqqiMs_uErSzdKVhXcXGlXjG8K0VQNqDukDHpcFok",
-    "accountId": "IyErNlkxHxxXNuZ5V9NGecGfcW8rX_6iCrzII-JDldrThQ",
-    "puuid": "vF0MzlklDjeCaUK-UHrMU-GtYjvn43TFamn-S6DrGjkS7oFg-G5WzqJcsBTC4jKEGFTylh0Q2CwOeQ",
-    "name": "MichaelMedStortM",
-    "profileIconId": 556,
-    "revisionDate": 1621974698000,
-    "summonerLevel": 167
-}*/
-// /lol/summoner/v4/summoners/by-name/{summonerName}
+router.get("/api/riot/league/entries/by-summoner/:encryptedId/:region", (req, res) => {
+    const url = protocol + req.params.region + baseUrl + "league/v4/entries/by-summoner/" + req.params.encryptedId;
 
+    async function fetchLeagues() {
+        await fetch(url, {
+            headers: {
+                "X-Riot-Token": process.env.RIOT_API_KEY
+            }
+        })
+            .then(res => res.json())
+            .then(leagueEntryDTO => res.send(leagueEntryDTO))
+            .catch(err => res.sendStatus(500));
+    }
 
+    if (!req.params.encryptedId || !req.params.region) {
+        res.sendStatus(400);
+    } else {
+        fetchLeagues();
+    }
+})
 
 module.exports = {
     router
