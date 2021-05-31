@@ -18,10 +18,6 @@ document.addEventListener("DOMContentLoaded", function () {
     toastrSettings();
 });
 
-function test() {
-    console.log("test")
-}
-
 async function linkAccount() {
     // boolean describing whether verification of summoner was successful or not
     const verified = await verifySummoner().then(res => res);
