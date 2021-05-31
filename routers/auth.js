@@ -72,7 +72,9 @@ router.get("/auth/create-user", async (req, res) => {
     const region = newUser.region;
     const id = newUser.encryptedId;
 
+    // get leagueEntryDTO array (containing solo 5v5, flex 5v5 tier, lp, wins/losses etc.)
     const leagueEntryDTO = await riot.getLeagueEntryDTO(region, id);
+    // find rankedSolo object from the array
     const rankedSolo = leagueEntryDTO.find(element => element.queueType === "RANKED_SOLO_5x5");
 
     if(req.session.newUser.verified) {
@@ -103,6 +105,7 @@ router.get("/auth/create-user", async (req, res) => {
             }
         }
 
+        // save data object to db
         create.user(data);
 
         // delete the newUser object from session as it will no longer be used
