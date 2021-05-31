@@ -1,17 +1,52 @@
 const bcrypt = require("bcrypt");
-const create = require("../mongodb/create");
+const mongo = require("../mongodb/mongodb");
+// const find = require("../mongodb/find");
 const riot = require("../riot/riot")
+
+const saltRounds = 10;
 
 const router = require("express").Router();
 
-router.post("/auth/login", (req, res) => {
-    // TO DO
-    // fetch req.body and validate login
+// endpoint that is called when a user tries to log in
+router.post("/auth/login", async (req, res) => {
+    const password = req.body.password;
+    const email = req.body.email;
 
-    // standin login validation. Just sets ression.loggedin to true
-    console.log("Client successfully logged in using sessionID: " + req.session.id);
-    req.session.loggedIn = true;
-    res.redirect("/");
+    const user = await mongo.find.byEmail(email);
+
+    // if user was found
+    if (user) {
+        // get users password from found user
+        const hashedPassword = user.details.password;
+
+        // compare password from front-end with encrypted password in user from db
+        const passwordMatches = await bcrypt.compare(password, hashedPassword)
+            .then(res => res)
+            .catch(err => err);
+
+        // if passwords match user will be logged in
+        if(passwordMatches) {
+            console.log("Client login accepted:", req.session.id);
+
+            req.session.loggedIn = true;
+            req.session.user = {
+                email: email,
+                summonerName: user.riot.summonerName
+            }
+
+            res.redirect("/");
+
+            // if passwords don't match, redirect to login page and don't log in user
+        } else {
+            console.log("Client login rejected (wrong password)", req.session.id);
+
+            res.redirect("/login");
+        }
+
+        // if user was not found redirect to login
+    } else {
+        res.redirect("/login");
+    }
 });
 
 router.post("/auth/signout", (req, res) => {
@@ -22,11 +57,11 @@ router.post("/auth/signout", (req, res) => {
 });
 
 router.post("/auth/signup", (req, res, next) => {
-    bcrypt.hash(req.body.password, 10,(err, hashedPassword) => {
+    bcrypt.hash(req.body.password, saltRounds,(err, hashedPassword) => {
         // let express handle the error and show it to the user.
         // if NODE_ENV is set to development the stack trace will be shown in browser
         // if set to production a "500 internal server error" will be displayed
-        if(err) {
+        if (err) {
             next(err);
 
         } else {
@@ -78,7 +113,7 @@ router.get("/auth/create-user", async (req, res) => {
     const rankedSolo = leagueEntryDTO.find(element => element.queueType === "RANKED_SOLO_5x5");
 
     // if summoner was verified, create data object containing profile, summoner/riot and user/details data
-    if(req.session.newUser.verified) {
+    if (req.session.newUser.verified) {
         const data = {
             profile: {
                 age: "",
@@ -107,7 +142,7 @@ router.get("/auth/create-user", async (req, res) => {
         }
 
         // save data object to db
-        create.user(data);
+        mongo.insert.user(data);
 
         // delete the newUser object from session as it will no longer be used
         delete req.session.newUser;
