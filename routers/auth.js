@@ -49,10 +49,21 @@ router.post("/auth/login", async (req, res) => {
     }
 });
 
+// endpoint that is called when a user attempts to sign out
 router.post("/auth/signout", (req, res) => {
-    // standin signout validation. Just sets ression.loggedin to false
-    console.log("Client successfully logged out using sessionID: " + req.session.id);
-    req.session.loggedIn = false;
+    const loggedIn = req.session.loggedIn;
+
+    if (loggedIn) {
+        req.session.loggedIn = false;
+
+        // if user object exists in session, make sure to delete it
+        if (req.session.user) {
+            delete req.session.user;
+        }
+
+        console.log("Client successfully logged out using sessionID: " + req.session.id);
+    }
+
     res.redirect("/");
 });
 
