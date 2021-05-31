@@ -87,6 +87,7 @@ router.post("/auth/signup", (req, res, next) => {
     });
 });
 
+// endpoint called during sign-up process to verify if a given summonerName belongs to the user
 router.post("/auth/verify-summoner", async (req, res) => {
     const summonerName = req.body.summonerName;
     const region = riot.translateRegion(req.body.region);
@@ -113,6 +114,8 @@ router.post("/auth/verify-summoner", async (req, res) => {
     }
 });
 
+// endpoint called during sign-up process when a users summonerName is verified
+// and the user should be saved to database
 router.get("/auth/create-user", async (req, res) => {
     const newUser = req.session.newUser;
     const region = newUser.region;
