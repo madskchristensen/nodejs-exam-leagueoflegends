@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
-const fetch = require("node-fetch");
 const create = require("../mongodb/create");
+const riot = require("../riot/riot")
 
 const router = require("express").Router();
 
@@ -42,39 +42,17 @@ router.post("/auth/signup", (req, res, next) => {
 });
 
 router.post("/auth/verify-summoner", async (req, res) => {
-    // node-fetch requires absolute urls, so it is necessary to get protocol and host from express
-    const baseUrl = req.protocol + "://" + req.get("host");
-
-    // endpoint variables and data posted from front-end
-    const endpointSummonerDTO = "/api/riot/summoners/by-name/";
-    const endpointVerificationString = "/api/riot/third-party-code/by-summoner/";
     const summonerName = req.body.summonerName;
     const region = req.body.region;
     const uuid = req.body.uuid;
 
-    // fetches summonerDTO containing the encrypted id needed to get verification string
-    async function getSummonerDTO() {
-        const response = await fetch(baseUrl + endpointSummonerDTO + summonerName + "/" + region)
-
-        return await response.json();
-    }
-
-    // fetches verification string using encrypted id
-    async function getVerificationString(encryptedId) {
-        const response = await fetch(baseUrl + endpointVerificationString + encryptedId + "/" + region);
-
-        return await response.json();
-    }
-
-    // results from both api calls
-    const summonerDTO = await getSummonerDTO().then(summonerDTO => summonerDTO);
-    const verificationString = await getVerificationString(summonerDTO.id).then(res => res.data);
+    const summonerDTO = await riot.getSummonerDTO(region, summonerName);
+    const verification = await riot.getVerification(region, summonerDTO.id);
 
     // matches displayed uuid in front-end against the string entered in the league client of the given summoner
-     // if they match it is certain the user trying to signup has access to the summoner name in question
-        // therefore it is safe to set the newUser object to verified and include summonerName
-
-    if (uuid === verificationString) {
+    // if they match it is certain the user trying to signup has access to the summoner name in question
+    // therefore it is safe to set the newUser object to verified and include summonerName
+    if (uuid === verification) {
         req.session.newUser.verified = true;
         req.session.newUser.summonerName = summonerName;
         req.session.newUser.region = region;
@@ -94,15 +72,7 @@ router.get("/auth/create-user", async (req, res) => {
     const region = newUser.region;
     const id = newUser.encryptedId;
 
-    const baseUrl = req.protocol + "://" + req.get("host");
-
-    async function getLeagueEntryDTO() {
-        const response = await fetch(baseUrl + "/api/riot/league/entries/by-summoner/" + id + "/" + region)
-
-        return await response.json();
-    }
-
-    const leagueEntryDTO = await getLeagueEntryDTO().then(leagueEntryDTO => leagueEntryDTO);
+    const leagueEntryDTO = await riot.getLeagueEntryDTO(region, id);
     const rankedSolo = leagueEntryDTO.find(element => element.queueType === "RANKED_SOLO_5x5");
 
     if(req.session.newUser.verified) {

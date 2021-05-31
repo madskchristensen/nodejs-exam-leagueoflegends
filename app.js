@@ -81,9 +81,6 @@ app.use(express.json());
 const sessionRouter = require("./routers/session");
 app.use(sessionRouter.router);
 
-const riotRouter = require("./routers/riot");
-app.use(riotRouter.router);
-
 const authRouter = require("./routers/auth");
 app.use(authRouter.router);
 
