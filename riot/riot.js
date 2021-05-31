@@ -42,16 +42,49 @@ async function getLeagueEntryDTO(region, encryptedId) {
     const endPoint = "league/v4/entries/by-summoner/";
     const url = protocol + region + baseUrl + endPoint + encryptedId;
 
-    const leagueEntryDTO = await fetch(url, { headers })
+    const leagueEntryDTO = await fetch(url, {headers})
         .then(res => res.json())
         .then(leagueEntryDTO => leagueEntryDTO)
-        .catch(error => { error });
+        .catch(error => {
+            error
+        });
 
     return leagueEntryDTO;
+}
+
+// matches value of selected option in the region <select> element
+// and returns a region code that can be used with the riot api
+// https://developer.riotgames.com/docs/lol#_routing-values
+function translateRegion(region) {
+    switch(region) {
+        case "EUW":
+            return "euw1";
+        case "NA":
+            return "na1";
+        case "EUNE":
+            return "eun1";
+        case "KR":
+            return "kr";
+        case "BR":
+            return "br1";
+        case "LAN":
+            return "la1";
+        case "LAS":
+            return "la2";
+        case "OCE":
+            return "oc1";
+        case "RU":
+            return "ru";
+        case "TR":
+            return "tr1";
+        case "JP":
+            return "jp1";
+    }
 }
 
 module.exports = {
     getSummonerDTO,
     getVerification,
-    getLeagueEntryDTO
+    getLeagueEntryDTO,
+    translateRegion
 }

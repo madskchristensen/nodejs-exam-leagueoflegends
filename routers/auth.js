@@ -43,7 +43,7 @@ router.post("/auth/signup", (req, res, next) => {
 
 router.post("/auth/verify-summoner", async (req, res) => {
     const summonerName = req.body.summonerName;
-    const region = req.body.region;
+    const region = riot.translateRegion(req.body.region);
     const uuid = req.body.uuid;
 
     const summonerDTO = await riot.getSummonerDTO(region, summonerName);
@@ -77,6 +77,7 @@ router.get("/auth/create-user", async (req, res) => {
     // find rankedSolo object from the array
     const rankedSolo = leagueEntryDTO.find(element => element.queueType === "RANKED_SOLO_5x5");
 
+    // if summoner was verified, create data object containing profile, summoner/riot and user/details data
     if(req.session.newUser.verified) {
         const data = {
             profile: {
@@ -116,7 +117,7 @@ router.get("/auth/create-user", async (req, res) => {
     } else {
         res.sendStatus(401);
     }
-})
+});
 
 module.exports = {
     router
