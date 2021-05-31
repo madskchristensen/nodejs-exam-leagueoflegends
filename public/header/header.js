@@ -1,13 +1,13 @@
 
   (async function getNavbarItemsFromSession() {
     try {
-        const response = await fetch("/getSession");
+        const response = await fetch("/auth/is-logged-in");
         const result = await response.json();
 
         // create navbar
         const navbarItems = document.getElementById("navbarItems");
 
-        if (result.session.loggedIn === true) {
+        if (result.loggedIn === true) {
 
             // create profile
             const profile = document.createElement("li");
@@ -50,7 +50,7 @@
             signout.appendChild(signoutForm);
             navbarItems.appendChild(signoutForm);
         }
-        else if (result.session.loggedIn === false || !result.session.loggedIn) {
+        else if (result.loggedIn === false) {
 
             // create login
             const login = document.createElement("li");

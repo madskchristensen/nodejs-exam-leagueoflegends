@@ -1,6 +1,6 @@
 (async function getProfile() {
     try {
-        const response = await fetch("/getSession");
+        const response = await fetch("/auth/is-logged-in");
         const result = await response.json();
 
         // TO DO - get summoner name from query param
@@ -66,7 +66,7 @@
         const buttonWrapper = document.getElementById("button-wrapper");
         
         // create message button if logged in
-        if (result.session.loggedIn === true) {
+        if (result.loggedIn === true) {
             const messageLink = document.createElement("a");
             messageLink.href = "/messenger";
             messageLink.classList.add("btn","btn-lg", "mb-3", "btn-success")
@@ -75,7 +75,7 @@
             buttonWrapper.appendChild(messageLink);
         }
         // disabled button if not logged in
-        else if (result.session.loggedIn === false || !result.session.loggedIn) {
+        else if (result.loggedIn === false) {
             const messageButton = document.createElement("button");
             messageButton.disabled = true;
             messageButton.type = "button";

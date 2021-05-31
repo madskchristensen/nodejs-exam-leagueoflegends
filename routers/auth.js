@@ -7,6 +7,12 @@ const saltRounds = 10;
 
 const router = require("express").Router();
 
+router.get("/auth/is-logged-in", (req, res) => {
+    const loggedIn = req.session.loggedIn;
+
+    res.send({loggedIn});
+})
+
 // endpoint that is called when a user tries to log in
 router.post("/auth/login", async (req, res) => {
     const password = req.body.password;
@@ -31,7 +37,8 @@ router.post("/auth/login", async (req, res) => {
             req.session.loggedIn = true;
             req.session.user = {
                 email: email,
-                summonerName: user.riot.summonerName
+                summonerName: user.riot.summonerName,
+                region: user.riot.region
             }
 
             res.redirect("/");
