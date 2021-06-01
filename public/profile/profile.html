@@ -1,24 +1,23 @@
 <link rel="stylesheet" href="profile.css">
 
 <div class="container">
-    <div id="wrapper" class="row mt-3 text-left justify-content-between">
+    <div id="wrapper" class="row mt-3 justify-content-between">
         <h1 id="summoner-name" class="display-5">Profile</h1>
-        <div id="left-section" class="col-2 ">
+        <div id="left-section" class="col-2 d-flex flex-column">
             <img class="img img-thumbnail w-75 mx-auto d-block mt-3" id="summoner-icon">
             <p class="text-center" id="summoner-level"></p>
-            <div class="row image-container rounded-3 mb-3 mx-1 align-items-center">
-                <div class="col-8">
-                    <img class="img w-100" id="summoner-rank-icon">
-                </div>
-                <div class="col-4 text-center pt-5">
-                    <p id="rank"></p>
+            <div class="row rounded-3 mb-3 mx-1 align-items-center justify-content-center text-center">
+                <div class="col">
+                    <img class="img w-75" id="summoner-rank-icon">
+                    <p id="rank" class="m-0"></p>
+                    <p id="lp"></p>
                 </div>
             </div>
             <div class="text-center pt-5" id="button-wrapper">
             </div>
 
         </div>
-        <div id="right-section" class="col-9 float-left">
+        <div id="right-section" class="col-9 pt-3 text-center">
             <div class="form-group row">
                 <label class="col-2 col-form-label">Age: </label>
                 <div class="col-sm-6">

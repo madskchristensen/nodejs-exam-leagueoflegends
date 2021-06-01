@@ -89,7 +89,8 @@
         // fill in summoner info
         // riot 
         document.getElementById("rank").innerText = user.riot.rankedSolo5x5.tier + " " +
-            user.riot.rankedSolo5x5.rank + " " + user.riot.rankedSolo5x5.leaguePoints + "LP";
+            user.riot.rankedSolo5x5.rank;
+        document.getElementById("lp").innerText = user.riot.rankedSolo5x5.leaguePoints + " LP";
         document.getElementById("summoner-name").innerText = user.riot.summonerName;
         document.getElementById("summoner-level").innerText = "Level " + user.riot.summonerLevel;
 
