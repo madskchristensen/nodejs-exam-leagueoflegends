@@ -35,13 +35,9 @@ router.post("/auth/login", async (req, res) => {
             console.log("Client login accepted:", req.session.id);
 
             req.session.loggedIn = true;
-            req.session.user = {
-                email: email,
-                summonerName: user.riot.summonerName,
-                region: user.riot.region
-            }
+            req.session.user = user;
 
-            res.redirect("/");
+            res.redirect("/profile");
 
             // if passwords don't match, redirect to login page and don't log in user
         } else {

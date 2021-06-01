@@ -1,5 +1,4 @@
-
-  (async function getNavbarItemsFromSession() {
+(async function getNavbarItemsFromSession() {
     try {
         const response = await fetch("/auth/is-logged-in");
         const result = await response.json();
@@ -33,10 +32,10 @@
             messenger.appendChild(messengerLink);
             navbarItems.appendChild(messenger);
 
-            // create signout 
+            // create signout
             const signout = document.createElement("li");
             signout.classList.add("nav-item", "active");
-            
+
             const signoutForm = document.createElement("form");
             signoutForm.method = "POST";
             signoutForm.action = "/auth/signout";
@@ -49,8 +48,8 @@
             signoutForm.appendChild(signoutButton);
             signout.appendChild(signoutForm);
             navbarItems.appendChild(signoutForm);
-        }
-        else if (result.loggedIn === false) {
+
+        } else if (result.loggedIn === false) {
 
             // create login
             const login = document.createElement("li");
@@ -64,8 +63,7 @@
             login.appendChild(loginLink);
             navbarItems.appendChild(login);
         }
-    }
-    catch(error) {
+    } catch (error) {
         console.log(error);
     }
 })();

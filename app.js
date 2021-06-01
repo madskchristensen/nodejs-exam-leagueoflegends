@@ -46,15 +46,6 @@ const fetch = require("node-fetch");
 // create session 
 const session = require("express-session");
 
-// middleware that sets needed variables in the session
-const sessionInitializer = function (req, res, next) {
-    if(!req.session.loggedIn) {
-        req.session.loggedIn = false;
-    }
-
-    next();
-}
-
 app.use(session({
     secret: process.env.SESSION_SECRET.split(","), // used to compute hash. split to process dotenv variable as array
     name: process.env.SESSION_NAME, // hidden custom name to avoid fingerprinting
@@ -68,6 +59,22 @@ app.use(session({
     }
 }));
 
+// middleware that sets needed variables in the session
+const sessionInitializer = async function (req, res, next) {
+    if (process.env.NODE_ENV === "development") {
+        const mongodb = require("./mongodb/mongodb");
+
+        req.session.user = await mongodb.find.byEmail("nymail@mail.dk");
+        req.session.loggedIn = true;
+    }
+
+    if(!req.session.loggedIn) {
+        req.session.loggedIn = false;
+    }
+
+    next();
+}
+
 app.use(sessionInitializer);
 
 // allow express to parse form data from requests
@@ -75,6 +82,7 @@ app.use(express.urlencoded({
     extended: true
 }));
 
+// allow express to parse json
 app.use(express.json());
 
 // routers
@@ -160,6 +168,7 @@ app._router.stack.forEach( (router) => {
     }
 })
 
+// wrap server.listen call in db.connect call to always have an active connection
 // listen at specified port
 db.connect(() => {
     server.listen(port, (err) => {
