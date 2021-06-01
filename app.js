@@ -92,6 +92,9 @@ app.use(sessionRouter.router);
 const authRouter = require("./routers/auth");
 app.use(authRouter.router);
 
+const userRouter = require("./routers/user");
+app.use(userRouter.router);
+
 // synchronous file read for loading html pages on express start
 const fs = require('fs');
 

@@ -93,7 +93,8 @@ router.post("/auth/signup", (req, res, next) => {
 // endpoint called during sign-up process to verify if a given summonerName belongs to the user
 router.post("/auth/verify-summoner", async (req, res) => {
     const summonerName = req.body.summonerName;
-    const region = riot.translateRegion(req.body.region);
+    const region = req.body.region;
+    const regionTranslated = riot.translateRegion(req.body.region);
     const uuid = req.body.uuid;
 
     const summonerDTO = await riot.getSummonerDTO(region, summonerName);
@@ -106,6 +107,7 @@ router.post("/auth/verify-summoner", async (req, res) => {
         req.session.newUser.verified = true;
         req.session.newUser.summonerName = summonerName;
         req.session.newUser.region = region;
+        req.session.newUser.regionTranslated = regionTranslated;
         req.session.newUser.profileIconId = summonerDTO.profileIconId;
         req.session.newUser.summonerLevel = summonerDTO.summonerLevel;
         req.session.newUser.encryptedId = summonerDTO.id;

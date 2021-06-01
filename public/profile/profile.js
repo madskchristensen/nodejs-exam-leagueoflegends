@@ -92,6 +92,7 @@
             user.riot.rankedSolo5x5.rank;
         document.getElementById("lp").innerText = user.riot.rankedSolo5x5.leaguePoints + " LP";
         document.getElementById("summoner-name").innerText = user.riot.summonerName;
+        document.getElementById("region").innerText = user.riot.region;
         document.getElementById("summoner-level").innerText = "Level " + user.riot.summonerLevel;
 
 
@@ -191,7 +192,7 @@ async function isLoggedIn() {
 }
 
 async function getUser() {
-    const response = await fetch("/getUser");
+    const response = await fetch("/user");
 
     return await response.json();
 }
