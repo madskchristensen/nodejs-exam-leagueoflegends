@@ -14,8 +14,8 @@
 
             </div>
             <div class="row mt-5">
-                <input type="text" placeholder="Type your message here..." class="mt-2 py-1">
-
+                <input type="text" placeholder="Type your message here..." class="mt-2 py-1" id="message-input">
+                <button onclick="sendPrivateMessage()">Send message</button>
             </div>
 
         </div>
@@ -24,3 +24,74 @@
 </div>
 
 <script src="/messenger/messenger.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    const socket = io();
+    // get session
+    // const response = await fetch("/getSession");
+    // const result = await response.json();
+
+    // save current user summoner name
+    // const socketIdentifier = result.session.profile.summonerName;
+    const socketIdentifier = "Jensen";
+
+    function sendPrivateMessage() {
+        const message = document.getElementById("message-input").value;
+        // get name of receiver
+        const activeConversationDiv = document.getElementsByClassName("list-group-item list-group-item-action conversation-link active");
+        const receiver = activeConversationDiv[0].id;
+
+        const from = socketIdentifier;
+        socket.emit("private message", { receiver, message, from });
+
+        const wrapperMessageDiv = document.createElement("div");
+        wrapperMessageDiv.classList.add("row");
+
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("col", "col-4", "my-1", "rounded-start");
+
+        const messageText = document.createElement("p");
+        messageText.classList.add("message-text")
+        messageText.innerText = message;
+        
+        wrapperMessageDiv.classList.add("justify-content-end")
+        messageDiv.classList.add("chat-right", "d-flex", "justify-content-end", "align-items-center");        
+
+        const listConversationDiv =  document.getElementsByClassName("tab-pane fade row active show");
+        
+        messageDiv.appendChild(messageText);
+        wrapperMessageDiv.appendChild(messageDiv);
+        listConversationDiv[0].appendChild(wrapperMessageDiv);
+    }
+
+    socket.on("private message", (data) => {
+        // see who message is from
+        // if "from" is in current chat divs, add message to conversation
+        // else maybe add new convo 
+        const listConversationDiv = document.getElementById("list-" + data.from )
+
+        if (!listConversationDiv !== undefined) {
+            const wrapperMessageDiv = document.createElement("div");
+            wrapperMessageDiv.classList.add("row");
+
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("col", "col-4", "my-1", "rounded-start");
+
+            const messageText = document.createElement("p");
+            messageText.classList.add("message-text")
+            messageText.innerText = data.message;
+        
+            messageDiv.classList.add("chat-left", "d-flex", "justify-content-start");
+            
+            messageDiv.appendChild(messageText);
+            wrapperMessageDiv.appendChild(messageDiv);
+            listConversationDiv.appendChild(wrapperMessageDiv);
+        }
+        else{
+            // TO DO 
+            // create new chat with given user
+            console.log("Message was sent to new user");
+        }
+    })
+</script>

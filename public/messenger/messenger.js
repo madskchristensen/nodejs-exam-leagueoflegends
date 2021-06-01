@@ -115,15 +115,21 @@
             const iconDiv = document.createElement("div");
             iconDiv.classList.add("col", "col-4", "py-3");
 
+            // create unique identifier for conversation based on participant IDs
+            // sort names
+            //const sortedConversationParticipants = conversation.participants.sort((a, b) => a.userObjectId.localeCompare(b.userObjectId));
+            //conversationIdentifier = sortedConversationParticipants[0].userObjectId + "-" + sortedConversationParticipants[1].userObjectId;
+            
             // find user that itsn't the logged in user
             const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId !== loggedInUserId );
-
-            // add id to user link
-            link.href="#list-" + conversationPartnerId.userObjectId;
-            link.setAttribute("aria-controls", conversationPartnerId.userObjectId);
-            link.id = "list-" + conversationPartnerId.userObjectId + "-list";
             // get conversation partner object from id
             const conversationPartner = testSummoners.find( ({ id }) => id === conversationPartnerId.userObjectId );
+            // save conversation partner summoner name to use as identifier
+            const conversationPartnerSummonerName = conversationPartner.riot.summonerName;
+            // add id to user link
+            link.href="#list-" + conversationPartnerSummonerName
+            link.setAttribute("aria-controls", conversationPartnerSummonerName);
+            link.id = conversationPartnerSummonerName;
 
             // summoner icon
             // display icon of conversation partner
@@ -160,7 +166,7 @@
            // summoner name
            const summonerName = document.createElement("h4");
            summonerName.classList.add("pt-3");
-           summonerName.innerText = conversationPartner.riot.summonerName;
+           summonerName.innerText = conversationPartnerSummonerName;
 
            // append summoner name to div
            nameDiv.appendChild(summonerName);
@@ -196,8 +202,8 @@
            const listConversationDiv = document.createElement("div");
            listConversationDiv.classList.add("tab-pane", "fade", "row");
            listConversationDiv.setAttribute("role", "tabpanel");
-           listConversationDiv.setAttribute("aria-labelledby", "list-" + conversationPartnerId.userObjectId + "-list");
-           listConversationDiv.id = "list-" + conversationPartnerId.userObjectId;
+           listConversationDiv.setAttribute("aria-labelledby", conversationPartnerSummonerName);
+           listConversationDiv.id = "list-" + conversationPartnerSummonerName;
 
            // create wrapper div for message
 

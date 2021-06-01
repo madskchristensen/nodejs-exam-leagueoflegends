@@ -29,6 +29,9 @@ app.use(
         }
     }));
 
+// escapeHtml
+const escapeHtml = require("html-escaper").escape;
+
 // socket.io setup
 // wrap express in plain node.js http server
 const server = require("http").createServer(app);
@@ -36,6 +39,47 @@ const server = require("http").createServer(app);
 // atttach socket.io to http server
 const io = require("socket.io")(server);
 
+// register middleware in Socket.IO
+// reference: https://socket.io/docs/v3/faq/ - how to use socket.io with express-session
+io.use((socket, next) => {
+    sessionMiddleware(socket.request, {}, next);
+
+  });
+
+io.on("connection", (socket) => {
+    console.log("A socket connected with id" + socket.id);
+    // when connecting create username that matches with session identifier (summonername maybe?)
+    // for now: sessionID
+    // socket.data.username = socket.request.session.user.summonerName;
+    socket.data.username = "Jens";
+
+    // join room with that name: 
+    socket.join(socket.data.username);
+    
+    socket.on("messageSent", (data) => {
+        io.emit("addMessage", { message: escapeHtml(data.message)});
+    });
+
+    socket.on("private message", (data) => {
+        // TO DO
+        // save message in DB
+        // from: socket.data.username
+        // to: anotherSocketId
+        // message: data.message
+
+        // send message to other user
+        socket.to(data.receiver).emit("private message", {
+             message: escapeHtml(data.message),
+             from: socket.data.username,
+             to: data.receiver
+        });
+    });
+
+    socket.on("disconnect", async () => {
+
+        console.log("A socket disconnected" + socket.data.username);
+    })
+});
 // escapehtml setup
 const escapeHTML = require("html-escaper").escape;
 
@@ -51,11 +95,10 @@ const sessionInitializer = function (req, res, next) {
     if(!req.session.loggedIn) {
         req.session.loggedIn = false;
     }
-
     next();
 }
 
-app.use(session({
+const sessionMiddleware = session({
     secret: process.env.SESSION_SECRET.split(","), // used to compute hash. split to process dotenv variable as array
     name: process.env.SESSION_NAME, // hidden custom name to avoid fingerprinting
     resave: false,
@@ -66,7 +109,9 @@ app.use(session({
         sameSite: true, // block CORS req
         maxAge: 600000, // Time in miliseconds - 10 minutes
     }
-}));
+});
+
+app.use(sessionMiddleware);
 
 app.use(sessionInitializer);
 
@@ -108,7 +153,6 @@ const messenger = fs.readFileSync(__dirname + "/public/messenger/messenger.html"
 
 // paths for all users to access
 app.get("/", (req, res) => {
-    console.log(req.session)
     res.send(header + frontpage + footer);
 })
 
