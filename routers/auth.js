@@ -7,6 +7,12 @@ const saltRounds = 10;
 
 const router = require("express").Router();
 
+router.get("/auth/is-logged-in", (req, res) => {
+    const loggedIn = req.session.loggedIn;
+
+    res.send({loggedIn});
+})
+
 // endpoint that is called when a user tries to log in
 router.post("/auth/login", async (req, res) => {
     const password = req.body.password;
@@ -29,12 +35,9 @@ router.post("/auth/login", async (req, res) => {
             console.log("Client login accepted:", req.session.id);
 
             req.session.loggedIn = true;
-            req.session.user = {
-                email: email,
-                summonerName: user.riot.summonerName
-            }
+            req.session.user = user;
 
-            res.redirect("/");
+            res.redirect("/profile");
 
             // if passwords don't match, redirect to login page and don't log in user
         } else {
@@ -90,7 +93,8 @@ router.post("/auth/signup", (req, res, next) => {
 // endpoint called during sign-up process to verify if a given summonerName belongs to the user
 router.post("/auth/verify-summoner", async (req, res) => {
     const summonerName = req.body.summonerName;
-    const region = riot.translateRegion(req.body.region);
+    const region = req.body.region.toLowerCase();
+    const regionTranslated = riot.translateRegion(req.body.region);
     const uuid = req.body.uuid;
 
     const summonerDTO = await riot.getSummonerDTO(region, summonerName);
@@ -102,7 +106,8 @@ router.post("/auth/verify-summoner", async (req, res) => {
     if (uuid === verification) {
         req.session.newUser.verified = true;
         req.session.newUser.summonerName = summonerName;
-        req.session.newUser.region = region;
+        req.session.newUser.region = region.toLowerCase();
+        req.session.newUser.regionTranslated = regionTranslated;
         req.session.newUser.profileIconId = summonerDTO.profileIconId;
         req.session.newUser.summonerLevel = summonerDTO.summonerLevel;
         req.session.newUser.encryptedId = summonerDTO.id;

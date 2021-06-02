@@ -56,29 +56,26 @@ async function getLeagueEntryDTO(region, encryptedId) {
 // and returns a region code that can be used with the riot api
 // https://developer.riotgames.com/docs/lol#_routing-values
 function translateRegion(region) {
-    switch(region) {
-        case "EUW":
-            return "euw1";
-        case "NA":
-            return "na1";
-        case "EUNE":
-            return "eun1";
-        case "KR":
-            return "kr";
-        case "BR":
-            return "br1";
-        case "LAN":
-            return "la1";
-        case "LAS":
-            return "la2";
-        case "OCE":
-            return "oc1";
-        case "RU":
-            return "ru";
-        case "TR":
-            return "tr1";
-        case "JP":
-            return "jp1";
+    const lowerCaseRegion = region.toLowerCase();
+
+    const regions = {
+        euw: "euw1",
+        na: "na1",
+        eune: "eun1",
+        kr: "kr",
+        br: "br1",
+        lan: "la1",
+        las: "la2",
+        oce: "oc1",
+        ru: "ru",
+        tr: "tr1",
+        jp: "jp1"
+    }
+
+    if (lowerCaseRegion in regions) {
+        return regions[lowerCaseRegion];
+    } else {
+        return undefined;
     }
 }
 

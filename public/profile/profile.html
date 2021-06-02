@@ -1,58 +1,64 @@
-<link rel="stylesheet" href="profile.css">
+<link rel="stylesheet" href="/profile/profile.css">
 
 <div class="container">
-    <h1 class="display-5 mt-5">Profile</h1>
-
-    <div id="wrapper" class="row mt-3 text-left justify-content-between">
-        <div id="left-section" class="col-2 ">
+    <div id="wrapper" class="row mt-3 justify-content-between">
+        <div>
+            <h1 id="summoner-name" class="display-5 ms-4 ps-4">Profile</h1>
+        </div>
+        <div id="left-section" class="col-2 d-flex flex-column text-center">
             <img class="img img-thumbnail w-75 mx-auto d-block mt-3" id="summoner-icon">
-            <p class="text-center" id="summoner-level"></p>
-            <div class="row image-container rounded-3 mb-3 mx-1 align-items-center">
-                <div class="col-8">
-                    <img class="img w-100" id="summoner-rank-icon">
-                </div>
-                <div class="col-4 text-center pt-5">
-                    <p id="rank"></p>
+            <p id="region" class="text-muted m-0">Region</p>
+            <p id="summoner-level"></p>
+            <div class="row rounded-3 mb-3 mx-1 align-items-center justify-content-center text-center">
+                <div class="col">
+                    <h6>Ranked Solo</h6>
+                    <img class="img w-75" id="summoner-rank-icon">
+                    <p id="rank" class="m-0"></p>
+                    <p id="lp"></p>
                 </div>
             </div>
             <div class="text-center pt-5" id="button-wrapper">
             </div>
 
         </div>
-        <div id="right-section" class="col-9 float-left">
-            <h1 id="summoner-name"></h1>
-            <div class="form-group row">
-                <label class="col-2 col-form-label">Age: </label>
-                <div class="col-sm-6">
-                    <input type="text" readonly class="form-control" id="age">
+
+        <!-- Profile information -->
+        <div id="right-section" class="col-9 pt-3 text-center">
+            <form method="post" action="/api/profile">
+                <div class="form-group row">
+                    <label class="col-2 col-form-label">Age: </label>
+                    <div class="col-sm-6">
+                        <input type="text" readonly class="form-control" id="age" name="age">
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row pt-3">
-                <label class="col-2 col-form-label">Languages: </label>
-                <div class="col-sm-6">
-                    <input type="text" readonly class="form-control" id="languages">
+                <div class="form-group row pt-3">
+                    <label class="col-2 col-form-label">Languages: </label>
+                    <div class="col-sm-6">
+                        <input type="text" readonly class="form-control" id="languages" name="languages">
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row pt-3">
-                <label class="col-2 col-form-label">Country: </label>
-                <div class="col-sm-6">
-                    <input type="text" readonly class="form-control" id="country">
+                <div class="form-group row pt-3">
+                    <label class="col-2 col-form-label">Country: </label>
+                    <div class="col-sm-6">
+                        <input type="text" readonly class="form-control" id="country" name="country">
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row pt-3">
-                <label class="col-2 col-form-label">Preferred roles: </label>
-                <div class="col-sm-6">
-                    <input type="text" readonly class="form-control" id="roles">
+                <div class="form-group row pt-3">
+                    <label class="col-2 col-form-label">Preferred roles: </label>
+                    <div class="col-sm-6">
+                        <input type="text" readonly class="form-control" id="roles" name="roles">
+                    </div>
                 </div>
-            </div>
-            <!--Atm. udvider begge divs sig når textarea bliver større. Skal lige fikses senere -->
-            <!--Se evt. https://stackoverflow.com/questions/5078239/how-do-i-remove-the-space-between-inline-inline-block-elements/5078297#5078297 -->
-            <div class="form-group row pt-3 mb-4">
-                <label class="col-2 col-form-label">Description: </label>
-                <div class="col-sm-6">
-                    <textarea type="text" readonly class="form-control" rows="6" id="description"></textarea>
+                <!--Atm. udvider begge divs sig når textarea bliver større. Skal lige fikses senere -->
+                <!--Se evt. https://stackoverflow.com/questions/5078239/how-do-i-remove-the-space-between-inline-inline-block-elements/5078297#5078297 -->
+                <div class="form-group row pt-3 mb-4">
+                    <label class="col-2 col-form-label">Description: </label>
+                    <div class="col-sm-6">
+                        <textarea type="text" readonly class="form-control" rows="6" id="description" name="description"></textarea>
+                    </div>
                 </div>
-            </div>
+                <input type="submit" value="Save"/>
+            </form>
         </div>
     </div>
 
@@ -62,7 +68,7 @@
 
         </div>
 
-        
+
     </div>
 </div>
 
