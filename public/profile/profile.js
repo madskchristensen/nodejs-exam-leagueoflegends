@@ -92,9 +92,8 @@
             user.riot.rankedSolo5x5.rank;
         document.getElementById("lp").innerText = user.riot.rankedSolo5x5.leaguePoints + " LP";
         document.getElementById("summoner-name").innerText = user.riot.summonerName;
-        document.getElementById("region").innerText = user.riot.region;
+        document.getElementById("region").innerText = user.riot.region.toUpperCase();
         document.getElementById("summoner-level").innerText = "Level " + user.riot.summonerLevel;
-
 
         // profile
         document.getElementById("age").value = testSummoner.custom.age;
@@ -106,7 +105,7 @@
         // summoner rank
         const summonerRank = document.getElementById("summoner-rank-icon");
         const summonerRankFromDB = user.riot.rankedSolo5x5.tier.split(" ")[0];
-        summonerRank.src = "../assets/riot/ranked-emblems/" + summonerRankFromDB + ".png";
+        summonerRank.src = "/assets/riot/ranked-emblems/" + summonerRankFromDB + ".png";
         
         // summoner icon
         const summonerIcon = document.getElementById("summoner-icon");
@@ -192,7 +191,7 @@ async function isLoggedIn() {
 }
 
 async function getUser() {
-    const response = await fetch("/user");
+    const response = await fetch("/api/user");
 
     return await response.json();
 }

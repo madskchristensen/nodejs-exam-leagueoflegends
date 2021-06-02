@@ -10,8 +10,13 @@ async function byEmail(email) {
 
 async function byRegionAndSummoner(region, summonerName) {
     const filter = { "$and": [ { "riot.summonerName" : summonerName }, { "riot.region" : region } ] };
+
+    return await db.query().collection("users").findOne(filter)
+        .then(user => user)
+        .catch(err => err);
 }
 
 module.exports = {
-    byEmail
+    byEmail,
+    byRegionAndSummoner
 }

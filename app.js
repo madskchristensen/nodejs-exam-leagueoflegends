@@ -61,12 +61,12 @@ app.use(session({
 
 // middleware that sets needed variables in the session
 const sessionInitializer = async function (req, res, next) {
-    if (process.env.NODE_ENV === "development") {
+/*    if (process.env.NODE_ENV === "development") {
         const mongodb = require("./mongodb/mongodb");
 
         req.session.user = await mongodb.find.byEmail("nymail@mail.dk");
         req.session.loggedIn = true;
-    }
+    }*/
 
     if(!req.session.loggedIn) {
         req.session.loggedIn = false;
@@ -92,7 +92,7 @@ app.use(sessionRouter.router);
 const authRouter = require("./routers/auth");
 app.use(authRouter.router);
 
-const userRouter = require("./routers/user");
+const userRouter = require("./routers/api/user");
 app.use(userRouter.router);
 
 // synchronous file read for loading html pages on express start
@@ -102,16 +102,16 @@ const fs = require('fs');
 // Can be called with .query() to perform operations like insert, find etc.
 const db = require("./mongodb/db");
 
-// components
-const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8");
-const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8");
-
 // pages
 const frontpage = fs.readFileSync(__dirname + "/public/frontpage/frontpage.html", "utf-8");
 const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8");
 const signup = fs.readFileSync(__dirname + "/public/signup/signup.html", "utf-8");
-const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html")
-const profile = fs.readFileSync(__dirname + "/public/profile/profile.html")
+const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html");
+const profile = fs.readFileSync(__dirname + "/public/profile/profile.html");
+
+// components
+const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8");
+const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8");
 
 // paths for all users to access
 app.get("/", (req, res) => {
@@ -137,8 +137,8 @@ app.get("/link-account", (req, res) => {
     res.send(header + linkAccount + footer);
 })
 
-// intercept all incoming requests with login check except above, as they are allowed for all users
-app.get("/*", (req, res, next) => {
+/*// intercept all incoming requests with login check except above, as they are allowed for all users
+app.get("/!*", (req, res, next) => {
     // check if path is valid
     if (!paths.includes(req.path)) {
         res.status(404).send(header + "<h4>Sorry the page doesnt exist</h1>");
@@ -150,18 +150,14 @@ app.get("/*", (req, res, next) => {
     else {
         next();
     }
-})
-
-// paths allowed for logged in users only
-app.get("/test", (req, res) => {
-    res.send(header + footer);
-})
+})*/
 
 app.get("/profile", (req, res) => {
+
     res.send(header + profile + footer);
 })
 
-// register all valid paths
+/*// register all valid paths
 const paths = [];
 
 // loop through all defined paths and add to array
@@ -169,7 +165,7 @@ app._router.stack.forEach( (router) => {
     if (router.route && router.route.path){
       paths.push(router.route.path + "/");
     }
-})
+})*/
 
 // wrap server.listen call in db.connect call to always have an active connection
 // listen at specified port
