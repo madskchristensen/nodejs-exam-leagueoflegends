@@ -4,8 +4,8 @@
     <div class="row py-5" >
         <div id="chats-div" class="col col-3">
             <h4>Chats</h4>
-            <input type="text" class="form-control pt-2 mb-3 mt-2" placeholder="Search in messages" >
-            <div id="messages-div" class="list-group" role="tablist">
+            <input type="text" id="new-conversation-input" class="form-control pt-2 mb-3 mt-3" placeholder="New chat: Type receiver name here" >
+            <div id="messages-div" class="list-group pt-2" role="tablist">
 
             </div>
         </div>
@@ -29,22 +29,57 @@
 <script>
     const socket = io();
     // get session
-    // const response = await fetch("/getSession");
-    // const result = await response.json();
-
+    const session = getSession();
     // save current user summoner name
-    // const socketIdentifier = result.session.profile.summonerName;
+    // const socketIdentifier = session.session.profile.summonerName;
+    // test identifier for now
     const socketIdentifier = "Jensen";
 
     function sendPrivateMessage() {
         const message = document.getElementById("message-input").value;
         // get name of receiver
-        const activeConversationDiv = document.getElementsByClassName("list-group-item list-group-item-action conversation-link active");
-        const receiver = activeConversationDiv[0].id;
+        let receiver;
 
-        const from = socketIdentifier;
-        socket.emit("private message", { receiver, message, from });
+        // get new conversation input field to check if new message
+        const newConversationInput = document.getElementById("new-conversation-input").value;
+        const messagesDiv = document.getElementById("messages-div");
 
+        // if nothing inside newConversationInput normal workflow
+        if (newConversationInput === "") {
+            const activeConversationDiv = document.getElementsByClassName("list-group-item list-group-item-action conversation-link active");
+            receiver = activeConversationDiv[0].id;
+        }
+        else {
+            receiver = newConversationInput;
+        }
+
+        // emit message
+        socket.emit("private message", { receiver, message, socketIdentifier });
+        
+        // create html elements
+
+        // create conversation partner object
+        const conversationPartner = {
+            riot: {
+                summonerName: receiver,
+                // TO DO
+                // fetch summoner from db. Default icon for now
+                summonerIcon: "1"
+            }
+        }
+
+        // create lastMessage object
+        const lastMessage = {
+            from: socketIdentifier,
+            body: message
+        }
+
+        // if new convo input isn't empty new conversation element is to be made
+        let listConversationDiv;
+
+
+        
+        // attach message to div
         const wrapperMessageDiv = document.createElement("div");
         wrapperMessageDiv.classList.add("row");
 
@@ -56,13 +91,30 @@
         messageText.innerText = message;
         
         wrapperMessageDiv.classList.add("justify-content-end")
-        messageDiv.classList.add("chat-right", "d-flex", "justify-content-end", "align-items-center");        
+        messageDiv.classList.add("chat-right", "d-flex", "justify-content-end", "align-items-center");    
 
-        const listConversationDiv =  document.getElementsByClassName("tab-pane fade row active show");
-        
         messageDiv.appendChild(messageText);
         wrapperMessageDiv.appendChild(messageDiv);
-        listConversationDiv[0].appendChild(wrapperMessageDiv);
+        // create new chat div and conversation element if new chat
+        if (newConversationInput !== "") {
+            generateConversation (conversationPartner, socketIdentifier, lastMessage, messagesDiv); 
+
+            // create messager div
+            const listConversationDiv = document.createElement("div");
+            listConversationDiv.classList.add("tab-pane", "fade", "row");
+            listConversationDiv.setAttribute("role", "tabpanel");
+            listConversationDiv.setAttribute("aria-labelledby", receiver);
+            listConversationDiv.id = "list-" + receiver;
+
+            listConversationDiv.appendChild(wrapperMessageDiv);
+        }
+        else {
+            // if conversation already had attach to active chat
+            listConversationDiv =  document.getElementsByClassName("tab-pane fade row active show");
+            listConversationDiv[0].appendChild(wrapperMessageDiv);
+
+        }
+
     }
 
     socket.on("private message", (data) => {

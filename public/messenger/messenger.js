@@ -102,137 +102,42 @@
         const messagesDiv = document.getElementById("messages-div");
         const messengerDiv = document.getElementById("messenger-div")
         messages.forEach(conversation => {
-            // outside link
-            const link = document.createElement("a");
-            link.classList.add("list-group-item", "list-group-item-action", "conversation-link");
-            link.setAttribute("data-bs-toggle", "list")
-            link.setAttribute("role", "tab");
-            // wrapper div
-            const conversationDiv = document.createElement("div");
-            conversationDiv.classList.add("row");
-
-            // div for summoner icon
-            const iconDiv = document.createElement("div");
-            iconDiv.classList.add("col", "col-4", "py-3");
-
-            // create unique identifier for conversation based on participant IDs
-            // sort names
-            //const sortedConversationParticipants = conversation.participants.sort((a, b) => a.userObjectId.localeCompare(b.userObjectId));
-            //conversationIdentifier = sortedConversationParticipants[0].userObjectId + "-" + sortedConversationParticipants[1].userObjectId;
-            
             // find user that itsn't the logged in user
             const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId !== loggedInUserId );
+
             // get conversation partner object from id
             const conversationPartner = testSummoners.find( ({ id }) => id === conversationPartnerId.userObjectId );
+
             // save conversation partner summoner name to use as identifier
             const conversationPartnerSummonerName = conversationPartner.riot.summonerName;
-            // add id to user link
-            link.href="#list-" + conversationPartnerSummonerName
-            link.setAttribute("aria-controls", conversationPartnerSummonerName);
-            link.id = conversationPartnerSummonerName;
-
-            // summoner icon
-            // display icon of conversation partner
-            const summonerIcon = document.createElement("img");
-            summonerIcon.classList.add("img-fluid", "w-100");
-            
-            summonerIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/" + conversationPartner.riot.summonerIcon + ".png";
-           
             // get last messageObject that sent message
             const lastMessage = conversation.messages[messages.length];
-            console.log(lastMessage);
-            
-            // match message object with user
-            let lastUser;
 
+            // find user that sent last message 
+            let lastUser;
             testSummoners.forEach(testSummoner => {
                 if (testSummoner.id === lastMessage.from) {
                     lastUser = testSummoner;
                 }
-            });         
+            });    
 
-           // append summoner icon to div
-           iconDiv.appendChild(summonerIcon);
-           conversationDiv.appendChild(iconDiv)
+            // create left side conversation entry
+            generateConversation(conversationPartner, lastUser.riot.summonerName, lastMessage, messagesDiv)
 
-           // wrapper div for name and message
-           const textDiv = document.createElement("div");
-           textDiv.classList.add("col", "col-8");
+            // Create chat
+            // div container and classes
+            const listConversationDiv = document.createElement("div");
+            listConversationDiv.classList.add("tab-pane", "fade", "row");
+            listConversationDiv.setAttribute("role", "tabpanel");
+            listConversationDiv.setAttribute("aria-labelledby", conversationPartnerSummonerName);
+            listConversationDiv.id = "list-" + conversationPartnerSummonerName;
 
-           // div for summoner name
-           const nameDiv = document.createElement("div");
-           nameDiv.classList.add("row", "row-12");
-           
-           // summoner name
-           const summonerName = document.createElement("h4");
-           summonerName.classList.add("pt-3");
-           summonerName.innerText = conversationPartnerSummonerName;
+            // loop through messages in conversation and append them to list
+            conversation.messages.forEach(message => {
+                generateMessage (message, loggedInUserId, listConversationDiv)
+            })
 
-           // append summoner name to div
-           nameDiv.appendChild(summonerName);
-           textDiv.appendChild(nameDiv);
-           
-           // last message text
-           const lastMessagePreviewDiv = document.createElement("div");
-           lastMessagePreviewDiv.classList.add("row", "row-12"); 
-
-           // last message
-           const lastMessagePreview = document.createElement("p");
-           lastMessagePreview.classList.add("fw-light")
-           if (lastMessage.from === loggedInUserId) {
-            lastMessagePreview.innerText = "You: " + lastMessage.body;
-           }
-           else{
-            lastMessagePreview.innerText = lastUser.riot.summonerName + ": " + lastMessage.body;
-           }
-
-           // apppend last message to div
-           lastMessagePreviewDiv.appendChild(lastMessagePreview);
-           textDiv.appendChild(lastMessagePreviewDiv);
-
-           conversationDiv.appendChild(textDiv);
-
-           // append conversation to div
-           link.appendChild(conversationDiv);
-
-           messagesDiv.appendChild(link);
-
-
-           // ******main content conversation*******
-           const listConversationDiv = document.createElement("div");
-           listConversationDiv.classList.add("tab-pane", "fade", "row");
-           listConversationDiv.setAttribute("role", "tabpanel");
-           listConversationDiv.setAttribute("aria-labelledby", conversationPartnerSummonerName);
-           listConversationDiv.id = "list-" + conversationPartnerSummonerName;
-
-           // create wrapper div for message
-
-
-           // loop through messages in conversation and append them to list
-           conversation.messages.forEach(message => {
-                const wrapperMessageDiv = document.createElement("div");
-                wrapperMessageDiv.classList.add("row");
-
-                const messageDiv = document.createElement("div");
-                messageDiv.classList.add("col", "col-4", "my-1", "rounded-start");
-
-                const messageText = document.createElement("p");
-                messageText.classList.add("message-text")
-                messageText.innerText = message.body;
-                
-                if (message.from === loggedInUserId) {
-                    wrapperMessageDiv.classList.add("justify-content-end")
-                    messageDiv.classList.add("chat-right", "d-flex", "justify-content-end", "align-items-center");
-                }    
-                else{
-                    messageDiv.classList.add("chat-left", "d-flex", "justify-content-start");
-                }
-
-                messageDiv.appendChild(messageText);
-                wrapperMessageDiv.appendChild(messageDiv);
-                listConversationDiv.appendChild(wrapperMessageDiv);
-           })
-           messengerDiv.appendChild(listConversationDiv);
+            messengerDiv.appendChild(listConversationDiv);
 
         })
     }
@@ -241,4 +146,114 @@
     }
 })();   
 
+
+
+function generateMessage (message, loggedInUserId, divToAppendTo ) {
+    const wrapperMessageDiv = document.createElement("div");
+    wrapperMessageDiv.classList.add("row");
+
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("col", "col-4", "my-1", "rounded-start");
+
+    const messageText = document.createElement("p");
+    messageText.classList.add("message-text")
+    messageText.innerText = message.body;
+    
+    // display messages left/right dependent on sender
+    if (message.from === loggedInUserId) {
+        wrapperMessageDiv.classList.add("justify-content-end")
+        messageDiv.classList.add("chat-right", "d-flex", "justify-content-end", "align-items-center");
+    }    
+    else{
+        messageDiv.classList.add("chat-left", "d-flex", "justify-content-start");
+    }
+
+    messageDiv.appendChild(messageText);
+    wrapperMessageDiv.appendChild(messageDiv);
+    divToAppendTo.appendChild(wrapperMessageDiv);
+}
+
+function generateConversation (conversationPartner, lastUserSummonerName, lastMessage, divToAppendTo) {
+        // summoner name
+        conversationPartnerSummonerName = conversationPartner.riot.summonerName;
+    
+        // outside link
+        const link = document.createElement("a");
+        link.classList.add("list-group-item", "list-group-item-action", "conversation-link");
+        link.setAttribute("data-bs-toggle", "list")
+        link.setAttribute("role", "tab");
+
+        // wrapper div
+        const conversationDiv = document.createElement("div");
+        conversationDiv.classList.add("row");
+
+        // div for summoner icon
+        const iconDiv = document.createElement("div");
+        iconDiv.classList.add("col", "col-4", "py-3");
+        
+        // add id to user link
+        link.href="#list-" + conversationPartnerSummonerName
+        link.setAttribute("aria-controls", conversationPartnerSummonerName);
+        link.id = conversationPartnerSummonerName;
+
+        // summoner icon
+        // display icon of conversation partner
+        const summonerIcon = document.createElement("img");
+        summonerIcon.classList.add("img-fluid", "w-100");   
+        summonerIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/" + conversationPartner.riot.summonerIcon + ".png";
+
+        // append summoner icon to div
+        iconDiv.appendChild(summonerIcon);
+        conversationDiv.appendChild(iconDiv)
+
+        // wrapper div for name and message
+        const textDiv = document.createElement("div");
+        textDiv.classList.add("col", "col-8");
+
+        // div for summoner name
+        const nameDiv = document.createElement("div");
+        nameDiv.classList.add("row", "row-12");
+        
+        // summoner name
+        const summonerName = document.createElement("h4");
+        summonerName.classList.add("pt-3");
+        summonerName.innerText = conversationPartnerSummonerName;
+
+        // append summoner name to div
+        nameDiv.appendChild(summonerName);
+        textDiv.appendChild(nameDiv);
+        
+        // last message text
+        const lastMessagePreviewDiv = document.createElement("div");
+        lastMessagePreviewDiv.classList.add("row", "row-12"); 
+
+        // last message
+        const lastMessagePreview = document.createElement("p");
+        lastMessagePreview.classList.add("fw-light");
+
+        // Append You / sommonername dependant on who sent the last message
+        if (lastMessage.from !== conversationPartner.id) {
+        lastMessagePreview.innerText = "You: " + lastMessage.body;
+        }
+        else{
+        lastMessagePreview.innerText = lastUserSummonerName + ": " + lastMessage.body;
+        }
+
+        // apppend last message to div
+        lastMessagePreviewDiv.appendChild(lastMessagePreview);
+        textDiv.appendChild(lastMessagePreviewDiv);
+        conversationDiv.appendChild(textDiv);
+
+        // append conversation to div
+        link.appendChild(conversationDiv);
+        divToAppendTo.appendChild(link);
+
+}
+
+async function getSession() {
+    const response = await fetch("/getSession");
+    const result = await response.json();
+    console.log(result);
+    return result;
+}
 

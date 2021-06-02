@@ -22,7 +22,7 @@ app.use(
         directives: {
             "script-src": ["'self'", "*.fontawesome.com", "*.jquery.com", "*.jsdelivr.net", "*.cloudflare.com", "'unsafe-inline'"],
             "connect-src": ["'self'", "ka-f.fontawesome.com"],
-            "style-src": ["'self'", "*.fontawesome.com", "*.jsdelivr.net", "'unsafe-inline'"], // unsafe-inline needed to allow fontawesome icons
+            "style-src": ["'self'", "*.fontawesome.com", "*.jsdelivr.net", "*.cloudflare.com", "'unsafe-inline'"], // unsafe-inline needed to allow fontawesome icons
             "font-src": ["'self'", "*.fontawesome.com"],
             "script-src-attr": ["'self'", "'unsafe-inline'"],
             "img-src": ["'self'", "ddragon.leagueoflegends.com"]
@@ -52,7 +52,7 @@ io.on("connection", (socket) => {
     // for now: sessionID
     // socket.data.username = socket.request.session.user.summonerName;
     socket.data.username = "Jens";
-
+   
     // join room with that name: 
     socket.join(socket.data.username);
     
@@ -126,9 +126,6 @@ app.use(express.json());
 const sessionRouter = require("./routers/session");
 app.use(sessionRouter.router);
 
-const riotRouter = require("./routers/riot");
-app.use(riotRouter.router);
-
 const authRouter = require("./routers/auth");
 app.use(authRouter.router);
 
@@ -191,10 +188,6 @@ app.get("/*", (req, res, next) => {
 })
 
 // paths allowed for logged in users only
-app.get("/test", (req, res) => {
-    res.send(header + footer);
-})
-
 app.get("/profile", (req, res) => {
     res.send(header + profile + footer);
 })
@@ -219,9 +212,9 @@ db.connect(() => {
         if (err) {
             console.log(err);
         } else {
-            console.log("")
             console.log("[express] running in", process.env.NODE_ENV, "mode");
             console.log("[express] listening at port", port);
+            console.log("")
         }
     })
 })
