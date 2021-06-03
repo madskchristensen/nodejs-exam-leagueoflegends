@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 const mongo = require("../mongodb/mongodb");
-// const find = require("../mongodb/find");
-const riot = require("../riot/riot")
+const riot = require("../service/riot")
 
 const saltRounds = 10;
 
@@ -37,7 +36,9 @@ router.post("/auth/login", async (req, res) => {
             req.session.loggedIn = true;
             req.session.user = user;
 
-            res.redirect("/profile");
+            const profileUrl = "/profile/" + user.riot.summonerName + "/" + user.riot.region;
+
+            res.redirect(profileUrl);
 
             // if passwords don't match, redirect to login page and don't log in user
         } else {
@@ -94,11 +95,11 @@ router.post("/auth/signup", (req, res, next) => {
 router.post("/auth/verify-summoner", async (req, res) => {
     const summonerName = req.body.summonerName;
     const region = req.body.region.toLowerCase();
-    const regionTranslated = riot.translateRegion(req.body.region);
+    const regionTranslated = riot.translateRegion(region);
     const uuid = req.body.uuid;
 
-    const summonerDTO = await riot.getSummonerDTO(region, summonerName);
-    const verification = await riot.getVerification(region, summonerDTO.id);
+    const summonerDTO = await riot.getSummonerDTO(regionTranslated, summonerName);
+    const verification = await riot.getVerification(regionTranslated, summonerDTO.id);
 
     // matches displayed uuid in front-end against the string entered in the league client of the given summoner
     // if they match it is certain the user trying to signup has access to the summoner name in question
@@ -124,14 +125,15 @@ router.post("/auth/verify-summoner", async (req, res) => {
 router.get("/auth/create-user", async (req, res) => {
     const newUser = req.session.newUser;
     const region = newUser.region;
+    const regionTranslated = riot.translateRegion(region);
     const id = newUser.encryptedId;
 
     // get leagueEntryDTO array (containing solo 5v5, flex 5v5 tier, lp, wins/losses etc.)
-    const leagueEntryDTO = await riot.getLeagueEntryDTO(region, id);
+    const leagueEntryDTO = await riot.getLeagueEntryDTO(regionTranslated, id);
     // find rankedSolo object from the array
     const rankedSolo = leagueEntryDTO.find(element => element.queueType === "RANKED_SOLO_5x5");
 
-    // if summoner was verified, create data object containing profile, summoner/riot and user/details data
+    // if summoner was verified, create data object containing profile, summoner/service and user/details data
     if (req.session.newUser.verified) {
         const data = {
             profile: {
