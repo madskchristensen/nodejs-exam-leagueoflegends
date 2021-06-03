@@ -1,4 +1,4 @@
-const db = require("./db");
+const db = require("../db");
 
 async function byEmail(email) {
     const filter = { "details.email": email };
@@ -16,7 +16,16 @@ async function byRegionAndSummoner(region, summonerName) {
         .catch(err => err);
 }
 
+async function all() {
+    const filter = {};
+
+    return await db.query().collection("users").find(filter).toArray()
+        .then(users => users)
+        .catch(err => err);
+}
+
 module.exports = {
     byEmail,
-    byRegionAndSummoner
+    byRegionAndSummoner,
+    all
 }

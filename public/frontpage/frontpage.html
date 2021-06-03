@@ -14,7 +14,7 @@
 
             <div id="search-div" class="input-group rounded-pill w-75 px-3 align-items-center">
                 <i class="fas fa-search px-2"></i>
-                <input type="search" class="form-control rounded ms-1" placeholder="Search for a summoner"
+                <input type="search" id="search-input" class="form-control rounded ms-1" placeholder="Search for a summoner"
                        aria-label="Search"
                        aria-describedby="search-addon"/>
 
@@ -34,8 +34,21 @@
                     </select>
                 </div>
             </div>
+
+            <div class="wrapper">
+                <div class="search-input">
+                    <a href="" target="_blank" hidden></a>
+                    <input type="text" placeholder="Type to search..">
+                    <div class="autocom-box">
+                        <!-- here list are inserted from javascript -->
+                    </div>
+                    <div class="icon"><i class="fas fa-search"></i></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="/frontpage/frontpage.js"></script>
+<script src="/frontpage/suggestions.js"></script>
+<script src="/frontpage/search.js"></script>

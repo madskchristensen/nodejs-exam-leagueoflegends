@@ -1,7 +1,7 @@
-const find = require("./find");
-const insert = require("./insert");
+const findUsers = require("./users/findUsers");
+const insertUsers = require("./users/insertUsers");
 
 module.exports = {
-    find,
-    insert
+    findUsers,
+    insertUsers
 }

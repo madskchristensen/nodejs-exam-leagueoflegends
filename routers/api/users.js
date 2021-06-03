@@ -20,13 +20,29 @@ router.get("/api/users/:summonerName/:region", async (req, res) => {
     const summonerName = req.params.summonerName;
     const region = req.params.region;
 
-    const user = await mongodb.find.byRegionAndSummoner(region, summonerName);
+    const user = await mongodb.findUsers.byRegionAndSummoner(region, summonerName);
 
     if (user) {
         delete user._id;
         delete user.details;
 
         res.send(user);
+
+    } else {
+        res.sendStatus(404);
+    }
+})
+
+router.get("/api/users/", async (req, res) => {
+    const users = await mongodb.findUsers.all();
+
+    if (users) {
+        users.forEach(user => {
+            delete user._id;
+            delete user.details;
+        });
+
+        res.send(users);
 
     } else {
         res.sendStatus(404);
