@@ -7,70 +7,70 @@
         // test user for now
         const testSummoner = {
             custom: {
-              age: "25",
-              languages: "Danish, English",
-              country: "Denmark",
-              roles: "Mid, Jungle",
-              description: "i am a league gamer"
+                age: "25",
+                languages: "Danish, English",
+                country: "Denmark",
+                roles: "Mid, Jungle",
+                description: "i am a league gamer"
             },
             riot: {
-              summonerName: "Jens",
-              summonerIcon: "4301",
-              summonerPicture: "picture8413",
-              summonerLevel: "65",
-              rank: "Silver V 85LP",
-              previousSeasons: [
-                {
-                  season: "8",
-                  rank: "Silver"
-                },
-                {
-                  season: "9",
-                  rank: "Gold"
-                }
-              ],
-              seasonStats: [
-                {
-                  champion: "Alistar",
-                  winRate: "55%",
-                  gamesPlayed: "64",
-                  KDA: "2.78"
-                },
-                {
-                  champion: "Rell",
-                  winRate: "64%",
-                  gamesPlayed: "61",
-                  KDA: "2.47"
-                },
-                {
-                    champion: "Rammus",
-                    winRate: "85%",
-                    gamesPlayed: "99",
-                    KDA: "10.78"
-                  },
-                  {
-                    champion: "Ekko",
-                    winRate: "45%",
-                    gamesPlayed: "8",
-                    KDA: "2.78"
-                  }
-              ]
+                summonerName: "Jens",
+                summonerIcon: "4301",
+                summonerPicture: "picture8413",
+                summonerLevel: "65",
+                rank: "Silver V 85LP",
+                previousSeasons: [
+                    {
+                        season: "8",
+                        rank: "Silver"
+                    },
+                    {
+                        season: "9",
+                        rank: "Gold"
+                    }
+                ],
+                seasonStats: [
+                    {
+                        champion: "Alistar",
+                        winRate: "55%",
+                        gamesPlayed: "64",
+                        KDA: "2.78"
+                    },
+                    {
+                        champion: "Rell",
+                        winRate: "64%",
+                        gamesPlayed: "61",
+                        KDA: "2.47"
+                    },
+                    {
+                        champion: "Rammus",
+                        winRate: "85%",
+                        gamesPlayed: "99",
+                        KDA: "10.78"
+                    },
+                    {
+                        champion: "Ekko",
+                        winRate: "45%",
+                        gamesPlayed: "8",
+                        KDA: "2.78"
+                    }
+                ]
             },
             details: {
                 email: "jens@gmail.com",
                 password: "hashedpasword873131"
-              }
-          }
+            }
+        }
 
-          const user = await getUser();
+        const user = await getUser();
 
         const buttonWrapper = document.getElementById("button-wrapper");
-        
+
         // create message button if logged in
         if (loggedIn) {
             const messageLink = document.createElement("a");
             messageLink.href = "/messenger";
-            messageLink.classList.add("btn","btn-lg", "mb-3", "btn-success")
+            messageLink.classList.add("btn", "btn-lg", "mb-3", "btn-success")
             messageLink.innerText = "Message";
 
             buttonWrapper.appendChild(messageLink);
@@ -101,17 +101,17 @@
         document.getElementById("country").value = testSummoner.custom.country;
         document.getElementById("roles").value = testSummoner.custom.roles;
         document.getElementById("description").value = testSummoner.custom.description;
-        
+
         // summoner rank
         const summonerRank = document.getElementById("summoner-rank-icon");
         const summonerRankFromDB = user.riot.rankedSolo5x5.tier.split(" ")[0];
         summonerRank.src = "/assets/riot/ranked-emblems/" + summonerRankFromDB + ".png";
-        
+
         // summoner icon
         const summonerIcon = document.getElementById("summoner-icon");
         const summonerIconFromDB = user.riot.profileIconId;
         summonerIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/" + summonerIconFromDB + ".png";
-        
+
         // summoner stats
         const championStatsDiv = document.getElementById("champion-stats");
         testSummoner.riot.seasonStats.forEach(champion => {
@@ -119,7 +119,7 @@
             // div
             const championDiv = document.createElement("div");
             championDiv.classList.add("row", "border", "my-3", "mx-1", "align-items-center");
-            
+
             // div for champion icon
             const iconDiv = document.createElement("div");
             iconDiv.classList.add("col", "col-1", "py-3");
@@ -178,8 +178,7 @@
 
             championStatsDiv.appendChild(championDiv);
         })
-    }
-    catch(error) {
+    } catch (error) {
         console.log(error);
     }
 })();
