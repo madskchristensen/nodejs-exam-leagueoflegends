@@ -92,7 +92,7 @@ app.use(sessionRouter.router);
 const authRouter = require("./routers/auth");
 app.use(authRouter.router);
 
-const userRouter = require("./routers/api/user");
+const userRouter = require("./routers/api/users");
 app.use(userRouter.router);
 
 // synchronous file read for loading html pages on express start
@@ -152,7 +152,8 @@ app.get("/!*", (req, res, next) => {
     }
 })*/
 
-app.get("/profile", (req, res) => {
+app.get("/profile/:summonerName/:region", (req, res) => {
+    console.log(req.params)
 
     res.send(header + profile + footer);
 })

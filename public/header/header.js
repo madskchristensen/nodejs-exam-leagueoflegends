@@ -1,4 +1,5 @@
 (async function getNavbarItemsFromSession() {
+
     try {
         const response = await fetch("/auth/is-logged-in");
         const result = await response.json();
@@ -14,8 +15,11 @@
 
             const profileLink = document.createElement("a");
             profileLink.classList.add("nav-link");
-            profileLink.href = "/profile";
-            profileLink.innerText = "Profile";
+
+            const user = await getUser();
+
+            profileLink.href = "/profile/" + user.riot.summonerName + "/" + user.riot.region;
+            profileLink.innerText = user.riot.summonerName;
 
             profile.appendChild(profileLink);
             navbarItems.appendChild(profile);
@@ -68,3 +72,8 @@
     }
 })();
 
+async function getUser() {
+    const response = await fetch("/api/users/current");
+
+    return response.json();
+}

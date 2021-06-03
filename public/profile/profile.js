@@ -2,72 +2,41 @@
     try {
         const loggedIn = await isLoggedIn();
 
-        // TO DO - get summoner name from query param
-        // something something get summoner
-        // test user for now
-        const testSummoner = {
-            custom: {
-                age: "25",
-                languages: "Danish, English",
-                country: "Denmark",
-                roles: "Mid, Jungle",
-                description: "i am a league gamer"
-            },
-            riot: {
-                summonerName: "Jens",
-                summonerIcon: "4301",
-                summonerPicture: "picture8413",
-                summonerLevel: "65",
-                rank: "Silver V 85LP",
-                previousSeasons: [
-                    {
-                        season: "8",
-                        rank: "Silver"
-                    },
-                    {
-                        season: "9",
-                        rank: "Gold"
-                    }
-                ],
-                seasonStats: [
-                    {
-                        champion: "Alistar",
-                        winRate: "55%",
-                        gamesPlayed: "64",
-                        KDA: "2.78"
-                    },
-                    {
-                        champion: "Rell",
-                        winRate: "64%",
-                        gamesPlayed: "61",
-                        KDA: "2.47"
-                    },
-                    {
-                        champion: "Rammus",
-                        winRate: "85%",
-                        gamesPlayed: "99",
-                        KDA: "10.78"
-                    },
-                    {
-                        champion: "Ekko",
-                        winRate: "45%",
-                        gamesPlayed: "8",
-                        KDA: "2.78"
-                    }
-                ]
-            },
-            details: {
-                email: "jens@gmail.com",
-                password: "hashedpasword873131"
-            }
-        }
+        const user = await getUserProfile();
+        const userLoggedIn = await getUser();
 
-        const user = await getUser();
+        // append hardcoded season stats to user as it has not been implemented yet
+        user.riot.seasonStats = [
+            {
+                champion: "Alistar",
+                winRate: "55%",
+                gamesPlayed: "64",
+                KDA: "2.78"
+            },
+            {
+                champion: "Rell",
+                winRate: "64%",
+                gamesPlayed: "61",
+                KDA: "2.47"
+            },
+            {
+                champion: "Rammus",
+                winRate: "85%",
+                gamesPlayed: "99",
+                KDA: "10.78"
+            },
+            {
+                champion: "Ekko",
+                winRate: "45%",
+                gamesPlayed: "8",
+                KDA: "2.78"
+            }
+        ];
 
         const buttonWrapper = document.getElementById("button-wrapper");
 
         // create message button if logged in
-        if (loggedIn) {
+        if (loggedIn && user.riot.summonerName !== userLoggedIn.riot.summonerName) {
             const messageLink = document.createElement("a");
             messageLink.href = "/messenger";
             messageLink.classList.add("btn", "btn-lg", "mb-3", "btn-success")
@@ -87,7 +56,7 @@
         }
 
         // fill in summoner info
-        // service
+        // riot
         document.getElementById("rank").innerText = user.riot.rankedSolo5x5.tier + " " +
             user.riot.rankedSolo5x5.rank;
         document.getElementById("lp").innerText = user.riot.rankedSolo5x5.leaguePoints + " LP";
@@ -96,16 +65,16 @@
         document.getElementById("summoner-level").innerText = "Level " + user.riot.summonerLevel;
 
         // profile
-        document.getElementById("age").value = testSummoner.custom.age;
-        document.getElementById("languages").value = testSummoner.custom.languages;
-        document.getElementById("country").value = testSummoner.custom.country;
-        document.getElementById("roles").value = testSummoner.custom.roles;
-        document.getElementById("description").value = testSummoner.custom.description;
+        document.getElementById("age").value = user.profile.age;
+        document.getElementById("languages").value = user.profile.languages;
+        document.getElementById("country").value = user.profile.country;
+        document.getElementById("roles").value = user.profile.roles;
+        document.getElementById("description").value = user.profile.description;
 
         // summoner rank
         const summonerRank = document.getElementById("summoner-rank-icon");
         const summonerRankFromDB = user.riot.rankedSolo5x5.tier.split(" ")[0];
-        summonerRank.src = "/assets/service/ranked-emblems/" + summonerRankFromDB + ".png";
+        summonerRank.src = "/assets/riot/ranked-emblems/" + summonerRankFromDB + ".png";
 
         // summoner icon
         const summonerIcon = document.getElementById("summoner-icon");
@@ -114,7 +83,7 @@
 
         // summoner stats
         const championStatsDiv = document.getElementById("champion-stats");
-        testSummoner.riot.seasonStats.forEach(champion => {
+        user.riot.seasonStats.forEach(champion => {
 
             // div
             const championDiv = document.createElement("div");
@@ -178,6 +147,7 @@
 
             championStatsDiv.appendChild(championDiv);
         })
+
     } catch (error) {
         console.log(error);
     }
@@ -189,10 +159,23 @@ async function isLoggedIn() {
     return await response.json();
 }
 
-async function getUser() {
-    const response = await fetch("/api/user");
+async function getUserProfile() {
+    const splitUrl = location.pathname.split("/");
+
+    const data = {
+        summonerName: splitUrl[2],
+        region: splitUrl[3]
+    }
+
+    const userUrl = "/api/users/" + data.summonerName + "/" + data.region;
+
+    const response = await fetch(userUrl);
 
     return await response.json();
 }
 
+async function getUser() {
+    const response = await fetch("/api/users/current");
 
+    return await response.json();
+}

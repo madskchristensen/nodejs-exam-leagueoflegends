@@ -74,6 +74,7 @@ function translateRegion(region) {
 
     if (lowerCaseRegion in regions) {
         return regions[lowerCaseRegion];
+
     } else {
         return undefined;
     }

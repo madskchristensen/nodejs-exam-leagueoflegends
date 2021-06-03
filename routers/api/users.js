@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const mongodb = require("../../mongodb/mongodb");
 
-router.get("/api/user", (req, res) => {
+router.get("/api/users/current", (req, res) => {
     const loggedIn = req.session.loggedIn;
 
     if (loggedIn) {
@@ -16,18 +16,21 @@ router.get("/api/user", (req, res) => {
     }
 })
 
-router.get("/api/user/:region/:summonerName", async(req, res) => {
-    const region = req.params.region;
+router.get("/api/users/:summonerName/:region", async (req, res) => {
     const summonerName = req.params.summonerName;
-
-    console.log(req.originalUrl)
+    const region = req.params.region;
 
     const user = await mongodb.find.byRegionAndSummoner(region, summonerName);
 
-    delete user._id;
-    delete user.details;
+    if (user) {
+        delete user._id;
+        delete user.details;
 
-    res.send(user);
+        res.send(user);
+
+    } else {
+        res.sendStatus(404);
+    }
 })
 
 router.post("/api/user/profile", (req, res) => {
