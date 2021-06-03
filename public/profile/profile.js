@@ -87,7 +87,7 @@
         }
 
         // fill in summoner info
-        // riot 
+        // service
         document.getElementById("rank").innerText = user.riot.rankedSolo5x5.tier + " " +
             user.riot.rankedSolo5x5.rank;
         document.getElementById("lp").innerText = user.riot.rankedSolo5x5.leaguePoints + " LP";
@@ -105,7 +105,7 @@
         // summoner rank
         const summonerRank = document.getElementById("summoner-rank-icon");
         const summonerRankFromDB = user.riot.rankedSolo5x5.tier.split(" ")[0];
-        summonerRank.src = "/assets/riot/ranked-emblems/" + summonerRankFromDB + ".png";
+        summonerRank.src = "/assets/service/ranked-emblems/" + summonerRankFromDB + ".png";
 
         // summoner icon
         const summonerIcon = document.getElementById("summoner-icon");

@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 const mongo = require("../mongodb/mongodb");
-// const find = require("../mongodb/find");
-const riot = require("../riot/riot")
+const riot = require("../service/riot")
 
 const saltRounds = 10;
 
@@ -131,7 +130,7 @@ router.get("/auth/create-user", async (req, res) => {
     // find rankedSolo object from the array
     const rankedSolo = leagueEntryDTO.find(element => element.queueType === "RANKED_SOLO_5x5");
 
-    // if summoner was verified, create data object containing profile, summoner/riot and user/details data
+    // if summoner was verified, create data object containing profile, summoner/service and user/details data
     if (req.session.newUser.verified) {
         const data = {
             profile: {
