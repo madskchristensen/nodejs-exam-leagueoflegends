@@ -9,7 +9,7 @@ const router = require("express").Router();
 router.get("/auth/is-logged-in", (req, res) => {
     const loggedIn = req.session.loggedIn;
 
-    res.send({loggedIn});
+    res.send({ data: loggedIn });
 })
 
 // endpoint that is called when a user tries to log in

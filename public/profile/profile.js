@@ -1,10 +1,14 @@
 (async function getProfile() {
     try {
-        const loggedIn = await isLoggedIn();
-        const user = await getUserProfile();
-        const userLoggedIn = await getUser();
+        // DATA SETUP //
 
-        // append hardcoded season stats to user as it has not been implemented yet
+        // Is user logged in?
+        const loggedIn = await isLoggedIn().then(result => result.data);
+
+        // Get user data for the profile being viewed
+        const user = await getUserProfile();
+
+        // Append hardcoded season stats to user as it has not been implemented yet
         user.riot.seasonStats = [
             {
                 champion: "Alistar",
@@ -32,29 +36,8 @@
             }
         ];
 
-        const buttonWrapper = document.getElementById("button-wrapper");
+        // LOAD PROFILE INFORMATION //
 
-        // create message button if logged in
-        if (loggedIn && user.riot.summonerName !== userLoggedIn.riot.summonerName) {
-            const messageLink = document.createElement("a");
-            messageLink.href = "/messenger";
-            messageLink.classList.add("btn", "btn-lg", "mb-3", "btn-success")
-            messageLink.innerText = "Message";
-
-            buttonWrapper.appendChild(messageLink);
-        }
-        // disabled button if not logged in
-        else if (!loggedIn) {
-            const messageButton = document.createElement("button");
-            messageButton.disabled = true;
-            messageButton.type = "button";
-            messageButton.innerText = "Please login to message";
-            messageButton.classList.add("btn", "btn-secondary", "w-75")
-
-            buttonWrapper.appendChild(messageButton);
-        }
-
-        // fill in summoner info
         // riot
         document.getElementById("rank").innerText = user.riot.rankedSolo5x5.tier + " " +
             user.riot.rankedSolo5x5.rank;
@@ -145,11 +128,52 @@
             championDiv.appendChild(winrateDiv);
 
             championStatsDiv.appendChild(championDiv);
-        })
+        });
+
+        // MESSAGE BUTTON //
+
+        // create elements related to message button
+        const buttonWrapper = document.getElementById("button-wrapper");
+        const messageButton = document.createElement("button");
+        const messageLink = document.createElement("a");
+
+        // set classes that apply in all cases for button
+        messageButton.classList.add("btn", "mb-3");
+
+        // by default make messageLink go to nothing
+        messageLink.href = "#";
+
+        messageButton.appendChild(messageLink);
+
+        // CONDITIONS FOR MESSAGE BUTTON //
+        // if logged in and not viewing own profile -> show message button
+        // if logged in and viewing own profile -> don't show message button
+        // if not logged in -> show disabled message button
+        if (loggedIn) {
+            const userLoggedIn = await getUser();
+
+            // if logged in user is not same as user being viewed -> allow to message
+            if (user.riot.summonerName !== userLoggedIn.riot.summonerName) {
+                messageLink.href = "/messenger";
+                messageButton.classList.add("btn-success")
+                messageButton.innerText = "Message";
+
+                buttonWrapper.appendChild(messageButton);
+            }
+
+            // if user is not logged in -> don't allow to message
+        } else {
+            messageButton.disabled = true;
+            messageButton.innerText = "Login to message";
+            messageButton.classList.add("btn-secondary")
+
+            buttonWrapper.appendChild(messageButton);
+        }
 
     } catch (error) {
-        console.log(error);
+        // show toastr error?
     }
+
 })();
 
 async function isLoggedIn() {

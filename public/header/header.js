@@ -2,12 +2,12 @@
 
     try {
         const response = await fetch("/auth/is-logged-in");
-        const result = await response.json();
+        const loggedIn = await response.json().then(res => res.data);
 
         // create navbar
         const navbarItems = document.getElementById("navbarItems");
 
-        if (result.loggedIn === true) {
+        if (loggedIn) {
 
             // create profile
             const profile = document.createElement("li");
@@ -53,7 +53,7 @@
             signout.appendChild(signoutForm);
             navbarItems.appendChild(signoutForm);
 
-        } else if (result.loggedIn === false) {
+        } else {
 
             // create login
             const login = document.createElement("li");
