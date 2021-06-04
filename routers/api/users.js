@@ -14,7 +14,7 @@ router.get("/api/users/current", (req, res) => {
     } else {
         res.sendStatus(404);
     }
-})
+});
 
 router.get("/api/users/:summonerName/:region", async (req, res) => {
     const summonerName = req.params.summonerName;
@@ -31,7 +31,7 @@ router.get("/api/users/:summonerName/:region", async (req, res) => {
     } else {
         res.sendStatus(404);
     }
-})
+});
 
 router.get("/api/users/", async (req, res) => {
     const users = await mongodb.findUsers.all();
@@ -47,12 +47,12 @@ router.get("/api/users/", async (req, res) => {
     } else {
         res.sendStatus(404);
     }
-})
+});
 
-router.post("/api/user/profile", (req, res) => {
+router.put("/api/users/profile", (req, res) => {
     // brug user fra session
     console.log(req.body)
-})
+});
 
 module.exports = {
     router

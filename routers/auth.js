@@ -81,7 +81,7 @@ router.post("/auth/signup", (req, res, next) => {
 
         } else {
             req.session.newUser = {
-                email: req.body.email,
+                email: req.body.email.toLowerCase(),
                 password: hashedPassword,
                 verified: false
             }

@@ -8,6 +8,9 @@
         // Get user data for the profile being viewed
         const user = await getUserProfile();
 
+        // Currently logged in user. Will be initialized later in the script if loggedIn is true
+        let userLoggedIn;
+
         // Append hardcoded season stats to user as it has not been implemented yet
         user.riot.seasonStats = [
             {
@@ -150,7 +153,7 @@
         // if logged in and viewing own profile -> don't show message button
         // if not logged in -> show disabled message button
         if (loggedIn) {
-            const userLoggedIn = await getUser();
+            userLoggedIn = await getUser();
 
             // if logged in user is not same as user being viewed -> allow to message
             if (user.riot.summonerName !== userLoggedIn.riot.summonerName) {
@@ -168,6 +171,25 @@
             messageButton.classList.add("btn-secondary")
 
             buttonWrapper.appendChild(messageButton);
+        }
+
+        // allow user to edit profile information and save it,
+        // if they are logged in and profile is their own
+        if (loggedIn && user.riot.summonerName === userLoggedIn.riot.summonerName) {
+            const saveProfileButton = document.createElement("button");
+            saveProfileButton.type = "submit";
+            saveProfileButton.classList.add("btn", "btn-success")
+            saveProfileButton.innerText = "Save"
+
+            const profileForm = document.getElementById("profile-form");
+            profileForm.appendChild(saveProfileButton);
+
+            const formData = new FormData(profileForm);
+            console.log(formData)
+
+            formData.forEach((value, key) => {
+                document.getElementById(key).readOnly = false;
+            })
         }
 
     } catch (error) {
@@ -201,4 +223,32 @@ async function getUser() {
     const response = await fetch("/api/users/current");
 
     return await response.json();
+}
+
+async function sendFormData() {
+    const profileForm = document.getElementById("profile-form");
+
+    const formData = new FormData(profileForm);
+
+    const data = {}
+
+    formData.forEach((value, key) => data[key] = value);
+
+    await fetch("/api/users/profile", {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: "PUT",
+        body: JSON.stringify(data)
+    })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
+            }
+
+            toastr.success("Profile saved!");
+        })
+        .catch(err => {
+            toastr.error("Something went wrong. Try again");
+        })
 }

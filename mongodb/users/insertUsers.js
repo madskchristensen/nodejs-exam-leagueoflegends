@@ -11,6 +11,13 @@ function user(data) {
     );
 }
 
+function profile(data) {
+    db.query().collection("users").insertOne(
+        data,
+    )
+}
+
 module.exports = {
-    user
+    user,
+    profile
 }
