@@ -1,7 +1,6 @@
 (async function getProfile() {
     try {
         const loggedIn = await isLoggedIn();
-
         const user = await getUserProfile();
         const userLoggedIn = await getUser();
 
