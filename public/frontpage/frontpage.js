@@ -8,6 +8,6 @@
         const currentUrl = location.href;
 
         location.href = currentUrl + "profile/" + summonerName + "/" + region;
-    })
+    });
 
 })();

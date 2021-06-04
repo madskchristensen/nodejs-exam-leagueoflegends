@@ -9,7 +9,12 @@ async function byEmail(email) {
 }
 
 async function byRegionAndSummoner(region, summonerName) {
-    const filter = { "$and": [ { "riot.summonerName" : summonerName }, { "riot.region" : region } ] };
+    // using constructor for regex instead of literal as constructor allows runtime compilation.
+    // this is needed because summonerName might be different from call to call
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+    const regex = new RegExp(`(${summonerName})`, "gi");
+
+    const filter = { "$and": [ { "riot.summonerName" : regex }, { "riot.region" : region } ] };
 
     return await db.query().collection("users").findOne(filter)
         .then(user => user)

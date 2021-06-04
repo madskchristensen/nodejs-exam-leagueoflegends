@@ -153,7 +153,6 @@ app.get("/!*", (req, res, next) => {
 })*/
 
 app.get("/profile/:summonerName/:region", (req, res) => {
-    console.log(req.params)
 
     res.send(header + profile + footer);
 })

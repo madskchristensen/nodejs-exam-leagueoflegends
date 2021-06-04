@@ -12,7 +12,7 @@ router.get("/api/users/current", (req, res) => {
         res.send(user);
 
     } else {
-        res.sendStatus(401);
+        res.sendStatus(404);
     }
 })
 
