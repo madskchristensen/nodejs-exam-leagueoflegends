@@ -39,6 +39,8 @@ const server = require("http").createServer(app);
 // atttach socket.io to http server
 const io = require("socket.io")(server);
 
+const messageService = require("./service/messages")
+
 // register middleware in Socket.IO
 // reference: https://socket.io/docs/v3/faq/ - how to use socket.io with express-session
 io.use((socket, next) => {
@@ -48,18 +50,13 @@ io.use((socket, next) => {
 
 io.on("connection", (socket) => {
     console.log("A socket connected with id" + socket.id);
-    // when connecting create username that matches with session identifier (summonername maybe?)
-    // for now: sessionID
-    // socket.data.username = socket.request.session.user.summonerName;
-    socket.data.username = "Jens";
-   
-    // join room with that name: 
-    socket.join(socket.data.username);
-    
-    socket.on("messageSent", (data) => {
-        io.emit("addMessage", { message: escapeHtml(data.message)});
-    });
 
+    // create username from session
+    socket.data.username = socket.request.session.user.riot.summonerName + "-" + socket.request.session.user.riot.region;
+    console.log(socket.data.username);
+    // join room username
+    socket.join(socket.data.username);
+      
     socket.on("private message", (data) => {
         // TO DO
         // save message in DB
@@ -67,11 +64,18 @@ io.on("connection", (socket) => {
         // to: anotherSocketId
         // message: data.message
 
+        // console.log(data);
         // send message to other user
-        socket.to(data.receiver).emit("private message", {
+        console.log("messages was hit");
+
+        //const response = await messageService.saveMessages(data);
+
+        // console.log(response);
+
+        socket.to(data.receiver.summonerName + "-" + data.receiver.region).emit("private message", {
              message: escapeHtml(data.message),
              from: socket.data.username,
-             to: data.receiver
+             to: data.receiver.summonerName + "-" + data.receiver.region
         });
     });
 
@@ -90,14 +94,6 @@ const fetch = require("node-fetch");
 // create session 
 const session = require("express-session");
 
-// middleware that sets needed variables in the session
-const sessionInitializer = function (req, res, next) {
-    if(!req.session.loggedIn) {
-        req.session.loggedIn = false;
-    }
-    next();
-}
-
 const sessionMiddleware = session({
     secret: process.env.SESSION_SECRET.split(","), // used to compute hash. split to process dotenv variable as array
     name: process.env.SESSION_NAME, // hidden custom name to avoid fingerprinting
@@ -113,6 +109,22 @@ const sessionMiddleware = session({
 
 app.use(sessionMiddleware);
 
+// middleware that sets needed variables in the session
+const sessionInitializer = async function (req, res, next) {
+   /* if (process.env.NODE_ENV === "development") {
+        const mongodb = require("./mongodb/mongodb");
+
+        req.session.user = await mongodb.find.byEmail("michael@fuglo.com");
+        req.session.loggedIn = true;
+    }*/
+
+    if(!req.session.loggedIn) {
+        req.session.loggedIn = false;
+    }
+
+    next();
+}
+
 app.use(sessionInitializer);
 
 // allow express to parse form data from requests
@@ -120,6 +132,7 @@ app.use(express.urlencoded({
     extended: true
 }));
 
+// allow express to parse json
 app.use(express.json());
 
 // routers
@@ -129,16 +142,18 @@ app.use(sessionRouter.router);
 const authRouter = require("./routers/auth");
 app.use(authRouter.router);
 
+const userRouter = require("./routers/api/user");
+app.use(userRouter.router);
+
+const messagesRouter = require("./routers/api/messages");
+app.use(messagesRouter.router);
+
 // synchronous file read for loading html pages on express start
 const fs = require('fs');
 
 // mongodb util module.
 // Can be called with .query() to perform operations like insert, find etc.
 const db = require("./mongodb/db");
-
-// components
-const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8");
-const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8");
 
 // pages
 const frontpage = fs.readFileSync(__dirname + "/public/frontpage/frontpage.html", "utf-8");
@@ -147,6 +162,10 @@ const signup = fs.readFileSync(__dirname + "/public/signup/signup.html", "utf-8"
 const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html")
 const profile = fs.readFileSync(__dirname + "/public/profile/profile.html")
 const messenger = fs.readFileSync(__dirname + "/public/messenger/messenger.html")
+
+// components
+const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8");
+const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8");
 
 // paths for all users to access
 app.get("/", (req, res) => {
@@ -206,6 +225,7 @@ app._router.stack.forEach( (router) => {
     }
 })
 
+// wrap server.listen call in db.connect call to always have an active connection
 // listen at specified port
 db.connect(() => {
     server.listen(port, (err) => {

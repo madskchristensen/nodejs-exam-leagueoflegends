@@ -1,7 +1,6 @@
 (async function getProfile() {
     try {
-        const response = await fetch("/getSession");
-        const result = await response.json();
+        const loggedIn = await isLoggedIn();
 
         // TO DO - get summoner name from query param
         // something something get summoner
@@ -63,10 +62,12 @@
               }
           }
 
+          const user = await getUser();
+
         const buttonWrapper = document.getElementById("button-wrapper");
         
         // create message button if logged in
-        if (result.session.loggedIn === true) {
+        if (loggedIn) {
             const messageLink = document.createElement("a");
             messageLink.href = "/messenger";
             messageLink.classList.add("btn","btn-lg", "mb-3", "btn-success")
@@ -75,7 +76,7 @@
             buttonWrapper.appendChild(messageLink);
         }
         // disabled button if not logged in
-        else if (result.session.loggedIn === false || !result.session.loggedIn) {
+        else if (!loggedIn) {
             const messageButton = document.createElement("button");
             messageButton.disabled = true;
             messageButton.type = "button";
@@ -87,12 +88,14 @@
 
         // fill in summoner info
         // riot 
-        document.getElementById("rank").innerText = testSummoner.riot.rank;
-        document.getElementById("summoner-name").innerText = testSummoner.riot.summonerName;
-        document.getElementById("summoner-level").innerText = "Level " + testSummoner.riot.summonerLevel;
+        document.getElementById("rank").innerText = user.riot.rankedSolo5x5.tier + " " +
+            user.riot.rankedSolo5x5.rank;
+        document.getElementById("lp").innerText = user.riot.rankedSolo5x5.leaguePoints + " LP";
+        document.getElementById("summoner-name").innerText = user.riot.summonerName;
+        document.getElementById("region").innerText = user.riot.region.toUpperCase();
+        document.getElementById("summoner-level").innerText = "Level " + user.riot.summonerLevel;
 
-
-        // custom
+        // profile
         document.getElementById("age").value = testSummoner.custom.age;
         document.getElementById("languages").value = testSummoner.custom.languages;
         document.getElementById("country").value = testSummoner.custom.country;
@@ -101,12 +104,12 @@
         
         // summoner rank
         const summonerRank = document.getElementById("summoner-rank-icon");
-        const summonerRankFromDB = testSummoner.riot.rank.split(" ")[0];
-        summonerRank.src = "../assets/riot/ranked-emblems/" + summonerRankFromDB + ".png";
+        const summonerRankFromDB = user.riot.rankedSolo5x5.tier.split(" ")[0];
+        summonerRank.src = "/assets/riot/ranked-emblems/" + summonerRankFromDB + ".png";
         
         // summoner icon
         const summonerIcon = document.getElementById("summoner-icon");
-        const summonerIconFromDB = testSummoner.riot.summonerIcon;
+        const summonerIconFromDB = user.riot.profileIconId;
         summonerIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/" + summonerIconFromDB + ".png";
         
         // summoner stats
@@ -179,6 +182,18 @@
     catch(error) {
         console.log(error);
     }
-})();   
+})();
+
+async function isLoggedIn() {
+    const response = await fetch("/auth/is-logged-in");
+
+    return await response.json();
+}
+
+async function getUser() {
+    const response = await fetch("/api/user");
+
+    return await response.json();
+}
 
 

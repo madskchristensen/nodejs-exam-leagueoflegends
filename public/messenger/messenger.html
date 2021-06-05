@@ -5,7 +5,23 @@
         <div id="chats-div" class="col col-3">
             <h4>Chats</h4>
             <input type="text" id="new-conversation-input" class="form-control pt-2 mb-3 mt-3" placeholder="New chat: Type receiver name here" >
-            <div id="messages-div" class="list-group pt-2" role="tablist">
+            <div id="select-div">
+                <select class="form-select form-select-sm" id="select-region">
+                    <!-- Backend region names atm. should be translated to actual region names-->
+                    <option selected>euw1</option>
+                    <option>na1</option>
+                    <option>eune1</option>
+                    <option>kr1</option>
+                    <option>br1</option>
+                    <option>lan1</option>
+                    <option>las1</option>
+                    <option>oce1</option>
+                    <option>ru1</option>
+                    <option>tr1</option>
+                    <option>jp1</option>
+                </select>
+            </div>
+            <div id="messages-div" class="list-group pt-3" role="tablist">
 
             </div>
         </div>
@@ -28,93 +44,84 @@
 
 <script>
     const socket = io();
-    // get session
-    const session = getSession();
-    // save current user summoner name
-    // const socketIdentifier = session.session.profile.summonerName;
-    // test identifier for now
-    const socketIdentifier = "Jensen";
+        // get session
+        let loggedInUser;
+        getUser().then((result) => {
+            loggedInUser = result;
+        });
 
-    function sendPrivateMessage() {
+    async function sendPrivateMessage() {
+        // save current user summoner name
+        const socketIdentifier = loggedInUser.riot.summonerName;
         const message = document.getElementById("message-input").value;
-        // get name of receiver
-        let receiver;
 
         // get new conversation input field to check if new message
         const newConversationInput = document.getElementById("new-conversation-input").value;
+        const newConversationRegion = document.getElementById("select-region").value;
         const messagesDiv = document.getElementById("messages-div");
 
+        // get name of receiver
+        let receiver = {};
         // if nothing inside newConversationInput normal workflow
         if (newConversationInput === "") {
-            const activeConversationDiv = document.getElementsByClassName("list-group-item list-group-item-action conversation-link active");
-            receiver = activeConversationDiv[0].id;
+            // get active conversation
+            const activeConversationDiv = document.getElementsByClassName("list-group-item list-group-item-action conversation-link active")[0];
+            const conversationIdentifierArr = activeConversationDiv.id.split("-");
+
+            receiver.summonerName = conversationIdentifierArr[0];
+            receiver.region = conversationIdentifierArr[1];
         }
         else {
-            receiver = newConversationInput;
+            receiver.summonerName = newConversationInput;
+            receiver.region = newConversationRegion;
         }
 
         // emit message
-        socket.emit("private message", { receiver, message, socketIdentifier });
-        
-        // create html elements
+        socket.emit("private message", { receiver, message });
 
-        // create conversation partner object
-        const conversationPartner = {
-            riot: {
-                summonerName: receiver,
+        // If no new chat. attach message to active messenger window
+        // TO DO
+        // currently doesn't check if conversation was already had - only if user chooses to create a new conversation
+        if (newConversationInput === "") {
+            listConversationDiv = document.getElementsByClassName("tab-pane fade row active show");
+            generateMessage (message, socketIdentifier, socketIdentifier, listConversationDiv[0])
+        }
+        // if new chat create new chat 
+        else {
+            // fetch user from DB
+            const conversationPartner = await getUserFromDB(receiver.region, receiver.summonerName);
+            if (conversationPartner) {
+                // create lastMessage object
+                const lastMessage = {
+                    from: socketIdentifier,
+                    body: message
+                }
+
+                // get wrapper divs for conversations (left) and messenger (right)             
+                const messagesDiv = document.getElementById("messages-div");
+                const messengerDiv = document.getElementById("messenger-div")
+
+                // create new conversation element to the left
+                generateConversation (conversationPartner, socketIdentifier, lastMessage, messagesDiv); 
+
+                // create messenger div
+                const listConversationDiv = generateMessageContainer(receiver.summonerName, receiver.region);
+
+                // attach message to messenger div
+                generateMessage (message, socketIdentifier, socketIdentifier, listConversationDiv)
+                messengerDiv.appendChild(listConversationDiv);
+
+                resetNewConversationInput();
+            }
+            else {
                 // TO DO
-                // fetch summoner from db. Default icon for now
-                summonerIcon: "1"
+                // alert that message could not be created as user doesn't exist in DB
+                alert("Summoner not found - please try again");
+
             }
         }
-
-        // create lastMessage object
-        const lastMessage = {
-            from: socketIdentifier,
-            body: message
-        }
-
-        // if new convo input isn't empty new conversation element is to be made
-        let listConversationDiv;
-
-
-        
-        // attach message to div
-        const wrapperMessageDiv = document.createElement("div");
-        wrapperMessageDiv.classList.add("row");
-
-        const messageDiv = document.createElement("div");
-        messageDiv.classList.add("col", "col-4", "my-1", "rounded-start");
-
-        const messageText = document.createElement("p");
-        messageText.classList.add("message-text")
-        messageText.innerText = message;
-        
-        wrapperMessageDiv.classList.add("justify-content-end")
-        messageDiv.classList.add("chat-right", "d-flex", "justify-content-end", "align-items-center");    
-
-        messageDiv.appendChild(messageText);
-        wrapperMessageDiv.appendChild(messageDiv);
-        // create new chat div and conversation element if new chat
-        if (newConversationInput !== "") {
-            generateConversation (conversationPartner, socketIdentifier, lastMessage, messagesDiv); 
-
-            // create messager div
-            const listConversationDiv = document.createElement("div");
-            listConversationDiv.classList.add("tab-pane", "fade", "row");
-            listConversationDiv.setAttribute("role", "tabpanel");
-            listConversationDiv.setAttribute("aria-labelledby", receiver);
-            listConversationDiv.id = "list-" + receiver;
-
-            listConversationDiv.appendChild(wrapperMessageDiv);
-        }
-        else {
-            // if conversation already had attach to active chat
-            listConversationDiv =  document.getElementsByClassName("tab-pane fade row active show");
-            listConversationDiv[0].appendChild(wrapperMessageDiv);
-
-        }
-
+        // reste message input
+        document.getElementById("message-input").value = ""
     }
 
     socket.on("private message", (data) => {
@@ -124,26 +131,38 @@
         const listConversationDiv = document.getElementById("list-" + data.from )
 
         if (!listConversationDiv !== undefined) {
-            const wrapperMessageDiv = document.createElement("div");
-            wrapperMessageDiv.classList.add("row");
-
-            const messageDiv = document.createElement("div");
-            messageDiv.classList.add("col", "col-4", "my-1", "rounded-start");
-
-            const messageText = document.createElement("p");
-            messageText.classList.add("message-text")
-            messageText.innerText = data.message;
-        
-            messageDiv.classList.add("chat-left", "d-flex", "justify-content-start");
-            
-            messageDiv.appendChild(messageText);
-            wrapperMessageDiv.appendChild(messageDiv);
-            listConversationDiv.appendChild(wrapperMessageDiv);
+            console.log(data);
+            generateMessage (data.message, data.from, data.to, listConversationDiv);
         }
         else{
-            // TO DO 
-            // create new chat with given user
-            console.log("Message was sent to new user");
+            // create conversation partner object
+            const conversationPartner = {
+                riot: {
+                    summonerName: data.from,
+                    // TO DO
+                    // fetch summoner from db. Default icon for now
+                    summonerIcon: "1"
+                }
+            }
+            // create lastMessage object
+            const lastMessage = {
+                from: data.from,
+                body: data.message
+            }
+            
+            // get wrapper divs for conversations (left) and messenger (right)             
+            const messagesDiv = document.getElementById("messages-div");
+            const messengerDiv = document.getElementById("messenger-div")
+
+            // create new conversation element to the left
+            generateConversation (conversationPartner, conversationPartner.riot.summonerName, lastMessage, messagesDiv); 
+
+            // create messenger div
+            const listConversationDiv = generateMessageContainer(conversationPartner.riot.summonerName, conversationPartner.riot.region);
+
+            // attach message to messenger div
+            generateMessage (data.message, conversationPartner.riot.summonerName, data.to, listConversationDiv)
+            messengerDiv.appendChild(listConversationDiv);
         }
     })
 </script>

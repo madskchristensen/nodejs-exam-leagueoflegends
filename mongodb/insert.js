@@ -11,6 +11,17 @@ function user(data) {
     );
 }
 
+function chat(data) {
+    db.query().collection("chats").insertOne(
+        data,
+        (error, data) => {
+            if (error) {
+                throw new Error(error);
+            }
+        }
+    );
+}
+
 module.exports = {
     user
 }

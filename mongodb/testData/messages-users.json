@@ -1,0 +1,42 @@
+{
+    "user2": {
+    "profile": {
+        "age": "",
+        "languages": "",
+        "country": "",
+        "roles": "",
+        "description": ""
+    },
+    "riot": {
+        "summonerName": "Jensen",
+        "profileIconId": 78,
+        "summonerLevel": 100,
+        "region": "euw1",
+        "rankedSolo5x5": {}
+    },
+    "details": {
+        "email": "mail@mail.dk",
+        "password": "$2b$10$oxsHAch7vssAGMB7i1kGNeBMIEA6XTI.xAuQNXbHyB.Yl/5pB2NE."
+    }
+},
+ "user1":{
+        "profile": {
+            "age": "",
+            "languages": "",
+            "country": "",
+            "roles": "",
+            "description": ""
+        },
+        "riot": {
+            "summonerName": "MichaelMedStortM",
+            "profileIconId": 556,
+            "summonerLevel": 167,
+            "region": "euw1",
+            "rankedSolo5x5": {}
+        },
+        "details": {
+            "email": "michael@fuglo.com",
+            "password": "$2b$10$oxsHAch7vssAGMB7i1kGNeBMIEA6XTI.xAuQNXbHyB.Yl/5pB2NE."
+        }
+    }
+}
