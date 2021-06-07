@@ -7,13 +7,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 async function linkAccount() {
     // boolean describing whether verification of summoner was successful or not
-    const verified = await verifySummoner().then(res => res);
+    const verification = await verifySummoner().then(res => res);
 
-    if (verified) {
-        window.location.href = "/auth/create-user"
+    console.log(verification);
+
+    if (verification.result) {
+        window.location.href = "/auth/create-user";
 
     } else {
-        toastr.error("Verification failed.")
+        toastr.error(verification.error);
     }
 }
 

@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
-const mongo = require("../mongodb/mongodb");
-const riot = require("../service/riot")
+const mongodb = require("../mongodb/mongodb");
+const riot = require("../service/riot");
 
 const saltRounds = 10;
 
@@ -17,7 +17,7 @@ router.post("/auth/login", async (req, res) => {
     const password = req.body.password;
     const email = req.body.email;
 
-    const user = await mongo.findUsers.byEmail(email);
+    const user = await mongodb.findUsers.byEmail(email);
 
     // if user was found
     if (user) {
@@ -51,7 +51,7 @@ router.post("/auth/login", async (req, res) => {
     } else {
         console.log("Client login rejected (user not found):", req.session.id);
 
-        res.redirect("/login?error=Wrong email and/or password")
+        res.redirect("/login?error=Wrong email and/or password");
     }
 });
 
@@ -77,11 +77,11 @@ router.post("/auth/signup", async (req, res, next) => {
     const email = req.body.email.toLowerCase();
     const password = req.body.password;
 
-    const user = await mongo.findUsers.byEmail(email);
+    const user = await mongodb.findUsers.byEmail(email);
 
     // if user was found using email, show error
     if (user) {
-        res.redirect("/signup?error=Email already exists")
+        res.redirect("/signup?error=Email already exists");
 
     } else {
         bcrypt.hash(password, saltRounds,(err, hashedPassword) => {
@@ -111,26 +111,39 @@ router.post("/auth/verify-summoner", async (req, res) => {
     const regionTranslated = riot.translateRegion(region);
     const uuid = req.body.uuid;
 
-    // get summoner and verification string from riot service
-    const summonerDTO = await riot.getSummonerDTO(regionTranslated, summonerName);
-    const verification = await riot.getVerification(regionTranslated, summonerDTO.id);
+    // find user from db, if exists
+    const user = await mongodb.findUsers.byRegionAndSummoner(region, summonerName);
 
-    // matches displayed uuid in front-end against the string entered in the league client of the given summoner
-    // if they match it is certain the user trying to signup has access to the summoner name in question
-    // therefore it is safe to set the newUser object to verified and include summonerName
-    if (uuid === verification) {
-        req.session.newUser.verified = true;
-        req.session.newUser.summonerName = summonerName;
-        req.session.newUser.region = region.toLowerCase();
-        req.session.newUser.regionTranslated = regionTranslated;
-        req.session.newUser.profileIconId = summonerDTO.profileIconId;
-        req.session.newUser.summonerLevel = summonerDTO.summonerLevel;
-        req.session.newUser.encryptedId = summonerDTO.id;
-
-        res.send(true);
+    // if user exists, show error
+    if (user) {
+        if (user.riot.summonerName === summonerName && user.riot.region === region) {
+            res.send({ result: false, error: "User with summoner name and region already exists." })
+        }
 
     } else {
-        res.send(false);
+        // get summonerDTO and verification string from riot service
+        const summonerDTO = await riot.getSummonerDTO(regionTranslated, summonerName);
+        const verification = await riot.getVerification(regionTranslated, summonerDTO.id);
+
+        // matches displayed uuid in front-end against the string entered in the league client of the given summoner
+        // if they match it is certain the user trying to signup has access to the summoner name in question
+        // therefore it is safe to set the newUser object to verified and add any remaining riot information
+        if (uuid === verification) {
+            req.session.newUser.verified = true;
+            req.session.newUser.summonerName = summonerName;
+            req.session.newUser.region = region.toLowerCase();
+            req.session.newUser.regionTranslated = regionTranslated;
+            req.session.newUser.profileIconId = summonerDTO.profileIconId;
+            req.session.newUser.summonerLevel = summonerDTO.summonerLevel;
+            req.session.newUser.encryptedId = summonerDTO.id;
+
+            // everything went okay so send result = true and no error
+            res.send({ result: true, error: "" } );
+
+        // verification string didnt match and so send error
+        } else {
+            res.send( { result: false, error: "Verification text didn't match." } );
+        }
     }
 });
 
@@ -177,7 +190,7 @@ router.get("/auth/create-user", async (req, res) => {
         }
 
         // save data object to db
-        mongo.insertUsers.user(data);
+        mongodb.insertUsers.user(data);
 
         // delete the newUser object from session as it will no longer be used
         delete req.session.newUser;

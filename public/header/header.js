@@ -29,7 +29,6 @@
         const navbarItems = document.getElementById("navbarItems");
 
         if (loggedIn) {
-
             // create profile
             const profile = document.createElement("li");
             profile.classList.add("nav-item", "active");

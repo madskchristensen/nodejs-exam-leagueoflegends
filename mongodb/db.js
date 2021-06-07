@@ -2,6 +2,20 @@ require("dotenv").config();
 
 // https://mrvautin.com/re-use-mongodb-database-connection-in-routes/
 
+/* --- Example of how to use ---
+const db = require("./mongodb/db");
+
+db.query().collection("profiles").insertOne(
+    { name: "test", rank: "silver1" },
+    (error, data) => {
+        if (error) {
+            throw new Error(error);
+        }
+        console.log(data);
+    }
+);
+*/
+
 // variables to be used
 const mongoClient = require("mongodb").MongoClient;
 const url = "mongodb://" + process.env.DB_HOST + ":" + process.env.DB_PORT;
@@ -29,20 +43,6 @@ function query() {
 function close() {
     mongodb.close();
 }
-
-/* --- Eksempel på brug ---
-const db = require("./mongodb/db");
-
-db.query().collection("profiles").insertOne(
-    { name: "test", rank: "silver1" },
-    (error, data) => {
-        if (error) {
-            throw new Error(error);
-        }
-        console.log(data);
-    }
-);
-*/
 
 module.exports = {
     connect,

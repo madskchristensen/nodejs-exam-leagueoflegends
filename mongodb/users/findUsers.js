@@ -4,8 +4,7 @@ function byEmail(email) {
     const filter = { "details.email": email };
 
     return db.query().collection("users").findOne(filter)
-        .then(user => user)
-        .catch(err => err);
+        .then(res => res);
 }
 
 function byRegionAndSummoner(region, summonerName) {
@@ -17,14 +16,12 @@ function byRegionAndSummoner(region, summonerName) {
     const filter = { "$and": [ { "riot.summonerName" : regex }, { "riot.region" : region } ] };
 
     return db.query().collection("users").findOne(filter)
-        .then(user => user)
-        .catch(err => err);
+        .then(res => res);
 }
 
 function all() {
     return db.query().collection("users").find().toArray()
-        .then(users => users)
-        .catch(err => err);
+        .then(res => res);
 }
 
 module.exports = {

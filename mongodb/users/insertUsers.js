@@ -2,22 +2,13 @@ const db = require("../db");
 
 function user(data) {
     db.query().collection("users").insertOne(
-        data,
-        (error, data) => {
+        data, (error) => {
             if (error) {
                 throw new Error(error);
             }
-        }
-    );
-}
-
-function profile(data) {
-    db.query().collection("users").insertOne(
-        data,
-    )
+        });
 }
 
 module.exports = {
-    user,
-    profile
+    user
 }
