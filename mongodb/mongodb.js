@@ -1,7 +1,11 @@
-const find = require("./find");
-const insert = require("./insert");
+// This module gathers all mongodb modules that are intended to be called and used in endpoints, services etc.
+
+const findUsers = require("./users/findUsers");
+const insertUsers = require("./users/insertUsers");
+const updateUsers = require("./users/updateUsers");
 
 module.exports = {
-    find,
-    insert
+    findUsers,
+    insertUsers,
+    updateUsers
 }

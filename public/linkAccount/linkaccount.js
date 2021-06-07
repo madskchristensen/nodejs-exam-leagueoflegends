@@ -1,21 +1,8 @@
 // use uuid module from cdn to generate a UUID on document load, that
 // the user can paste into their client for verification
-function toastrSettings() {
-    toastr.options.closeButton = true;
-    toastr.options.timeOut = 3000;
-    toastr.options.extendedTimeOut = 3000;
-    toastr.options.progressBar = true;
-
-    toastr.options.showMethod = 'slideDown';
-    toastr.options.hideMethod = 'slideUp';
-    toastr.options.closeMethod = 'slideUp';
-}
-
 document.addEventListener("DOMContentLoaded", function () {
     const uuidInput = document.getElementById("floatingUUID");
     uuidInput.value = uuidv4();
-
-    toastrSettings();
 });
 
 async function linkAccount() {

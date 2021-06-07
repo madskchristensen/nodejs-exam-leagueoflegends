@@ -9,7 +9,7 @@ const router = require("express").Router();
 router.get("/auth/is-logged-in", (req, res) => {
     const loggedIn = req.session.loggedIn;
 
-    res.send({loggedIn});
+    res.send({ data: loggedIn });
 })
 
 // endpoint that is called when a user tries to log in
@@ -17,7 +17,7 @@ router.post("/auth/login", async (req, res) => {
     const password = req.body.password;
     const email = req.body.email;
 
-    const user = await mongo.find.byEmail(email);
+    const user = await mongo.findUsers.byEmail(email);
 
     // if user was found
     if (user) {
@@ -81,7 +81,7 @@ router.post("/auth/signup", (req, res, next) => {
 
         } else {
             req.session.newUser = {
-                email: req.body.email,
+                email: req.body.email.toLowerCase(),
                 password: hashedPassword,
                 verified: false
             }
@@ -163,7 +163,7 @@ router.get("/auth/create-user", async (req, res) => {
         }
 
         // save data object to db
-        mongo.insert.user(data);
+        mongo.insertUsers.user(data);
 
         // delete the newUser object from session as it will no longer be used
         delete req.session.newUser;

@@ -1,11 +1,17 @@
 (async function getProfile() {
     try {
-        const loggedIn = await isLoggedIn();
+        // DATA SETUP //
 
+        // Is user logged in?
+        const loggedIn = await isLoggedIn().then(result => result.data);
+
+        // Get user data for the profile being viewed
         const user = await getUserProfile();
-        const userLoggedIn = await getUser();
 
-        // append hardcoded season stats to user as it has not been implemented yet
+        // Currently logged in user. Will be initialized later in the script if loggedIn is true
+        let userLoggedIn;
+
+        // Append hardcoded season stats to user as it has not been implemented yet
         user.riot.seasonStats = [
             {
                 champion: "Alistar",
@@ -33,29 +39,8 @@
             }
         ];
 
-        const buttonWrapper = document.getElementById("button-wrapper");
+        // LOAD PROFILE INFORMATION //
 
-        // create message button if logged in
-        if (loggedIn && user.riot.summonerName !== userLoggedIn.riot.summonerName) {
-            const messageLink = document.createElement("a");
-            messageLink.href = "/messenger";
-            messageLink.classList.add("btn", "btn-lg", "mb-3", "btn-success")
-            messageLink.innerText = "Message";
-
-            buttonWrapper.appendChild(messageLink);
-        }
-        // disabled button if not logged in
-        else if (!loggedIn) {
-            const messageButton = document.createElement("button");
-            messageButton.disabled = true;
-            messageButton.type = "button";
-            messageButton.innerText = "Please login to message";
-            messageButton.classList.add("btn", "btn-secondary", "w-75")
-
-            buttonWrapper.appendChild(messageButton);
-        }
-
-        // fill in summoner info
         // riot
         document.getElementById("rank").innerText = user.riot.rankedSolo5x5.tier + " " +
             user.riot.rankedSolo5x5.rank;
@@ -146,11 +131,70 @@
             championDiv.appendChild(winrateDiv);
 
             championStatsDiv.appendChild(championDiv);
-        })
+        });
+
+        // MESSAGE BUTTON //
+
+        // create elements related to message button
+        const buttonWrapper = document.getElementById("button-wrapper");
+        const messageButton = document.createElement("button");
+        const messageLink = document.createElement("a");
+
+        // set classes that apply in all cases for button
+        messageButton.classList.add("btn", "mb-3");
+
+        // by default make messageLink go to nothing
+        messageLink.href = "#";
+
+        messageButton.appendChild(messageLink);
+
+        // CONDITIONS FOR MESSAGE BUTTON //
+        // if logged in and not viewing own profile -> show message button
+        // if logged in and viewing own profile -> don't show message button
+        // if not logged in -> show disabled message button
+        if (loggedIn) {
+            userLoggedIn = await getUser();
+
+            // if logged in user is not same as user being viewed -> allow to message
+            if (user.riot.summonerName !== userLoggedIn.riot.summonerName) {
+                messageLink.href = "/messenger";
+                messageButton.classList.add("btn-success")
+                messageButton.innerText = "Message";
+
+                buttonWrapper.appendChild(messageButton);
+            }
+
+            // if user is not logged in -> don't allow to message
+        } else {
+            messageButton.disabled = true;
+            messageButton.innerText = "Login to message";
+            messageButton.classList.add("btn-secondary")
+
+            buttonWrapper.appendChild(messageButton);
+        }
+
+        // allow user to edit profile information and save it,
+        // if they are logged in and profile is their own
+        if (loggedIn && user.riot.summonerName === userLoggedIn.riot.summonerName) {
+            const saveProfileButton = document.createElement("button");
+            saveProfileButton.type = "submit";
+            saveProfileButton.classList.add("btn", "btn-success")
+            saveProfileButton.innerText = "Save"
+
+            const profileForm = document.getElementById("profile-form");
+            profileForm.appendChild(saveProfileButton);
+
+            const formData = new FormData(profileForm);
+
+            formData.forEach((value, key) => {
+                document.getElementById(key).readOnly = false;
+            })
+        }
 
     } catch (error) {
-        console.log(error);
+        // show toastr error?
     }
+
 })();
 
 async function isLoggedIn() {
@@ -178,4 +222,34 @@ async function getUser() {
     const response = await fetch("/api/users/current");
 
     return await response.json();
+}
+
+async function sendFormData() {
+    const profileForm = document.getElementById("profile-form");
+
+    const formData = new FormData(profileForm);
+
+    const data = {}
+
+    formData.forEach((value, key) => data[key] = value);
+
+    await fetch("/api/users/profile", {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: "PUT",
+        body: JSON.stringify(data)
+    })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
+            }
+
+            console.log("save was ok")
+
+            toastr.success("Profile saved!");
+        })
+        .catch(err => {
+            toastr.error("Something went wrong. Try again");
+        })
 }

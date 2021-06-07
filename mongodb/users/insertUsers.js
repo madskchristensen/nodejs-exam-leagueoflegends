@@ -1,4 +1,4 @@
-const db = require("./db");
+const db = require("../db");
 
 function user(data) {
     db.query().collection("users").insertOne(
@@ -11,6 +11,13 @@ function user(data) {
     );
 }
 
+function profile(data) {
+    db.query().collection("users").insertOne(
+        data,
+    )
+}
+
 module.exports = {
-    user
+    user,
+    profile
 }

@@ -1,13 +1,29 @@
+function toastrSettings() {
+    toastr.options.closeButton = true;
+    toastr.options.timeOut = 3000;
+    toastr.options.extendedTimeOut = 3000;
+    toastr.options.progressBar = true;
+
+    toastr.options.showMethod = 'slideDown';
+    toastr.options.hideMethod = 'slideUp';
+    toastr.options.closeMethod = 'slideUp';
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    toastrSettings();
+});
+
 (async function getNavbarItemsFromSession() {
 
     try {
         const response = await fetch("/auth/is-logged-in");
-        const result = await response.json();
+        const loggedIn = await response.json().then(res => res.data);
 
         // create navbar
         const navbarItems = document.getElementById("navbarItems");
 
-        if (result.loggedIn === true) {
+        if (loggedIn) {
 
             // create profile
             const profile = document.createElement("li");
@@ -53,7 +69,7 @@
             signout.appendChild(signoutForm);
             navbarItems.appendChild(signoutForm);
 
-        } else if (result.loggedIn === false) {
+        } else {
 
             // create login
             const login = document.createElement("li");

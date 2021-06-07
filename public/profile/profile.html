@@ -24,25 +24,30 @@
 
         <!-- Profile information -->
         <div id="right-section" class="col-9 pt-3 text-center">
-            <form method="post" action="/api/profile">
+            <!-- Profile form -->
+            <form onsubmit="sendFormData(); return false;" id="profile-form" class="w-100">
+                <!-- Form group -->
                 <div class="form-group row">
                     <label class="col-2 col-form-label">Age: </label>
                     <div class="col-sm-6">
                         <input type="text" readonly class="form-control" id="age" name="age">
                     </div>
                 </div>
+                <!-- Form group -->
                 <div class="form-group row pt-3">
                     <label class="col-2 col-form-label">Languages: </label>
                     <div class="col-sm-6">
                         <input type="text" readonly class="form-control" id="languages" name="languages">
                     </div>
                 </div>
+                <!-- Form group -->
                 <div class="form-group row pt-3">
                     <label class="col-2 col-form-label">Country: </label>
                     <div class="col-sm-6">
                         <input type="text" readonly class="form-control" id="country" name="country">
                     </div>
                 </div>
+                <!-- Form group -->
                 <div class="form-group row pt-3">
                     <label class="col-2 col-form-label">Preferred roles: </label>
                     <div class="col-sm-6">
@@ -54,10 +59,10 @@
                 <div class="form-group row pt-3 mb-4">
                     <label class="col-2 col-form-label">Description: </label>
                     <div class="col-sm-6">
-                        <textarea type="text" readonly class="form-control" rows="6" id="description" name="description"></textarea>
+                        <textarea type="text" readonly class="form-control" rows="6" id="description"
+                                  name="description"></textarea>
                     </div>
                 </div>
-                <input type="submit" value="Save"/>
             </form>
         </div>
     </div>
@@ -72,5 +77,5 @@
     </div>
 </div>
 
-<script type="module" src="/profile/profile.js"></script>
+<script src="/profile/profile.js"></script>
 
