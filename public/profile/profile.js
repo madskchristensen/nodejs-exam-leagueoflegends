@@ -185,7 +185,6 @@
             profileForm.appendChild(saveProfileButton);
 
             const formData = new FormData(profileForm);
-            console.log(formData)
 
             formData.forEach((value, key) => {
                 document.getElementById(key).readOnly = false;
@@ -245,6 +244,8 @@ async function sendFormData() {
             if (!res.ok) {
                 throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
             }
+
+            console.log("save was ok")
 
             toastr.success("Profile saved!");
         })
