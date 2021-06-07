@@ -33,7 +33,6 @@ router.get("/api/user/:region/:summonerName", async(req, res) => {
     else {
         res.sendStatus(404);
     }
-
 })
 
 router.post("/api/user/profile", (req, res) => {

@@ -114,8 +114,6 @@
                 resetNewConversationInput();
             }
             else {
-                // TO DO
-                // alert that message could not be created as user doesn't exist in DB
                 alert("Summoner not found - please try again");
 
             }
@@ -124,29 +122,28 @@
         document.getElementById("message-input").value = ""
     }
 
-    socket.on("private message", (data) => {
+    socket.on("private message", async (data) => {
         // see who message is from
         // if "from" is in current chat divs, add message to conversation
         // else maybe add new convo 
         const listConversationDiv = document.getElementById("list-" + data.from )
-
-        if (!listConversationDiv !== undefined) {
-            console.log(data);
+        console.log(data);
+        if (listConversationDiv) {
             generateMessage (data.message, data.from, data.to, listConversationDiv);
         }
         else{
+            // get region and summoner name
+            const senderRegionAndSummonerName = data.from.split("-");
+            const senderSummonerName = senderRegionAndSummonerName[0];
+            const senderRegion = senderRegionAndSummonerName[1];
+
             // create conversation partner object
-            const conversationPartner = {
-                riot: {
-                    summonerName: data.from,
-                    // TO DO
-                    // fetch summoner from db. Default icon for now
-                    summonerIcon: "1"
-                }
-            }
+            const conversationPartner = await getUserFromDB(senderRegion, senderSummonerName);
+
+
             // create lastMessage object
             const lastMessage = {
-                from: data.from,
+                from: conversationPartner._id,
                 body: data.message
             }
             
@@ -160,8 +157,10 @@
             // create messenger div
             const listConversationDiv = generateMessageContainer(conversationPartner.riot.summonerName, conversationPartner.riot.region);
 
+            // get receiver summoner name
+            const receiverSummonerName = data.to.split("-")[0]
             // attach message to messenger div
-            generateMessage (data.message, conversationPartner.riot.summonerName, data.to, listConversationDiv)
+            generateMessage (data.message, conversationPartner.riot.summonerName, receiverSummonerName, listConversationDiv)
             messengerDiv.appendChild(listConversationDiv);
         }
     })

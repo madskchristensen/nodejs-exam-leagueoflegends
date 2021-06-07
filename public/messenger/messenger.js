@@ -97,52 +97,51 @@
         ]
 */
         const conversationsFromDb = await getMessagesFromDB();
-
-        const messages = [conversationsFromDb[0]];
-        console.log(messages);
-        const testSummoners = conversationsFromDb[1];
-        const loggedInUserId = conversationsFromDb[2];
-        console.log(testSummoners);
+        console.log(conversationsFromDb);
+        const messages = conversationsFromDb.chats;
+        const participants = conversationsFromDb.participants;
+        const loggedInUserId = conversationsFromDb.userID.toString();
         const messagesDiv = document.getElementById("messages-div");
         const messengerDiv = document.getElementById("messenger-div")
 
-        messages.forEach(conversation => {
-            // find user that itsn't the logged in user
-            console.log(conversation);
-            const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId !== loggedInUserId );
+        // check if messages exists
+        if (messages) {
+            messages.forEach(conversation => {
+                // find user that itsn't the logged in user
+                const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId.toString() !== loggedInUserId );
+                // get conversation partner object from id
+                const conversationPartner = participants.find( ({ _id }) => _id.toString() === conversationPartnerId.userObjectId.toString() );
 
-            // get conversation partner object from id
-            const conversationPartner = testSummoners.find( ({ _id }) => _id === conversationPartnerId.userObjectId );
-
-            // save conversation partner summoner name to use as identifier
-            const conversationPartnerSummonerName = conversationPartner.riot.summonerName;
-            const conversationPartnerRegion = conversationPartner.riot.region;
-
-            // get last messageObject that sent message
-            const lastMessage = conversation.messages[conversation.messages.length - 1];
-
-            // find user that sent last message 
-            let lastUser;
-            testSummoners.forEach(testSummoner => {
-                if (testSummoner._id === lastMessage.from) {
-                    lastUser = testSummoner;
-                }
-            });    
-            // create left side conversation entry
-            generateConversation(conversationPartner, lastUser.riot.summonerName, lastMessage, messagesDiv)
-
-            // Create chat
-            // div container and classes
-            const listConversationDiv = generateMessageContainer (conversationPartnerSummonerName, conversationPartnerRegion);
-            
-            // loop through messages in conversation and append them to list
-            conversation.messages.forEach(message => {
-                generateMessage (message.body, message.from, loggedInUserId, listConversationDiv)
+                // save conversation partner summoner name to use as identifier
+                const conversationPartnerSummonerName = conversationPartner.riot.summonerName;
+                const conversationPartnerRegion = conversationPartner.riot.region;
+    
+                // get last messageObject that sent message
+                const lastMessage = conversation.messages[conversation.messages.length - 1];
+    
+                // find user that sent last message 
+                let lastUser;
+                participants.forEach(user => {
+                    if (user._id === lastMessage.from) {
+                        lastUser = user;
+                    }
+                });    
+                // create left side conversation entry
+                generateConversation(conversationPartner, lastUser.riot.summonerName, lastMessage, messagesDiv)
+    
+                // Create chat
+                // div container and classes
+                const listConversationDiv = generateMessageContainer (conversationPartnerSummonerName, conversationPartnerRegion);
+                
+                // loop through messages in conversation and append them to list
+                conversation.messages.forEach(message => {
+                    generateMessage (message.body, message.from, loggedInUserId, listConversationDiv)
+                })
+    
+                messengerDiv.appendChild(listConversationDiv);
             })
+        }
 
-            messengerDiv.appendChild(listConversationDiv);
-
-        })
     }
     catch(error) {
         console.log(error);

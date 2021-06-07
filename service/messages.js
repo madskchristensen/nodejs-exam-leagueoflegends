@@ -18,12 +18,48 @@ router.post ("/api/messages/create-message", (req, res) => {
 });*/
 
 async function saveMessages(data) {
-    console.log(data);
-
     // get objectIds for sender/receiver
+    const receiverUsername = data.receiver.summonerName;
+    const receiverRegion = data.receiver.region;
+    const receiverFromDB = await mongo.find.byRegionAndSummoner(receiverRegion, receiverUsername);
 
-    //check if conversation exists between participants
-    
+    const senderUsername = data.from.summonerName;
+    const senderRegion = data.from.region;
+    const senderFromDB = await mongo.find.byRegionAndSummoner(senderRegion, senderUsername);
+
+    // find conversation between users
+    const conversation = await mongo.findChats.sharedBetweenIds( receiverFromDB._id, senderFromDB._id);
+    if (conversation) {
+        // append message to conversation
+        // create message object
+        const messageData = {
+            from: senderFromDB._id,
+            body: data.message,
+            timeStamp: new Date().toUTCString()
+        }
+        mongo.updateChats.messages(conversation._id, messageData)
+    }
+    else {
+        // create new conversation
+        const conversationData = {
+            participants: [ 
+                {
+                    userObjectId: receiverFromDB._id
+                },
+                {   
+                    userObjectId: senderFromDB._id
+                } 
+            ],
+            messages: [ 
+                {
+                    from: senderFromDB._id,
+                    body: data.message,
+                    timeStamp: new Date().toUTCString()
+                }
+            ]
+        }
+        mongo.insertChats.chat(conversationData);
+    }    
     return "hey"; 
 }
 

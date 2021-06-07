@@ -52,7 +52,10 @@ io.on("connection", (socket) => {
     console.log("A socket connected with id" + socket.id);
 
     // create username from session
-    socket.data.username = socket.request.session.user.riot.summonerName + "-" + socket.request.session.user.riot.region;
+    socket.data.summonerName = socket.request.session.user.riot.summonerName;
+    socket.data.region = socket.request.session.user.riot.region;
+
+    socket.data.username = socket.data.summonerName + "-" + socket.data.region;
     console.log(socket.data.username);
     // join room username
     socket.join(socket.data.username);
@@ -67,10 +70,12 @@ io.on("connection", (socket) => {
         // console.log(data);
         // send message to other user
         console.log("messages was hit");
+        data.from = {};
+        data.from.summonerName = socket.data.summonerName;
+        data.from.region = socket.data.region;
 
-        //const response = await messageService.saveMessages(data);
-
-        // console.log(response);
+        const response = messageService.saveMessages(data);
+        console.log(response);
 
         socket.to(data.receiver.summonerName + "-" + data.receiver.region).emit("private message", {
              message: escapeHtml(data.message),

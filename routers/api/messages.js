@@ -13,34 +13,40 @@ router.get("/api/messages", async (req, res) => {
         const userFromDB = await mongo.find.byRegionAndSummoner(region, summonerName);
         delete userFromDB.details;
         delete userFromDB.profile;
-
+        
         // get messages for given user
-        const messages = await mongo.find.conversationsBySingleId(userFromDB._id.toString());
+        const conversation = {};
+        const chatsFromDB = await mongo.findChats.findAll(userFromDB._id);
+        console.log(chatsFromDB);
+        // check if conversations were had
+        if (chatsFromDB.length) {
+            // combine all messagepartners
+            let conversationPartners = [userFromDB];
+            for (let conversation of chatsFromDB) {
+                try {
+                    // filter own id 
+                    const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId.toString() !== userFromDB._id.toString() );
+                    let conversationParticipant = await mongo.find.byId(conversationPartnerId.userObjectId);
 
-        // combine all messagepartners
-        let conversationPartners = [userFromDB];
-        for (let conversation of messages) {
-            try {
-                // filter own id 
-                const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId !== userFromDB._id.toString() );
-                let conversationParticipant = await mongo.find.byId(conversationPartnerId.userObjectId.toString());
-                delete conversationParticipant.details;
-                delete conversationParticipant.profile;
+                    delete conversationParticipant.details;
+                    delete conversationParticipant.profile;
+                    conversationParticipant._id = conversationParticipant._id;
+                    conversationPartners.push(conversationParticipant);
+                }
+                catch (error) {
+                    console.log(error);
+                }
+            }
+            // delete ids
+            delete chatsFromDB[0]._id;
+            delete chatsFromDB._id;
 
-                conversationPartners.push(conversationParticipant);
-            }
-            catch (error) {
-                console.log(error);
-            }
+            conversation.chats = chatsFromDB;
+            conversation.participants = conversationPartners;
+            conversation.userID = userFromDB._id.toString();
         }
-        messages.push(conversationPartners);
-        messages.push(userFromDB._id.toString());
 
-        // delete ids
-        delete messages[0]._id;
-        delete messages._id;
-
-        res.send(messages);
+        res.send(conversation);
 
     } else {
         res.sendStatus(401);

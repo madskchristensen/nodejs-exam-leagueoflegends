@@ -1,7 +1,7 @@
-const db = require("./db");
+const db = require("../db");
 
-function user(data) {
-    db.query().collection("users").insertOne(
+function chat(data) {
+    db.query().collection("chats").insertOne(
         data,
         (error, data) => {
             if (error) {
@@ -12,5 +12,5 @@ function user(data) {
 }
 
 module.exports = {
-    user
+    chat
 }
