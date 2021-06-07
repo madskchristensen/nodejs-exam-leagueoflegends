@@ -73,33 +73,45 @@ router.post("/auth/signout", (req, res) => {
     res.redirect("/");
 });
 
-router.post("/auth/signup", (req, res, next) => {
-    bcrypt.hash(req.body.password, saltRounds,(err, hashedPassword) => {
-        // let express handle the error and show it to the user.
-        // if NODE_ENV is set to development the stack trace will be shown in browser
-        // if set to production a "500 internal server error" will be displayed
-        if (err) {
-            next(err);
+router.post("/auth/signup", async (req, res, next) => {
+    const email = req.body.email.toLowerCase();
+    const password = req.body.password;
 
-        } else {
-            req.session.newUser = {
-                email: req.body.email.toLowerCase(),
-                password: hashedPassword,
-                verified: false
+    const user = await mongo.findUsers.byEmail(email);
+
+    // if user was found using email, show error
+    if (user) {
+        res.redirect("/signup?error=Email already exists")
+
+    } else {
+        bcrypt.hash(password, saltRounds,(err, hashedPassword) => {
+            // let express handle the error and show it to the user.
+            // if NODE_ENV is set to development the stack trace will be shown in browser
+            // if set to production a "500 internal server error" will be displayed
+            if (err) {
+                next(err);
+
+            } else {
+                req.session.newUser = {
+                    email: email,
+                    password: hashedPassword,
+                    verified: false
+                }
+
+                res.redirect("/link-account");
             }
-
-            res.redirect("/link-account");
-        }
-    });
+        });
+    }
 });
 
-// endpoint called during sign-up process to verify if a given summonerName belongs to the user
+// endpoint called from linkaccount.js during signup process to verify if a given summonerName belongs to the user
 router.post("/auth/verify-summoner", async (req, res) => {
     const summonerName = req.body.summonerName;
     const region = req.body.region.toLowerCase();
     const regionTranslated = riot.translateRegion(region);
     const uuid = req.body.uuid;
 
+    // get summoner and verification string from riot service
     const summonerDTO = await riot.getSummonerDTO(regionTranslated, summonerName);
     const verification = await riot.getVerification(regionTranslated, summonerDTO.id);
 
@@ -173,7 +185,7 @@ router.get("/auth/create-user", async (req, res) => {
         // redirect to frontpage and show success message
         res.redirect("/login?success=User created successfully!");
 
-        // if verified is not set for some weird reason, redirect to start of signup
+    // if verified is not set for some weird reason, redirect to start of signup
     } else {
         res.redirect("/signup?error=Something went wrong. Please try again.");
     }

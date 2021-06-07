@@ -22,7 +22,6 @@ function byRegionAndSummoner(region, summonerName) {
 }
 
 function all() {
-
     return db.query().collection("users").find().toArray()
         .then(users => users)
         .catch(err => err);
