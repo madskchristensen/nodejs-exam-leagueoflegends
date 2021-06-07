@@ -25,7 +25,7 @@ app.use(
             "style-src": ["'self'", "*.fontawesome.com", "*.jsdelivr.net", "*.cloudflare.com", "'unsafe-inline'"], // unsafe-inline needed to allow fontawesome icons
             "font-src": ["'self'", "*.fontawesome.com"],
             "script-src-attr": ["'self'", "'unsafe-inline'"],
-            "img-src": ["'self'", "ddragon.leagueoflegends.com"]
+            "img-src": ["'self'", "ddragon.leagueoflegends.com", "data: w3.org"]
         }
     }));
 
@@ -68,7 +68,7 @@ const sessionInitializer = async function (req, res, next) {
         req.session.loggedIn = true;
     }*/
 
-    if(!req.session.loggedIn) {
+    if (!req.session.loggedIn) {
         req.session.loggedIn = false;
     }
 
@@ -118,8 +118,8 @@ app.get("/", (req, res) => {
     res.send(header + frontpage + footer);
 })
 
-app.get("/login", (req, res) => {
-    res.send(header + login + footer);
+app.get("/login", (req, res, next) => {
+        res.send(header + login + footer);
 })
 
 app.get("/signup", (req, res) => {

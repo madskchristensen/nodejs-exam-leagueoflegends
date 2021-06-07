@@ -7,3 +7,9 @@
     border: 1px solid #ced4da;
     background-color: white;
 }
+
+/* Change bootstrap form glow to a slight gray highlight */
+.form-control:focus {
+    border-color: darkgray;
+    box-shadow: none;
+}

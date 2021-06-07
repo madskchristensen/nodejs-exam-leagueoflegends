@@ -8,11 +8,6 @@
         // Get user data for the profile being viewed
         const user = await getUserProfile();
 
-        if (user.error) {
-            sessionStorage.setItem("error", "User not found.");
-            location.href = "/";
-        }
-
         // Currently logged in user. Will be initialized later in the script if loggedIn is true
         let userLoggedIn;
 

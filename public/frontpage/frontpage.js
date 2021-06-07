@@ -2,26 +2,30 @@
     const searchInput = document.getElementById("search-input");
     const regionSelect = document.getElementById("select-region");
 
-    searchInput.addEventListener("search", () => {
+    // triggers whenever a user hits "enter" in the search input
+    // will redirect to profile page if user exists, and show error if not
+    searchInput.addEventListener("search", async () => {
         const region = regionSelect.value.toLowerCase();
         const summonerName = searchInput.value;
         const currentUrl = location.href;
 
-        location.href = currentUrl + "profile/" + summonerName + "/" + region;
+        const user = await getUserProfile(summonerName, region);
+
+        if (user.error) {
+            toastr.error("User " + summonerName + " not found.");
+            searchInput.value = "";
+
+        } else {
+            location.href = currentUrl + "profile/" + summonerName + "/" + region;
+        }
     });
 
 })();
 
-(function showToastrMessageIfAny() {
-    const error = sessionStorage.getItem("error");
-    const success = sessionStorage.getItem("success");
+async function getUserProfile(summonerName, region) {
+    const userUrl = "/api/users/" + summonerName + "/" + region;
 
-    if (error) {
-        toastr.error(error);
+    const response = await fetch(userUrl);
 
-    } else if (success) {
-        toastr.success(success);
-    }
-
-    sessionStorage.clear();
-})();
+    return await response.json();
+}

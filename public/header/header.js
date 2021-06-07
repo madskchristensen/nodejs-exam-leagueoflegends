@@ -1,12 +1,22 @@
 (function toastrSettings() {
     toastr.options.closeButton = true;
     toastr.options.timeOut = 3000;
-    toastr.options.extendedTimeOut = 3000;
     toastr.options.progressBar = true;
 
     toastr.options.showMethod = 'slideDown';
     toastr.options.hideMethod = 'slideUp';
     toastr.options.closeMethod = 'slideUp';
+})();
+
+(function showToastr() {
+    const searchParams = new URLSearchParams(location.search);
+
+    if (searchParams.has("error")) {
+        toastr.error(searchParams.get("error"));
+    } else if (searchParams.has("success")) {
+        toastr.success(searchParams.get("success"));
+    }
+
 })();
 
 (async function getNavbarItemsFromSession() {

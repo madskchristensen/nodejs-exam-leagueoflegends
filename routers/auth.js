@@ -42,14 +42,16 @@ router.post("/auth/login", async (req, res) => {
 
             // if passwords don't match, redirect to login page and don't log in user
         } else {
-            console.log("Client login rejected (wrong password)", req.session.id);
+            console.log("Client login rejected (wrong password):", req.session.id);
 
-            res.redirect("/login");
+            res.redirect("/login?error=Wrong email and/or password");
         }
 
         // if user was not found redirect to login
     } else {
-        res.redirect("/login");
+        console.log("Client login rejected (user not found):", req.session.id);
+
+        res.redirect("/login?error=Wrong email and/or password")
     }
 });
 
@@ -168,10 +170,12 @@ router.get("/auth/create-user", async (req, res) => {
         // delete the newUser object from session as it will no longer be used
         delete req.session.newUser;
 
-        res.redirect("/");
+        // redirect to frontpage and show success message
+        res.redirect("/login?success=User created successfully!");
 
+        // if verified is not set for some weird reason, redirect to start of signup
     } else {
-        res.sendStatus(401);
+        res.redirect("/signup?error=Something went wrong. Please try again.");
     }
 });
 
