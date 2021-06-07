@@ -49,9 +49,24 @@ router.get("/api/users/", async (req, res) => {
     }
 });
 
-router.put("/api/users/profile", (req, res) => {
-    // brug user fra session
-    console.log(req.body)
+router.put("/api/users/profile", async (req, res) => {
+    const user = req.session.user;
+
+    if (req.session.loggedIn) {
+        // will return result of the update containing n modified, n found and ok fields
+        const res = await mongodb.updateUsers.profile(user.riot.summonerName, user.riot.region, req.body);
+
+        // if 1 user was found, 1 user was modified and result is ok, update was successful
+        if (res.n === 1 && res.nModified === 1 && res.ok === 1) {
+            res.send({ data: true })
+
+        } else {
+            res.send({ data: false })
+        }
+
+    } else {
+        res.send({ data: false })
+    }
 });
 
 module.exports = {

@@ -2,8 +2,10 @@
 
 const findUsers = require("./users/findUsers");
 const insertUsers = require("./users/insertUsers");
+const updateUsers = require("./users/updateUsers");
 
 module.exports = {
     findUsers,
-    insertUsers
+    insertUsers,
+    updateUsers
 }
