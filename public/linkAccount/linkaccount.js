@@ -10,7 +10,7 @@ async function linkAccount() {
     const verified = await verifySummoner().then(res => res);
 
     if (verified) {
-        toastr.success("Verification succeeded!")
+        sessionStorage.setItem("success", "User created successfully!")
         window.location.href = "/auth/create-user"
 
     } else {

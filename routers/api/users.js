@@ -29,7 +29,7 @@ router.get("/api/users/:summonerName/:region", async (req, res) => {
         res.send(user);
 
     } else {
-        res.sendStatus(404);
+        res.status(404).send({ error: "User not found" });
     }
 });
 
@@ -58,14 +58,14 @@ router.put("/api/users/profile", async (req, res) => {
 
         // if 1 user was found, 1 user was modified and result is ok, update was successful
         if (result.n === 1 && result.nModified === 1 && result.ok === 1) {
-            res.send({ data: true })
+            res.send({ data: true });
 
         } else {
-            res.send({ data: false })
+            res.send({ data: false });
         }
 
     } else {
-        res.send({ data: false })
+        res.send({ data: false });
     }
 });
 

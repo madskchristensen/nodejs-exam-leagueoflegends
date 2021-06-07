@@ -11,3 +11,17 @@
     });
 
 })();
+
+(function showToastrMessageIfAny() {
+    const error = sessionStorage.getItem("error");
+    const success = sessionStorage.getItem("success");
+
+    if (error) {
+        toastr.error(error);
+
+    } else if (success) {
+        toastr.success(success);
+    }
+
+    sessionStorage.clear();
+})();
