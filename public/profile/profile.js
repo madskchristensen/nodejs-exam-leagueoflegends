@@ -1,7 +1,6 @@
 (async function getProfile() {
     try {
         // DATA SETUP //
-
         // Is user logged in?
         const loggedIn = await isLoggedIn().then(result => result.data);
 
@@ -9,7 +8,7 @@
         const userProfile = await getUserProfile();
 
         // Currently logged in user. Will be initialized later in the script if loggedIn is true
-        let userLoggedIn;
+        let userLoggedIn = await getUser();
 
         // Append hardcoded season stats to user as it has not been implemented yet
         userProfile.riot.seasonStats = [
@@ -43,45 +42,7 @@
         loadProfile(userProfile);
 
         // MESSAGE BUTTON //
-
-        // create elements related to message button
-        const buttonWrapper = document.getElementById("button-wrapper");
-        const messageButton = document.createElement("button");
-        const messageLink = document.createElement("a");
-
-        // set classes that apply in all cases for button
-        messageButton.classList.add("btn", "mb-3");
-
-        // by default make messageLink go to nothing
-        messageLink.href = "#";
-
-        messageButton.appendChild(messageLink);
-
-        // CONDITIONS FOR MESSAGE BUTTON //
-        // if logged in and not viewing own profile -> show message button
-        // if logged in and viewing own profile -> don't show message button
-        // if not logged in -> show disabled message button
-        if (loggedIn) {
-            userLoggedIn = await getUser();
-
-            // if logged in user is not same as user being viewed -> allow to message
-            if (userProfile.riot.summonerName !== userLoggedIn.riot.summonerName &&
-                userProfile.riot.region !== userLoggedIn.riot.region) {
-                messageLink.href = "/messenger";
-                messageButton.classList.add("btn-success")
-                messageButton.innerText = "Message";
-
-                buttonWrapper.appendChild(messageButton);
-            }
-
-        // if user is not logged in -> don't allow to message
-        } else {
-            messageButton.disabled = true;
-            messageButton.innerText = "Login to message";
-            messageButton.classList.add("btn-secondary")
-
-            buttonWrapper.appendChild(messageButton);
-        }
+        loadMessageButton(loggedIn, userProfile, userLoggedIn);
 
         // allow user to edit profile information and save it,
         // if they are logged in and profile is their own
@@ -96,6 +57,46 @@
     }
 
 })();
+
+function loadMessageButton(loggedIn, userProfile, userLoggedIn) {
+    // create elements related to message button
+    const buttonWrapper = document.getElementById("button-wrapper");
+    const messageButton = document.createElement("button");
+    const messageLink = document.createElement("a");
+
+    // set classes that apply in all cases for button
+    messageButton.classList.add("btn", "mb-3");
+
+    // by default make messageLink go to nothing
+    messageLink.href = "#";
+
+    messageButton.appendChild(messageLink);
+
+    // CONDITIONS FOR MESSAGE BUTTON //
+    // if logged in and not viewing own profile -> show message button
+    // if logged in and viewing own profile -> don't show message button
+    // if not logged in -> show disabled message button
+    if (loggedIn) {
+
+        // if logged in user is not same as user being viewed -> allow to message
+        if (userProfile.riot.summonerName !== userLoggedIn.riot.summonerName &&
+            userProfile.riot.region !== userLoggedIn.riot.region) {
+            messageLink.href = "/messenger";
+            messageButton.classList.add("btn-success")
+            messageButton.innerText = "Message";
+
+            buttonWrapper.appendChild(messageButton);
+        }
+
+    // if user is not logged in -> don't allow to message
+    } else {
+        messageButton.disabled = true;
+        messageButton.innerText = "Login to message";
+        messageButton.classList.add("btn-secondary")
+
+        buttonWrapper.appendChild(messageButton);
+    }
+}
 
 function loadProfile(userProfile) {
     // riot
