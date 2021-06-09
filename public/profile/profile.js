@@ -6,13 +6,13 @@
         const loggedIn = await isLoggedIn().then(result => result.data);
 
         // Get user data for the profile being viewed
-        const user = await getUserProfile();
+        const userProfile = await getUserProfile();
 
         // Currently logged in user. Will be initialized later in the script if loggedIn is true
         let userLoggedIn;
 
         // Append hardcoded season stats to user as it has not been implemented yet
-        user.riot.seasonStats = [
+        userProfile.riot.seasonStats = [
             {
                 champion: "Alistar",
                 winRate: "55%",
@@ -40,98 +40,7 @@
         ];
 
         // LOAD PROFILE INFORMATION //
-
-        // riot
-        document.getElementById("rank").innerText = user.riot.rankedSolo5x5.tier + " " +
-            user.riot.rankedSolo5x5.rank;
-        document.getElementById("lp").innerText = user.riot.rankedSolo5x5.leaguePoints + " LP";
-        document.getElementById("summoner-name").innerText = user.riot.summonerName;
-        document.getElementById("region").innerText = user.riot.region.toUpperCase();
-        document.getElementById("summoner-level").innerText = "Level " + user.riot.summonerLevel;
-
-        // profile
-        document.getElementById("age").value = user.profile.age;
-        document.getElementById("languages").value = user.profile.languages;
-        document.getElementById("country").value = user.profile.country;
-        document.getElementById("roles").value = user.profile.roles;
-        document.getElementById("description").value = user.profile.description;
-
-        // summoner rank
-        const summonerRank = document.getElementById("summoner-rank-icon");
-        const summonerRankFromDB = user.riot.rankedSolo5x5.tier.split(" ")[0];
-        summonerRank.src = "/assets/riot/ranked-emblems/" + summonerRankFromDB + ".png";
-
-        // summoner icon
-        const summonerIcon = document.getElementById("summoner-icon");
-        const summonerIconFromDB = user.riot.profileIconId;
-        summonerIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/" + summonerIconFromDB + ".png";
-
-        // summoner stats
-        const championStatsDiv = document.getElementById("champion-stats");
-        user.riot.seasonStats.forEach(champion => {
-
-            // div
-            const championDiv = document.createElement("div");
-            championDiv.classList.add("row", "border", "my-3", "mx-1", "align-items-center");
-
-            // div for champion icon
-            const iconDiv = document.createElement("div");
-            iconDiv.classList.add("col", "col-1", "py-3");
-
-            // champion icon
-            const championIcon = document.createElement("img")
-            championIcon.classList.add("img-fluid", "w-100");
-            championIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/champion/" + champion.champion + ".png";
-
-            iconDiv.appendChild(championIcon);
-            championDiv.appendChild(iconDiv);
-
-            // div for champion name
-            const championNameDiv = document.createElement("div");
-            championNameDiv.classList.add("col", "col-2", "py-3");
-
-            // champion name
-            const championName = document.createElement("h5");
-            championName.innerText = champion.champion;
-
-            championNameDiv.appendChild(championName);
-            championDiv.appendChild(championNameDiv);
-
-            // div for kda
-            const kdaDiv = document.createElement("div");
-            kdaDiv.classList.add("col", "col-2", "py-3");
-
-            // kda
-            const kda = document.createElement("h5");
-            kda.innerText = "KDA: " + champion.KDA;
-
-            kdaDiv.appendChild(kda);
-            championDiv.appendChild(kdaDiv);
-
-            // div for games played
-            const gamesPlayedDiv = document.createElement("div");
-            gamesPlayedDiv.classList.add("col", "col-3", "py-3");
-
-            // kda
-            const gamesPlayed = document.createElement("h5");
-            gamesPlayed.innerText = "Games played: " + champion.gamesPlayed;
-
-            gamesPlayedDiv.appendChild(gamesPlayed);
-            championDiv.appendChild(gamesPlayedDiv);
-
-            // div for winrate
-            const winrateDiv = document.createElement("div");
-            winrateDiv.classList.add("col", "col-3", "py-3");
-
-            // kda
-            const winrate = document.createElement("h5");
-            winrate.innerText = "Winrate: " + champion.winRate;
-
-            winrateDiv.appendChild(winrate);
-            championDiv.appendChild(winrateDiv);
-
-            championStatsDiv.appendChild(championDiv);
-        });
+        loadProfile(userProfile);
 
         // MESSAGE BUTTON //
 
@@ -156,7 +65,7 @@
             userLoggedIn = await getUser();
 
             // if logged in user is not same as user being viewed -> allow to message
-            if (user.riot.summonerName !== userLoggedIn.riot.summonerName) {
+            if (userProfile.riot.summonerName !== userLoggedIn.riot.summonerName) {
                 messageLink.href = "/messenger";
                 messageButton.classList.add("btn-success")
                 messageButton.innerText = "Message";
@@ -164,7 +73,7 @@
                 buttonWrapper.appendChild(messageButton);
             }
 
-            // if user is not logged in -> don't allow to message
+        // if user is not logged in -> don't allow to message
         } else {
             messageButton.disabled = true;
             messageButton.innerText = "Login to message";
@@ -175,20 +84,8 @@
 
         // allow user to edit profile information and save it,
         // if they are logged in and profile is their own
-        if (loggedIn && user.riot.summonerName === userLoggedIn.riot.summonerName) {
-            const saveProfileButton = document.createElement("button");
-            saveProfileButton.type = "submit";
-            saveProfileButton.classList.add("btn", "btn-success")
-            saveProfileButton.innerText = "Save"
-
-            const profileForm = document.getElementById("profile-form");
-            profileForm.appendChild(saveProfileButton);
-
-            const formData = new FormData(profileForm);
-
-            formData.forEach((value, key) => {
-                document.getElementById(key).readOnly = false;
-            })
+        if (loggedIn && userProfile.riot.summonerName === userLoggedIn.riot.summonerName) {
+            enableProfileEditing();
         }
 
     } catch (error) {
@@ -196,6 +93,118 @@
     }
 
 })();
+
+function loadProfile(userProfile) {
+    // riot
+    document.getElementById("rank").innerText = userProfile.riot.rankedSolo5x5.tier + " " +
+        userProfile.riot.rankedSolo5x5.rank;
+    document.getElementById("lp").innerText = userProfile.riot.rankedSolo5x5.leaguePoints + " LP";
+    document.getElementById("summoner-name").innerText = userProfile.riot.summonerName;
+    document.getElementById("region").innerText = userProfile.riot.region.toUpperCase();
+    document.getElementById("summoner-level").innerText = "Level " + userProfile.riot.summonerLevel;
+
+    // profile
+    document.getElementById("age").value = userProfile.profile.age;
+    document.getElementById("languages").value = userProfile.profile.languages;
+    document.getElementById("country").value = userProfile.profile.country;
+    document.getElementById("roles").value = userProfile.profile.roles;
+    document.getElementById("description").value = userProfile.profile.description;
+
+    // summoner rank
+    const summonerRank = document.getElementById("summoner-rank-icon");
+    const summonerRankFromDB = userProfile.riot.rankedSolo5x5.tier.split(" ")[0];
+    summonerRank.src = "/assets/riot/ranked-emblems/" + summonerRankFromDB + ".png";
+
+    // summoner icon
+    const summonerIcon = document.getElementById("summoner-icon");
+    const summonerIconFromDB = userProfile.riot.profileIconId;
+    summonerIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/" + summonerIconFromDB + ".png";
+
+    // summoner stats
+    const championStatsDiv = document.getElementById("champion-stats");
+    userProfile.riot.seasonStats.forEach(champion => {
+
+        // div
+        const championDiv = document.createElement("div");
+        championDiv.classList.add("row", "border", "my-3", "mx-1", "align-items-center");
+
+        // div for champion icon
+        const iconDiv = document.createElement("div");
+        iconDiv.classList.add("col", "col-1", "py-3");
+
+        // champion icon
+        const championIcon = document.createElement("img")
+        championIcon.classList.add("img-fluid", "w-100");
+        championIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/champion/" + champion.champion + ".png";
+
+        iconDiv.appendChild(championIcon);
+        championDiv.appendChild(iconDiv);
+
+        // div for champion name
+        const championNameDiv = document.createElement("div");
+        championNameDiv.classList.add("col", "col-2", "py-3");
+
+        // champion name
+        const championName = document.createElement("h5");
+        championName.innerText = champion.champion;
+
+        championNameDiv.appendChild(championName);
+        championDiv.appendChild(championNameDiv);
+
+        // div for kda
+        const kdaDiv = document.createElement("div");
+        kdaDiv.classList.add("col", "col-2", "py-3");
+
+        // kda
+        const kda = document.createElement("h5");
+        kda.innerText = "KDA: " + champion.KDA;
+
+        kdaDiv.appendChild(kda);
+        championDiv.appendChild(kdaDiv);
+
+        // div for games played
+        const gamesPlayedDiv = document.createElement("div");
+        gamesPlayedDiv.classList.add("col", "col-3", "py-3");
+
+        // kda
+        const gamesPlayed = document.createElement("h5");
+        gamesPlayed.innerText = "Games played: " + champion.gamesPlayed;
+
+        gamesPlayedDiv.appendChild(gamesPlayed);
+        championDiv.appendChild(gamesPlayedDiv);
+
+        // div for winrate
+        const winrateDiv = document.createElement("div");
+        winrateDiv.classList.add("col", "col-3", "py-3");
+
+        // kda
+        const winrate = document.createElement("h5");
+        winrate.innerText = "Winrate: " + champion.winRate;
+
+        winrateDiv.appendChild(winrate);
+        championDiv.appendChild(winrateDiv);
+
+        championStatsDiv.appendChild(championDiv);
+    });
+}
+
+function enableProfileEditing() {
+    // set up save profile button
+    const saveProfileButton = document.createElement("button");
+    saveProfileButton.type = "submit";
+    saveProfileButton.classList.add("btn", "btn-success", "w-25", "mt-3");
+    saveProfileButton.innerText = "Save";
+
+    const saveCol = document.getElementById("form-save-col");
+    saveCol.appendChild(saveProfileButton);
+
+    const profileForm = document.getElementById("profile-form");
+    const formData = new FormData(profileForm);
+
+    formData.forEach((value, key) => {
+        document.getElementById(key).readOnly = false;
+    })
+}
 
 async function isLoggedIn() {
     const response = await fetch("/auth/is-logged-in");

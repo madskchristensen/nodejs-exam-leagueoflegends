@@ -30,7 +30,7 @@ router.post("/auth/login", async (req, res) => {
             .catch(err => err);
 
         // if passwords match user will be logged in
-        if(passwordMatches) {
+        if (passwordMatches) {
             console.log("Client login accepted:", req.session.id);
 
             req.session.loggedIn = true;

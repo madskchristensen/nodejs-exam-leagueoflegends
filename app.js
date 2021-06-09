@@ -64,7 +64,7 @@ const sessionInitializer = async function (req, res, next) {
 /*    if (process.env.NODE_ENV === "development") {
         const mongodb = require("./mongodb/mongodb");
 
-        req.session.user = await mongodb.find.byEmail("nymail@mail.dk");
+        req.session.user = await mongodb.findUsers.byEmail("nymail@mail.dk");
         req.session.loggedIn = true;
     }*/
 

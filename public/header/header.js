@@ -13,6 +13,7 @@
 
     if (searchParams.has("error")) {
         toastr.error(searchParams.get("error"));
+
     } else if (searchParams.has("success")) {
         toastr.success(searchParams.get("success"));
     }
@@ -20,7 +21,6 @@
 })();
 
 (async function getNavbarItemsFromSession() {
-
     try {
         const response = await fetch("/auth/is-logged-in");
         const loggedIn = await response.json().then(res => res.data);
@@ -87,6 +87,7 @@
             login.appendChild(loginLink);
             navbarItems.appendChild(login);
         }
+
     } catch (error) {
         console.log(error);
     }
