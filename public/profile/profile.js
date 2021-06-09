@@ -65,7 +65,8 @@
             userLoggedIn = await getUser();
 
             // if logged in user is not same as user being viewed -> allow to message
-            if (userProfile.riot.summonerName !== userLoggedIn.riot.summonerName) {
+            if (userProfile.riot.summonerName !== userLoggedIn.riot.summonerName &&
+                userProfile.riot.region !== userLoggedIn.riot.region) {
                 messageLink.href = "/messenger";
                 messageButton.classList.add("btn-success")
                 messageButton.innerText = "Message";
@@ -84,7 +85,9 @@
 
         // allow user to edit profile information and save it,
         // if they are logged in and profile is their own
-        if (loggedIn && userProfile.riot.summonerName === userLoggedIn.riot.summonerName) {
+        if (loggedIn &&
+            userProfile.riot.summonerName === userLoggedIn.riot.summonerName &&
+            userProfile.riot.region === userLoggedIn.riot.region) {
             enableProfileEditing();
         }
 
