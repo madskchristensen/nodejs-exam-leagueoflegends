@@ -56,36 +56,35 @@ io.on("connection", (socket) => {
     socket.data.region = socket.request.session.user.riot.region;
 
     socket.data.username = socket.data.summonerName + "-" + socket.data.region;
-    console.log(socket.data.username);
-    // join room username
+    
+    // join room with username
     socket.join(socket.data.username);
-      
-    socket.on("private message", (data) => {
-        // TO DO
-        // save message in DB
-        // from: socket.data.username
-        // to: anotherSocketId
-        // message: data.message
 
-        // console.log(data);
+    socket.on("private message", async (data) => {
         // send message to other user
-        console.log("messages was hit");
         data.from = {};
         data.from.summonerName = socket.data.summonerName;
         data.from.region = socket.data.region;
 
-        const response = messageService.saveMessages(data);
-        console.log(response);
+        const response = await messageService.saveMessages(data);
 
-        socket.to(data.receiver.summonerName + "-" + data.receiver.region).emit("private message", {
-             message: escapeHtml(data.message),
-             from: socket.data.username,
-             to: data.receiver.summonerName + "-" + data.receiver.region
-        });
+        if (response.data) {
+            socket.to(data.receiver.summonerName + "-" + data.receiver.region).to(socket.data.username).emit("private message", {
+                message: escapeHtml(data.message),
+                from: socket.data.username,
+                to: data.receiver.summonerName + "-" + data.receiver.region,
+                toSelf: false
+            });
+            io.in(socket.data.username).emit("private message", {
+                message: escapeHtml(data.message),
+                from: socket.data.username,
+                to: data.receiver.summonerName + "-" + data.receiver.region,
+                toSelf: true
+            });
+        } 
     });
 
     socket.on("disconnect", async () => {
-
         console.log("A socket disconnected" + socket.data.username);
     })
 });
@@ -116,12 +115,12 @@ app.use(sessionMiddleware);
 
 // middleware that sets needed variables in the session
 const sessionInitializer = async function (req, res, next) {
-   /* if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development") {
         const mongodb = require("./mongodb/mongodb");
 
         req.session.user = await mongodb.find.byEmail("michael@fuglo.com");
         req.session.loggedIn = true;
-    }*/
+    }
 
     if(!req.session.loggedIn) {
         req.session.loggedIn = false;

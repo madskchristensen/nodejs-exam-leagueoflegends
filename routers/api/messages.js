@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const mongo = require("../../mongodb/mongodb");
+const messageService = require("../../service/messages");
 
 router.get("/api/messages", async (req, res) => {
     const loggedIn = req.session.loggedIn;
@@ -17,39 +18,28 @@ router.get("/api/messages", async (req, res) => {
         // get messages for given user
         const conversation = {};
         const chatsFromDB = await mongo.findChats.findAll(userFromDB._id);
-        console.log(chatsFromDB);
+
         // check if conversations were had
         if (chatsFromDB.length) {
             // combine all messagepartners
-            let conversationPartners = [userFromDB];
-            for (let conversation of chatsFromDB) {
-                try {
-                    // filter own id 
-                    const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId.toString() !== userFromDB._id.toString() );
-                    let conversationParticipant = await mongo.find.byId(conversationPartnerId.userObjectId);
-
-                    delete conversationParticipant.details;
-                    delete conversationParticipant.profile;
-                    conversationParticipant._id = conversationParticipant._id;
-                    conversationPartners.push(conversationParticipant);
-                }
-                catch (error) {
-                    console.log(error);
-                }
-            }
+            const conversationPartners = await messageService.combineAllChatParticipants(chatsFromDB, userFromDB);
+            
             // delete ids
             delete chatsFromDB[0]._id;
             delete chatsFromDB._id;
-
+            
             conversation.chats = chatsFromDB;
             conversation.participants = conversationPartners;
             conversation.userID = userFromDB._id.toString();
+
+            res.status(200).send(conversation);
         }
-
-        res.send(conversation);
-
+        else {
+            // no chats found send null object
+            res.status(204).send( { message: "No conversations found" } );
+        }
     } else {
-        res.sendStatus(401);
+        res.status(401).send( { message: "ERROR: You are not authorized to access this endpoint" });
     }
 });
 

@@ -1,22 +1,5 @@
 const mongo = require("../mongodb/mongodb");
 
-// Post message to conversation 
-/*
-router.post ("/api/messages/create-message", (req, res) => {
-    // if no conversation including the two participants create new conversation with participants object and messages object (1)
-    // else append message object to existing messages object
-    console.log(req.body);
-    // create message object to be saved from localdatetime
-    const successfull = true;
-    // find conversation between users (receiver and socketIdentifier)
-    if (successfull) {
-        res.sendStatus(201).send({ message:"Message was saved successfully" });
-    }
-    else {
-        res.sendStatus(500).send({ message: "Message could not be saved in database" });
-    }
-});*/
-
 async function saveMessages(data) {
     // get objectIds for sender/receiver
     const receiverUsername = data.receiver.summonerName;
@@ -27,17 +10,26 @@ async function saveMessages(data) {
     const senderRegion = data.from.region;
     const senderFromDB = await mongo.find.byRegionAndSummoner(senderRegion, senderUsername);
 
-    // find conversation between users
+    // find if conversation between users were had
     const conversation = await mongo.findChats.sharedBetweenIds( receiverFromDB._id, senderFromDB._id);
+
+    // if conversation exists ==> conversation was already had ==> append message to chat
     if (conversation) {
-        // append message to conversation
         // create message object
         const messageData = {
             from: senderFromDB._id,
             body: data.message,
             timeStamp: new Date().toUTCString()
         }
-        mongo.updateChats.messages(conversation._id, messageData)
+        const result = await mongo.updateChats.messages(conversation._id, messageData);
+       
+        // if 1 chat was found, 1 chat was modified and result is ok, update was successful
+        if (result.n === 1 && result.nModified === 1 && result.ok === 1) {
+            return { data: true, method: "update" }
+        } 
+        else {
+            return { data: false, method: "update" }
+        }
     }
     else {
         // create new conversation
@@ -59,10 +51,33 @@ async function saveMessages(data) {
             ]
         }
         mongo.insertChats.chat(conversationData);
+        return { data: true, method: "create" }
     }    
-    return "hey"; 
+}
+
+// combines all chat participants in array of chats into a single array
+async function combineAllChatParticipants(chats, user) {
+    // combine all messagepartners
+    let conversationPartners = [user];
+    for (let conversation of chats) {
+        try {
+            // filter own id 
+            const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId.toString() !== user._id.toString() );
+            let conversationParticipant = await mongo.find.byId(conversationPartnerId.userObjectId);
+
+            delete conversationParticipant.details;
+            delete conversationParticipant.profile;
+
+            conversationPartners.push(conversationParticipant);
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+    return conversationPartners;
 }
 
 module.exports = {
-    saveMessages
+    saveMessages,
+    combineAllChatParticipants
 }

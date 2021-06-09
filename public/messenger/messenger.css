@@ -7,7 +7,15 @@
 
 #messenger-div {
   min-height: calc(100vh - 230px);   
+  max-height: calc(100vh - 230px);   
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column-reverse;
+}
 
+.conversation-container {
+  overflow-y: auto;
 }
 
 #messenger {
