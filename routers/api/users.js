@@ -9,10 +9,10 @@ router.get("/api/users/current", (req, res) => {
         delete user.details;
         delete user._id;
 
-        res.send(user);
+        res.status(200).send(user);
 
     } else {
-        res.sendStatus(404);
+        res.status(204).send( { error: "Logged in user not found" } );
     }
 });
 
@@ -26,10 +26,10 @@ router.get("/api/users/:summonerName/:region", async (req, res) => {
         delete user._id;
         delete user.details;
 
-        res.send(user);
+        res.status(200).send(user);
 
     } else {
-        res.status(404).send({ error: "User not found" });
+        res.status(204).send( { error: "User not found" } );
     }
 });
 
@@ -42,10 +42,10 @@ router.get("/api/users/", async (req, res) => {
             delete user.details;
         });
 
-        res.send(users);
+        res.status(200).send(users);
 
     } else {
-        res.sendStatus(404);
+        res.status(204).send( { error: "Users not found" } );
     }
 });
 
@@ -58,14 +58,14 @@ router.put("/api/users/profile", async (req, res) => {
 
         // if 1 user was found, 1 user was modified and result is ok, update was successful
         if (result.n === 1 && result.nModified === 1 && result.ok === 1) {
-            res.send({ data: true });
+            res.status(200).send( { data: true } );
 
         } else {
-            res.send({ data: false });
+            res.status(204).send( { data: false } );
         }
 
     } else {
-        res.send({ data: false });
+        res.status(401).send( { data: false, error: "You are not authorized to access this endpoint" } );
     }
 });
 

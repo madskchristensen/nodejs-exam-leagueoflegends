@@ -1,0 +1,20 @@
+{
+    "participants": [{
+        "userObjectId": "60b688995e64130460dc1aa0"
+    }, {
+        "userObjectId": "60b89dd590b62197979f0e0f"
+    }],
+    "messages": [{
+        "from": "60b688995e64130460dc1aa0",
+        "body": "Hey you",
+        "timestamp": "Thu, 03 Jun 2021 18:31:56 GMT"
+    }, {
+        "from": "60b688995e64130460dc1aa0",
+        "body": "Why are you not answering",
+        "timestamp": "Thu, 03 Jun 2021 18:33:56 GMT"
+    }, {
+        "from": "60b89dd590b62197979f0e0f",
+        "body": "Im busy grinding m8",
+        "timestamp": "Thu, 03 Jun 2021 18:36:56 GMT"
+    }]
+}

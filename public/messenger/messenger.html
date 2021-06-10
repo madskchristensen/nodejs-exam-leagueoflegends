@@ -1,0 +1,163 @@
+<link rel="stylesheet" href="messenger.css">
+
+<div class="container">
+    <div class="row pt-5" >
+        <div id="chats-div" class="col col-3">
+            <h4>Chats</h4>
+            <input type="text" id="new-conversation-input" class="form-control pt-2 mb-3 mt-3" placeholder="New chat: Type receiver name here" >
+            <div id="select-div">
+                <select class="form-select form-select-sm" id="select-region">
+                    <option selected>euw</option>
+                    <option>na</option>
+                    <option>eune</option>
+                    <option>kr</option>
+                    <option>br</option>
+                    <option>lan</option>
+                    <option>las</option>
+                    <option>oce</option>
+                    <option>ru</option>
+                    <option>tr</option>
+                    <option>jp</option>
+                </select>
+            </div>
+            <div id="messages-div" class="list-group pt-3" role="tablist">
+
+            </div>
+        </div>
+        <div class="col col-9" id="messenger">
+            <div class="tab-content" id="messenger-div">
+
+            </div>
+            <div class="row mt-5">
+                <input type="text" placeholder="Type your message here..." class="mt-2 py-1" id="message-input">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/messenger/messenger.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    const socket = io();
+    
+    // get session
+    let loggedInUser;
+    getUserFromSession().then((result) => {
+        loggedInUser = result;
+    });
+
+    const sendMessageInput = document.getElementById("message-input");
+    sendMessageInput.addEventListener("keyup", (event) => {
+        // e.keyCode for legacy browsers
+        if (event.keyCode === 13 || event.key === 'Enter') {
+            sendPrivateMessage();
+        }
+    })
+
+    async function sendPrivateMessage() {
+        // save current user summoner name
+        const socketIdentifier = loggedInUser.riot.summonerName;
+        const message = document.getElementById("message-input").value;
+
+        // get new conversation input field to check if new message
+        const newConversationInput = document.getElementById("new-conversation-input").value;
+        const newConversationRegion = document.getElementById("select-region").value;
+        const messagesDiv = document.getElementById("messages-div");
+
+        // get name of receiver
+        let receiver = { };
+        // if nothing inside newConversationInput append message to chat
+        if (newConversationInput === "") {
+            // get active conversation
+            const activeConversationDiv = document.getElementsByClassName("list-group-item list-group-item-action conversation-link active")[0];
+            const conversationIdentifierArr = activeConversationDiv.id.split("-");
+
+            receiver.summonerName = conversationIdentifierArr[0];
+            receiver.region = conversationIdentifierArr[1];
+        }
+        else {
+            receiver.summonerName = newConversationInput;
+            receiver.region = newConversationRegion;
+        }
+
+        const conversationPartner = await getUserFromDB(receiver.region, receiver.summonerName);
+        if (!conversationPartner) {
+            alert("Summoner not found - please try again");
+        }
+        else if (conversationPartner.riot.summonerName === loggedInUser.riot.summonerName && conversationPartner.riot.region === loggedInUser.riot.region ) {
+            alert("You can't send messages to yourself. Get a life");
+        }
+        else {
+            socket.emit("private message", { receiver, message });
+            // reset message and conversation inputs
+            resetMessageInputs();
+        }
+    }
+
+    
+    socket.on("private message", async (data) => {
+        if (data.toSelf) {
+            listConversationDiv = document.getElementById("list-" + data.to);
+        }
+        else {
+            listConversationDiv = document.getElementById("list-" + data.from);
+        }
+
+        // if conversation element already exists - append message to chat
+        if (listConversationDiv) {
+            if (data.toSelf) {
+                generateMessage (data.message, data.from, data.from, listConversationDiv);
+            }
+            else {
+                generateMessage (data.message, data.from, data.to, listConversationDiv);
+            }
+        }
+        // else create new conversation, chat and message
+        else {
+            // get region and summoner name
+            let senderRegionAndSummonerName;
+            if (data.toSelf) {
+                senderRegionAndSummonerName = data.to.split("-");
+            }
+            else {
+                senderRegionAndSummonerName = data.from.split("-");
+            }
+
+            const senderSummonerName = senderRegionAndSummonerName[0];
+            const senderRegion = senderRegionAndSummonerName[1];
+
+            // create conversation partner object
+            const conversationPartner = await getUserFromDB(senderRegion, senderSummonerName);
+
+            // create lastMessage object
+            let lastMessage = {
+                body: data.message
+            }
+
+            if (data.toSelf) {
+                lastMessage.from = conversationPartner.riot.summonerName;
+            }
+            else {
+                lastMessage.from = conversationPartner._id;
+            }
+            
+            // get wrapper divs for conversations (left) and messenger (right)             
+            const messagesDiv = document.getElementById("messages-div");
+
+            // create new conversation element to the left
+            generateConversation (conversationPartner, conversationPartner.riot.summonerName, lastMessage, messagesDiv); 
+
+            // create messenger div
+            const listConversationDiv = generateMessageContainer(conversationPartner.riot.summonerName, conversationPartner.riot.region);
+            
+            const messengerDiv = document.getElementById("messenger-div")
+
+            // get receiver summoner name
+            const receiverSummonerName = data.to.split("-")[0]
+            // attach message to messenger div
+            generateMessage (data.message, conversationPartner.riot.summonerName, receiverSummonerName, listConversationDiv)
+            messengerDiv.appendChild(listConversationDiv);
+        }
+    })
+</script>

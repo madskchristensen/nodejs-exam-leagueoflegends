@@ -29,6 +29,9 @@ app.use(
         }
     }));
 
+// escapeHtml
+const escapeHtml = require("html-escaper").escape;
+
 // socket.io setup
 // wrap express in plain node.js http server
 const server = require("http").createServer(app);
@@ -36,6 +39,54 @@ const server = require("http").createServer(app);
 // atttach socket.io to http server
 const io = require("socket.io")(server);
 
+const messageService = require("./service/messages")
+
+// register middleware in Socket.IO
+// reference: https://socket.io/docs/v3/faq/ - how to use socket.io with express-session
+io.use((socket, next) => {
+    sessionMiddleware(socket.request, {}, next);
+});
+
+io.on("connection", (socket) => {
+    console.log("A socket connected with id" + socket.id);
+
+    // create username from session
+    socket.data.summonerName = socket.request.session.user.riot.summonerName;
+    socket.data.region = socket.request.session.user.riot.region;
+
+    socket.data.username = socket.data.summonerName + "-" + socket.data.region;
+    
+    // join room with username
+    socket.join(socket.data.username);
+
+    socket.on("private message", async (data) => {
+        // send message to other user
+        data.from = {};
+        data.from.summonerName = socket.data.summonerName;
+        data.from.region = socket.data.region;
+
+        const response = await messageService.saveMessages(data);
+
+        if (response.data) {
+            socket.to(data.receiver.summonerName + "-" + data.receiver.region).to(socket.data.username).emit("private message", {
+                message: escapeHtml(data.message),
+                from: socket.data.username,
+                to: data.receiver.summonerName + "-" + data.receiver.region,
+                toSelf: false
+            });
+            io.in(socket.data.username).emit("private message", {
+                message: escapeHtml(data.message),
+                from: socket.data.username,
+                to: data.receiver.summonerName + "-" + data.receiver.region,
+                toSelf: true
+            });
+        } 
+    });
+
+    socket.on("disconnect", async () => {
+        console.log("A socket disconnected" + socket.data.username);
+    })
+});
 // escapehtml setup
 const escapeHTML = require("html-escaper").escape;
 
@@ -46,7 +97,7 @@ const fetch = require("node-fetch");
 // create session 
 const session = require("express-session");
 
-app.use(session({
+const sessionMiddleware = session({
     secret: process.env.SESSION_SECRET.split(","), // used to compute hash. split to process dotenv variable as array
     name: process.env.SESSION_NAME, // hidden custom name to avoid fingerprinting
     resave: false,
@@ -57,14 +108,16 @@ app.use(session({
         sameSite: true, // block CORS req
         maxAge: 600000, // Time in miliseconds - 10 minutes
     }
-}));
+});
+
+app.use(sessionMiddleware);
 
 // middleware that sets needed variables in the session
 const sessionInitializer = async function (req, res, next) {
-/*    if (process.env.NODE_ENV === "development") {
+    /*if (process.env.NODE_ENV === "development") {
         const mongodb = require("./mongodb/mongodb");
 
-        req.session.user = await mongodb.findUsers.byEmail("nymail@mail.dk");
+        req.session.user = await mongodb.findUsers.byEmail("michael@fuglo.com");
         req.session.loggedIn = true;
     }*/
 
@@ -95,6 +148,9 @@ app.use(authRouter.router);
 const userRouter = require("./routers/api/users");
 app.use(userRouter.router);
 
+const messagesRouter = require("./routers/api/messages");
+app.use(messagesRouter.router);
+
 // synchronous file read for loading html pages on express start
 const fs = require('fs');
 
@@ -106,8 +162,9 @@ const db = require("./mongodb/db");
 const frontpage = fs.readFileSync(__dirname + "/public/frontpage/frontpage.html", "utf-8");
 const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8");
 const signup = fs.readFileSync(__dirname + "/public/signup/signup.html", "utf-8");
-const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html");
-const profile = fs.readFileSync(__dirname + "/public/profile/profile.html");
+const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html")
+const profile = fs.readFileSync(__dirname + "/public/profile/profile.html")
+const messenger = fs.readFileSync(__dirname + "/public/messenger/messenger.html")
 
 // components
 const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8");
@@ -133,31 +190,42 @@ app.get("/signup", (req, res) => {
 })
 
 app.get("/link-account", (req, res) => {
-
     res.send(header + linkAccount + footer);
 })
 
-/*// intercept all incoming requests with login check except above, as they are allowed for all users
-app.get("/!*", (req, res, next) => {
+// intercept all incoming requests with login check except above, as they are allowed for all users
+app.get("/*", (req, res, next) => {
     // check if path is valid
-    if (!paths.includes(req.path)) {
+    /*if (!paths.includes(req.path)) {
         res.status(404).send(header + "<h4>Sorry the page doesnt exist</h1>");
-    }
+    }*/
     // check if user is authorized
-    else if (!(req.session.loggedIn === true)) {
-        res.status(401).send(header + "<h4>Sorry but you are not authorized to view this page</h1>")
+    if (!(req.session.loggedIn === true)) {
+        res.status(401).send(header + "<h4>Please login to view this page</h1>")
     }
     else {
         next();
     }
-})*/
+})
 
 app.get("/profile/:summonerName/:region", (req, res) => {
-
     res.send(header + profile + footer);
 })
 
-/*// register all valid paths
+app.get("/messenger", (req, res) => {
+    res.send(header + messenger + footer);
+})
+
+// intercept all incoming requests with login check except above, as they are allowed for all users
+app.get("/*", (req, res, next) => {
+    // check if path is valid
+    if (!paths.includes(req.path)) {
+        res.status(404).send(header + "<h4>Sorry the page doesnt exist</h1>");
+    }
+
+})
+
+// register all valid paths
 const paths = [];
 
 // loop through all defined paths and add to array
@@ -165,7 +233,7 @@ app._router.stack.forEach( (router) => {
     if (router.route && router.route.path){
       paths.push(router.route.path + "/");
     }
-})*/
+})
 
 // wrap server.listen call in db.connect call to always have an active connection
 // listen at specified port

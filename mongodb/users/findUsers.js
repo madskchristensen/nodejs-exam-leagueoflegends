@@ -1,4 +1,5 @@
 const db = require("../db");
+const ObjectId = require('mongodb').ObjectId; 
 
 function byEmail(email) {
     const filter = { "details.email": email };
@@ -19,6 +20,13 @@ function byRegionAndSummoner(region, summonerName) {
         .then(res => res);
 }
 
+
+async function byId(objectId) {
+    return await db.query().collection("users").findOne(ObjectId(objectId))
+        .then(user => user)
+        .catch(err => err);
+}
+
 function all() {
     return db.query().collection("users").find().toArray()
         .then(res => res);
@@ -27,5 +35,6 @@ function all() {
 module.exports = {
     byEmail,
     byRegionAndSummoner,
+    byId,
     all
 }

@@ -176,16 +176,22 @@ router.get("/auth/create-user", async (req, res) => {
                 summonerLevel: newUser.summonerLevel,
                 region: newUser.region,
                 rankedSolo5x5: {
-                    tier: rankedSolo.tier,
-                    rank: rankedSolo.rank,
-                    leaguePoints: rankedSolo.leaguePoints,
-                    wins: rankedSolo.wins,
-                    losses: rankedSolo.losses
                 }
             },
             details: {
                 email: req.session.newUser.email,
                 password: req.session.newUser.password
+            }
+        }
+
+        // insert ranked data if summoner is ranked in 5v5 solo
+        if (rankedSolo) {
+            data.riot.rankedSolo5x5 = {
+                tier: rankedSolo.tier,
+                rank: rankedSolo.rank,
+                leaguePoints: rankedSolo.leaguePoints,
+                wins: rankedSolo.wins,
+                losses: rankedSolo.losses
             }
         }
 
