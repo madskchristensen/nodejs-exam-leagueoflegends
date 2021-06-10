@@ -82,9 +82,9 @@
 
         const conversationPartner = await getUserFromDB(receiver.region, receiver.summonerName);
         if (!conversationPartner) {
-            alert("Summoner not found - please try again");
+            toastr.error("Summoner not found - please try again.");
         } else if (conversationPartner.riot.summonerName === loggedInUser.riot.summonerName && conversationPartner.riot.region === loggedInUser.riot.region ) {
-            alert("You can't send messages to yourself. Get a life");
+            toastr.error("You can't send messages to yourself. Get a life...");
         } else {
             socket.emit("private message", { receiver, message });
             // reset message and conversation inputs
