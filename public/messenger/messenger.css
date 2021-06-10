@@ -1,7 +1,4 @@
 #chats-div {
-  border: 1px solid;
-  border-color: darkgray;
-  background-color: white;  
   min-height: calc(100vh - 300px);   
 }
 
@@ -16,13 +13,6 @@
 
 .conversation-container {
   overflow-y: auto;
-}
-
-#messenger {
-  border: 1px solid;
-  border-color: darkgray;
-  background-color: white;   
-  min-height: calc(100vh - 230px);   
 }
 
 .chat-left{
