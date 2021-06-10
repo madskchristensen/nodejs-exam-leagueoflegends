@@ -12,7 +12,7 @@ router.get("/api/users/current", (req, res) => {
         res.status(200).send(user);
 
     } else {
-        res.status(204).send( { error: "Logged in user not found" } );
+        res.status(404).send( { error: "Logged in user not found" } );
     }
 });
 
@@ -29,7 +29,7 @@ router.get("/api/users/:summonerName/:region", async (req, res) => {
         res.status(200).send(user);
 
     } else {
-        res.status(204).send( { error: "User not found" } );
+        res.status(404).send( { error: "User not found" } );
     }
 });
 
@@ -45,7 +45,7 @@ router.get("/api/users/", async (req, res) => {
         res.status(200).send(users);
 
     } else {
-        res.status(204).send( { error: "Users not found" } );
+        res.status(404).send( { error: "Users not found" } );
     }
 });
 
@@ -61,7 +61,7 @@ router.put("/api/users/profile", async (req, res) => {
             res.status(200).send( { data: true } );
 
         } else {
-            res.status(204).send( { data: false } );
+            res.status(404).send( { data: false } );
         }
 
     } else {
@@ -71,4 +71,4 @@ router.put("/api/users/profile", async (req, res) => {
 
 module.exports = {
     router
-}
+};

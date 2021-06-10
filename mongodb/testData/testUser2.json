@@ -1,0 +1,26 @@
+{
+    "profile": {
+        "age": "32",
+        "languages": "English, Russian",
+        "country": "Russia",
+        "roles": "Top, Jungle",
+        "description": "Cool gamer from Russia even though I'm still just a test"
+    },
+    "riot": {
+        "summonerName": "TestUser2",
+        "profileIconId": 559,
+        "summonerLevel": 237,
+        "region": "ru",
+        "rankedSolo5x5": {
+            "tier": "Grandmaster",
+            "rank": "I",
+            "leaguePoints": "860",
+            "wins": "288",
+            "losses": "237"
+        }
+    },
+    "details": {
+        "email": "testuser2@mail.dk",
+        "password": "$2b$10$WqrhpqvDCQlz203EOVczF.8Pk17/gS.Ts70IR/BdpsoOPVYuAuy16"
+    }
+}

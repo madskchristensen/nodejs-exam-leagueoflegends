@@ -75,8 +75,7 @@
 
             receiver.summonerName = conversationIdentifierArr[0];
             receiver.region = conversationIdentifierArr[1];
-        }
-        else {
+        } else {
             receiver.summonerName = newConversationInput;
             receiver.region = newConversationRegion;
         }
@@ -84,11 +83,9 @@
         const conversationPartner = await getUserFromDB(receiver.region, receiver.summonerName);
         if (!conversationPartner) {
             alert("Summoner not found - please try again");
-        }
-        else if (conversationPartner.riot.summonerName === loggedInUser.riot.summonerName && conversationPartner.riot.region === loggedInUser.riot.region ) {
+        } else if (conversationPartner.riot.summonerName === loggedInUser.riot.summonerName && conversationPartner.riot.region === loggedInUser.riot.region ) {
             alert("You can't send messages to yourself. Get a life");
-        }
-        else {
+        } else {
             socket.emit("private message", { receiver, message });
             // reset message and conversation inputs
             resetMessageInputs();
@@ -99,8 +96,7 @@
     socket.on("private message", async (data) => {
         if (data.toSelf) {
             listConversationDiv = document.getElementById("list-" + data.to);
-        }
-        else {
+        } else {
             listConversationDiv = document.getElementById("list-" + data.from);
         }
 
@@ -108,19 +104,16 @@
         if (listConversationDiv) {
             if (data.toSelf) {
                 generateMessage (data.message, data.from, data.from, listConversationDiv);
-            }
-            else {
+            } else {
                 generateMessage (data.message, data.from, data.to, listConversationDiv);
             }
-        }
         // else create new conversation, chat and message
-        else {
+        } else {
             // get region and summoner name
             let senderRegionAndSummonerName;
             if (data.toSelf) {
                 senderRegionAndSummonerName = data.to.split("-");
-            }
-            else {
+            } else {
                 senderRegionAndSummonerName = data.from.split("-");
             }
 
@@ -133,12 +126,11 @@
             // create lastMessage object
             let lastMessage = {
                 body: data.message
-            }
+            };
 
             if (data.toSelf) {
                 lastMessage.from = conversationPartner.riot.summonerName;
-            }
-            else {
+            } else {
                 lastMessage.from = conversationPartner._id;
             }
             
@@ -151,12 +143,12 @@
             // create messenger div
             const listConversationDiv = generateMessageContainer(conversationPartner.riot.summonerName, conversationPartner.riot.region);
             
-            const messengerDiv = document.getElementById("messenger-div")
+            const messengerDiv = document.getElementById("messenger-div");
 
             // get receiver summoner name
-            const receiverSummonerName = data.to.split("-")[0]
+            const receiverSummonerName = data.to.split("-")[0];
             // attach message to messenger div
-            generateMessage (data.message, conversationPartner.riot.summonerName, receiverSummonerName, listConversationDiv)
+            generateMessage (data.message, conversationPartner.riot.summonerName, receiverSummonerName, listConversationDiv);
             messengerDiv.appendChild(listConversationDiv);
         }
     })

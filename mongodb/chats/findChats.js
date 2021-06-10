@@ -15,7 +15,7 @@ function findAll (objectId) {
 
     return db.query().collection("chats").find(filter).toArray()
     .then(conversations => conversations)
-    .catch(err => err)
+    .catch(err => err);
 }
 
 function byId(objectId) {
@@ -28,4 +28,4 @@ module.exports = {
     sharedBetweenIds,
     findAll,
     byId
-}
+};

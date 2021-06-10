@@ -65,7 +65,7 @@ function generateConversation (conversationPartner, lastUserSummonerName, lastMe
     // outside link
     const link = document.createElement("a");
     link.classList.add("list-group-item", "list-group-item-action", "conversation-link", "conversation-container");
-    link.setAttribute("data-bs-toggle", "list")
+    link.setAttribute("data-bs-toggle", "list");
     link.setAttribute("role", "tab");
 
     // wrapper div
@@ -89,7 +89,7 @@ function generateConversation (conversationPartner, lastUserSummonerName, lastMe
 
     // append summoner icon to div
     iconDiv.appendChild(summonerIcon);
-    conversationDiv.appendChild(iconDiv)
+    conversationDiv.appendChild(iconDiv);
 
     // wrapper div for name and message
     const textDiv = document.createElement("div");
@@ -102,7 +102,7 @@ function generateConversation (conversationPartner, lastUserSummonerName, lastMe
     // summoner name
     const summonerName = document.createElement("h5");
     summonerName.classList.add("pt-3");
-    summonerName.id = "summonerName-" + conversationPartnerSummonerName + "-" + conversationPartnerRegion
+    summonerName.id = "summonerName-" + conversationPartnerSummonerName + "-" + conversationPartnerRegion;
     summonerName.innerText = conversationPartnerSummonerName;
 
     // append summoner name to div
@@ -133,8 +133,7 @@ function generateConversation (conversationPartner, lastUserSummonerName, lastMe
     // Append You / sommonername dependant on who sent the last message
     if (lastMessage.from !== conversationPartner._id) {
         lastMessagePreview.innerText = "You: " + lastMessage.body;
-    }
-    else{
+    } else{
         lastMessagePreview.innerText = lastUserSummonerName + ": " + lastMessage.body;
     }
 
@@ -168,12 +167,12 @@ function generateMessage (message, from,  sessionIdentifier, divToAppendTo ) {
     messageDiv.classList.add("col", "col-4", "my-1", "rounded-start");
 
     const messageText = document.createElement("p");
-    messageText.classList.add("message-text")
+    messageText.classList.add("message-text");
     messageText.innerText = message;
     
     // display messages left/right dependent on sender
     if (from === sessionIdentifier) {
-        wrapperMessageDiv.classList.add("justify-content-end")
+        wrapperMessageDiv.classList.add("justify-content-end");
         messageDiv.classList.add("chat-right", "d-flex", "justify-content-end", "align-items-center");
     }    
     else{
@@ -190,7 +189,7 @@ function generateConversationAndMessageContainer(conversationPartner, lastUserSu
     const lastMessage = {
         from: lastUserSummonerName,
         body: message
-    }
+    };
 
     // get wrapper divs for conversations (left) and messenger (right)             
     const messagesDiv = document.getElementById("messages-div");
@@ -213,14 +212,13 @@ async function getUserFromDB(region, summonerName) {
     const response = await fetch("/api/users/" + summonerName + "/" + region);
     if (response.ok === true){
         return await response.json();
-    }
-    else {
+    } else {
         return null;
     }
 }
 
 async function getMessagesFromDB() {
-    const response = await fetch("/api/messages");
+    const response = await fetch("/api/chats/current");
 
     return await response.json();
 }

@@ -2,7 +2,10 @@ const router = require("express").Router();
 const mongo = require("../../mongodb/mongodb");
 const messageService = require("../../service/messages");
 
-router.get("/api/messages", async (req, res) => {
+// GET all conversations that logged in user is part of. Data is split up into two sections: 
+// CHATS: All conversations that logged in user is part of
+// PARTICIPANTS: Array of all participants in all conversations
+router.get("/api/chats/current", async (req, res) => {
     const loggedIn = req.session.loggedIn;
 
     if (loggedIn) {
@@ -33,10 +36,9 @@ router.get("/api/messages", async (req, res) => {
             conversation.userID = userFromDB._id.toString();
 
             res.status(200).send(conversation);
-        }
-        else {
+        } else {
             // no chats found send null object
-            res.status(204).send( { error: "No conversations found" } );
+            res.status(204).send( { message: "No conversations found" } );
         }
     } else {
         res.status(401).send( { error: "You are not authorized to access this endpoint" } );
@@ -45,4 +47,4 @@ router.get("/api/messages", async (req, res) => {
 
 module.exports = {
     router
-}
+};

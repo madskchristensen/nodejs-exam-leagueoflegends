@@ -12,4 +12,4 @@ function profile(summonerName, region, data) {
 
 module.exports = {
     profile
-}
+};

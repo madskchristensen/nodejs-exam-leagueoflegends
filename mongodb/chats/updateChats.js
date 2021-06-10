@@ -12,4 +12,4 @@ function messages(chatId, data) {
 
 module.exports = {
     messages
-}
+};

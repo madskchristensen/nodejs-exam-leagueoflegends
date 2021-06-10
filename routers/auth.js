@@ -8,9 +8,9 @@ const router = require("express").Router();
 
 router.get("/auth/is-logged-in", (req, res) => {
     const loggedIn = req.session.loggedIn;
-
-    res.send({ data: loggedIn });
-})
+    
+    res.send( { data: loggedIn } );
+});
 
 // endpoint that is called when a user tries to log in
 router.post("/auth/login", async (req, res) => {
@@ -113,18 +113,19 @@ router.post("/auth/verify-summoner", async (req, res) => {
 
     // find user from db, if exists
     const user = await mongodb.findUsers.byRegionAndSummoner(region, summonerName);
-
+    console.log(user);
     // if user exists, show error
     if (user) {
         if (user.riot.summonerName === summonerName && user.riot.region === region) {
-            res.send({ result: false, error: "User with summoner name and region already exists." })
+            res.send( { result: false, error: "User with summoner name and region already exists." } )
         }
 
     } else {
         // get summonerDTO and verification string from riot service
         const summonerDTO = await riot.getSummonerDTO(regionTranslated, summonerName);
         const verification = await riot.getVerification(regionTranslated, summonerDTO.id);
-
+        console.log(summonerDTO);
+        console.log(verification);
         // matches displayed uuid in front-end against the string entered in the league client of the given summoner
         // if they match it is certain the user trying to signup has access to the summoner name in question
         // therefore it is safe to set the newUser object to verified and add any remaining riot information
@@ -138,7 +139,7 @@ router.post("/auth/verify-summoner", async (req, res) => {
             req.session.newUser.encryptedId = summonerDTO.id;
 
             // everything went okay so send result = true and no error
-            res.send({ result: true, error: "" } );
+            res.send( { result: true, error: "" } );
 
         // verification string didnt match and so send error
         } else {
@@ -182,7 +183,7 @@ router.get("/auth/create-user", async (req, res) => {
                 email: req.session.newUser.email,
                 password: req.session.newUser.password
             }
-        }
+        };
 
         // insert ranked data if summoner is ranked in 5v5 solo
         if (rankedSolo) {
@@ -193,7 +194,7 @@ router.get("/auth/create-user", async (req, res) => {
                 wins: rankedSolo.wins,
                 losses: rankedSolo.losses
             }
-        }
+        };
 
         // save data object to db
         mongodb.insertUsers.user(data);
@@ -212,4 +213,4 @@ router.get("/auth/create-user", async (req, res) => {
 
 module.exports = {
     router
-}
+};

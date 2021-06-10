@@ -70,7 +70,7 @@ function translateRegion(region) {
         ru: "ru",
         tr: "tr1",
         jp: "jp1"
-    }
+    };
 
     if (lowerCaseRegion in regions) {
         return regions[lowerCaseRegion];
@@ -85,4 +85,4 @@ module.exports = {
     getVerification,
     getLeagueEntryDTO,
     translateRegion
-}
+};

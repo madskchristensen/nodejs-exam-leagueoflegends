@@ -74,7 +74,6 @@
             navbarItems.appendChild(signoutForm);
 
         } else {
-
             // create login
             const login = document.createElement("li");
             login.classList.add("nav-item", "active");

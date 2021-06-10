@@ -6,10 +6,10 @@
 
         // Get user data for the profile being viewed
         const userProfile = await getUserProfile();
-
+        console.log(userProfile);
         // Currently logged in user. Will be initialized later in the script if loggedIn is true
         let userLoggedIn = await getUser();
-
+        console.log(userLoggedIn);
         // Append hardcoded season stats to user as it has not been implemented yet
         userProfile.riot.seasonStats = [
             {
@@ -82,7 +82,7 @@ function loadMessageButton(loggedIn, userProfile, userLoggedIn) {
         if (userProfile.riot.summonerName !== userLoggedIn.riot.summonerName &&
             userProfile.riot.region !== userLoggedIn.riot.region) {
             messageLink.href = "/messenger";
-            messageButton.classList.add("btn-success")
+            messageButton.classList.add("btn-success");
             messageButton.innerText = "Message";
 
             buttonWrapper.appendChild(messageButton);
@@ -92,7 +92,7 @@ function loadMessageButton(loggedIn, userProfile, userLoggedIn) {
     } else {
         messageButton.disabled = true;
         messageButton.innerText = "Login to message";
-        messageButton.classList.add("btn-secondary")
+        messageButton.classList.add("btn-secondary");
 
         buttonWrapper.appendChild(messageButton);
     }
@@ -137,7 +137,7 @@ function loadProfile(userProfile) {
         iconDiv.classList.add("col", "col-1", "py-3");
 
         // champion icon
-        const championIcon = document.createElement("img")
+        const championIcon = document.createElement("img");
         championIcon.classList.add("img-fluid", "w-100");
         championIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/champion/" + champion.champion + ".png";
 
@@ -222,7 +222,7 @@ async function getUserProfile() {
     const data = {
         summonerName: splitUrl[2],
         region: splitUrl[3]
-    }
+    };
 
     const userUrl = "/api/users/" + data.summonerName + "/" + data.region;
 
@@ -242,7 +242,7 @@ async function sendFormData() {
 
     const formData = new FormData(profileForm);
 
-    const data = {}
+    const data = {};
 
     formData.forEach((value, key) => data[key] = value);
 
@@ -258,11 +258,11 @@ async function sendFormData() {
                 throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
             }
 
-            console.log("save was ok")
+            console.log("save was ok");
 
             toastr.success("Profile saved!");
         })
         .catch(err => {
             toastr.error("Something went wrong. Try again");
-        })
+        });
 }

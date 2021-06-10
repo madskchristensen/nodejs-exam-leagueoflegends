@@ -1,6 +1,6 @@
 const mongo = require("../mongodb/mongodb");
 
-async function saveMessages(data) {
+async function saveMessage(data) {
     // get objectIds for sender/receiver
     const receiverUsername = data.receiver.summonerName;
     const receiverRegion = data.receiver.region;
@@ -20,18 +20,18 @@ async function saveMessages(data) {
             from: senderFromDB._id,
             body: data.message,
             timeStamp: new Date().toUTCString()
-        }
+        };
+
         const result = await mongo.updateChats.messages(conversation._id, messageData);
        
         // if 1 chat was found, 1 chat was modified and result is ok, update was successful
         if (result.n === 1 && result.nModified === 1 && result.ok === 1) {
-            return { data: true, method: "update" }
-        } 
-        else {
-            return { data: false, method: "update" }
+            return { data: true, method: "update" };
+        } else {
+            return { data: false, method: "update" };
         }
-    }
-    else {
+    // if no conversation exists ==> create new chat
+    } else {
         // create new conversation
         const conversationData = {
             participants: [ 
@@ -49,9 +49,9 @@ async function saveMessages(data) {
                     timeStamp: new Date().toUTCString()
                 }
             ]
-        }
+        };
         mongo.insertChats.chat(conversationData);
-        return { data: true, method: "create" }
+        return { data: true, method: "create" };
     }    
 }
 
@@ -69,8 +69,7 @@ async function combineAllChatParticipants(chats, user) {
             delete conversationParticipant.profile;
 
             conversationPartners.push(conversationParticipant);
-        }
-        catch (error) {
+        } catch (error) {
             console.log(error);
         }
     }
@@ -78,6 +77,6 @@ async function combineAllChatParticipants(chats, user) {
 }
 
 module.exports = {
-    saveMessages,
+    saveMessage,
     combineAllChatParticipants
-}
+};

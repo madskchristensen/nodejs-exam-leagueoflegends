@@ -33,7 +33,7 @@ async function verifySummoner() {
         uuid,
         summonerName,
         region
-    }
+    };
 
     // verify summoner on back-end and return response
     return await fetch("/auth/verify-summoner", {

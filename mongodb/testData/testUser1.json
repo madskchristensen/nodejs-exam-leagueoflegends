@@ -1,0 +1,26 @@
+{
+    "profile": {
+        "age": "26",
+        "languages": "Danish, English",
+        "country": "Denmark",
+        "roles": "Jungle, Mid",
+        "description": "Cool gamer even though I'm only a test"
+    },
+    "riot": {
+        "summonerName": "testUser1",
+        "profileIconId": 556,
+        "summonerLevel": 168,
+        "region": "euw",
+        "rankedSolo5x5": {
+            "tier": "Diamond",
+            "rank": "IV",
+            "leaguePoints": "88",
+            "wins": "55",
+            "losses": "44"
+        }
+    },
+    "details": {
+        "email": "testuser1@mail.dk",
+        "password": "$2b$10$7pS542OKUwE21NRnqE0snex1Q.YFSC04PJuFdX4MZsEioy88DMX4S"
+    }
+}

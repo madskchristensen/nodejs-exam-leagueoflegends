@@ -39,7 +39,7 @@ const server = require("http").createServer(app);
 // atttach socket.io to http server
 const io = require("socket.io")(server);
 
-const messageService = require("./service/messages")
+const messageService = require("./service/messages");
 
 // register middleware in Socket.IO
 // reference: https://socket.io/docs/v3/faq/ - how to use socket.io with express-session
@@ -65,7 +65,7 @@ io.on("connection", (socket) => {
         data.from.summonerName = socket.data.summonerName;
         data.from.region = socket.data.region;
 
-        const response = await messageService.saveMessages(data);
+        const response = await messageService.saveMessage(data);
 
         if (response.data) {
             socket.to(data.receiver.summonerName + "-" + data.receiver.region).to(socket.data.username).emit("private message", {
@@ -87,6 +87,7 @@ io.on("connection", (socket) => {
         console.log("A socket disconnected" + socket.data.username);
     })
 });
+
 // escapehtml setup
 const escapeHTML = require("html-escaper").escape;
 
@@ -148,7 +149,7 @@ app.use(authRouter.router);
 const userRouter = require("./routers/api/users");
 app.use(userRouter.router);
 
-const messagesRouter = require("./routers/api/messages");
+const messagesRouter = require("./routers/api/chats");
 app.use(messagesRouter.router);
 
 // synchronous file read for loading html pages on express start
@@ -162,9 +163,9 @@ const db = require("./mongodb/db");
 const frontpage = fs.readFileSync(__dirname + "/public/frontpage/frontpage.html", "utf-8");
 const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8");
 const signup = fs.readFileSync(__dirname + "/public/signup/signup.html", "utf-8");
-const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html")
-const profile = fs.readFileSync(__dirname + "/public/profile/profile.html")
-const messenger = fs.readFileSync(__dirname + "/public/messenger/messenger.html")
+const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html");
+const profile = fs.readFileSync(__dirname + "/public/profile/profile.html");
+const messenger = fs.readFileSync(__dirname + "/public/messenger/messenger.html");
 
 // components
 const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8");
@@ -173,11 +174,11 @@ const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8"
 // paths for all users to access
 app.get("/", (req, res) => {
     res.send(header + frontpage + footer);
-})
+});
 
 app.get("/login", (req, res, next) => {
         res.send(header + login + footer);
-})
+});
 
 app.get("/signup", (req, res) => {
     // check is user is already signed in
@@ -187,34 +188,36 @@ app.get("/signup", (req, res) => {
     else {
         res.send(header + signup + footer);
     }
-})
+});
 
 app.get("/link-account", (req, res) => {
     res.send(header + linkAccount + footer);
-})
+});
+
+app.get("/profile/:summonerName/:region", (req, res) => {
+    res.send(header + profile + footer);
+});
 
 // intercept all incoming requests with login check except above, as they are allowed for all users
 app.get("/*", (req, res, next) => {
     // check if path is valid
-    /*if (!paths.includes(req.path)) {
+    if (!paths.includes(req.path)) {
         res.status(404).send(header + "<h4>Sorry the page doesnt exist</h1>");
-    }*/
+    }
     // check if user is authorized
-    if (!(req.session.loggedIn === true)) {
-        res.status(401).send(header + "<h4>Please login to view this page</h1>")
+    else if (!(req.session.loggedIn === true)) {
+        res.status(401).send(header + "<h4>Please login to view this page</h1>");
     }
     else {
         next();
     }
-})
+});
 
-app.get("/profile/:summonerName/:region", (req, res) => {
-    res.send(header + profile + footer);
-})
+
 
 app.get("/messenger", (req, res) => {
     res.send(header + messenger + footer);
-})
+});
 
 // intercept all incoming requests with login check except above, as they are allowed for all users
 app.get("/*", (req, res, next) => {
@@ -231,7 +234,7 @@ const paths = [];
 // loop through all defined paths and add to array
 app._router.stack.forEach( (router) => {
     if (router.route && router.route.path){
-      paths.push(router.route.path + "/");
+        paths.push(router.route.path + "/");
     }
 })
 
@@ -244,7 +247,7 @@ db.connect(() => {
         } else {
             console.log("[express] running in", process.env.NODE_ENV, "mode");
             console.log("[express] listening at port", port);
-            console.log("")
+            console.log("");
         }
     })
 })

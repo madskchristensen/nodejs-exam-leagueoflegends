@@ -1,20 +1,30 @@
 {
     "participants": [{
-        "userObjectId": "60b688995e64130460dc1aa0"
+        "userObjectId": {
+            "$oid": "60c2444ee88ffe763418401e"
+        }
     }, {
-        "userObjectId": "60b89dd590b62197979f0e0f"
+        "userObjectId": {
+            "$oid": "60c24aa06c35bd4dacce98c1"
+        }
     }],
     "messages": [{
-        "from": "60b688995e64130460dc1aa0",
-        "body": "Hey you",
-        "timestamp": "Thu, 03 Jun 2021 18:31:56 GMT"
+        "from": {
+            "$oid": "60c24aa06c35bd4dacce98c1"
+        },
+        "body": "Hello from Russia",
+        "timeStamp": "Thu, 10 Jun 2021 17:26:24 GMT"
     }, {
-        "from": "60b688995e64130460dc1aa0",
-        "body": "Why are you not answering",
-        "timestamp": "Thu, 03 Jun 2021 18:33:56 GMT"
+        "from": {
+            "$oid": "60c2444ee88ffe763418401e"
+        },
+        "body": "Hello from West Europe. You doing well?",
+        "timeStamp": "Thu, 10 Jun 2021 17:27:27 GMT"
     }, {
-        "from": "60b89dd590b62197979f0e0f",
-        "body": "Im busy grinding m8",
-        "timestamp": "Thu, 03 Jun 2021 18:36:56 GMT"
+        "from": {
+            "$oid": "60c24aa06c35bd4dacce98c1"
+        },
+        "body": "Da",
+        "timeStamp": "Thu, 10 Jun 2021 17:27:34 GMT"
     }]
 }

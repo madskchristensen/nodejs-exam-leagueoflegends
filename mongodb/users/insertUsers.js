@@ -11,4 +11,4 @@ function user(data) {
 
 module.exports = {
     user
-}
+};

@@ -15,4 +15,4 @@ module.exports = {
     findChats,
     insertChats,
     updateChats
-}
+};
