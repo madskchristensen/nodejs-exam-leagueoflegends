@@ -7,14 +7,12 @@
         if (messages) {
             const participants = conversationsFromDb.participants;
             const loggedInUserId = conversationsFromDb.userID.toString();
-    
             const messagesDiv = document.getElementById("messages-div");
             const messengerDiv = document.getElementById("messenger-div");
             
             messages.forEach(conversation => {
                 // get conversation partner data
                 const conversationPartner = findConversationPartner(conversation, loggedInUserId, participants);
-    
                 // get last messageObject that sent message
                 const lastMessage = conversation.messages[conversation.messages.length - 1];
     
@@ -207,14 +205,12 @@ function generateConversationAndMessageContainer(conversationPartner, lastUserSu
 }
 
 async function getUserFromSession() {
-    const response = await fetch("/api/user");
-
+    const response = await fetch("/api/users/current");
     return await response.json();
 }
 
 async function getUserFromDB(region, summonerName) {
-    const response = await fetch("/api/user/" + region + "/" + summonerName);
-
+    const response = await fetch("/api/users/" + summonerName + "/" + region);
     if (response.ok === true){
         return await response.json();
     }

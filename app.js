@@ -25,7 +25,7 @@ app.use(
             "style-src": ["'self'", "*.fontawesome.com", "*.jsdelivr.net", "*.cloudflare.com", "'unsafe-inline'"], // unsafe-inline needed to allow fontawesome icons
             "font-src": ["'self'", "*.fontawesome.com"],
             "script-src-attr": ["'self'", "'unsafe-inline'"],
-            "img-src": ["'self'", "ddragon.leagueoflegends.com"]
+            "img-src": ["'self'", "ddragon.leagueoflegends.com", "data: w3.org"]
         }
     }));
 
@@ -45,8 +45,7 @@ const messageService = require("./service/messages")
 // reference: https://socket.io/docs/v3/faq/ - how to use socket.io with express-session
 io.use((socket, next) => {
     sessionMiddleware(socket.request, {}, next);
-
-  });
+});
 
 io.on("connection", (socket) => {
     console.log("A socket connected with id" + socket.id);
@@ -115,14 +114,14 @@ app.use(sessionMiddleware);
 
 // middleware that sets needed variables in the session
 const sessionInitializer = async function (req, res, next) {
-    if (process.env.NODE_ENV === "development") {
+    /*if (process.env.NODE_ENV === "development") {
         const mongodb = require("./mongodb/mongodb");
 
-        req.session.user = await mongodb.find.byEmail("michael@fuglo.com");
+        req.session.user = await mongodb.findUsers.byEmail("michael@fuglo.com");
         req.session.loggedIn = true;
-    }
+    }*/
 
-    if(!req.session.loggedIn) {
+    if (!req.session.loggedIn) {
         req.session.loggedIn = false;
     }
 
@@ -146,7 +145,7 @@ app.use(sessionRouter.router);
 const authRouter = require("./routers/auth");
 app.use(authRouter.router);
 
-const userRouter = require("./routers/api/user");
+const userRouter = require("./routers/api/users");
 app.use(userRouter.router);
 
 const messagesRouter = require("./routers/api/messages");
@@ -176,8 +175,8 @@ app.get("/", (req, res) => {
     res.send(header + frontpage + footer);
 })
 
-app.get("/login", (req, res) => {
-    res.send(header + login + footer);
+app.get("/login", (req, res, next) => {
+        res.send(header + login + footer);
 })
 
 app.get("/signup", (req, res) => {
@@ -191,8 +190,30 @@ app.get("/signup", (req, res) => {
 })
 
 app.get("/link-account", (req, res) => {
-
     res.send(header + linkAccount + footer);
+})
+
+// intercept all incoming requests with login check except above, as they are allowed for all users
+app.get("/*", (req, res, next) => {
+    // check if path is valid
+    /*if (!paths.includes(req.path)) {
+        res.status(404).send(header + "<h4>Sorry the page doesnt exist</h1>");
+    }*/
+    // check if user is authorized
+    if (!(req.session.loggedIn === true)) {
+        res.status(401).send(header + "<h4>Please login to view this page</h1>")
+    }
+    else {
+        next();
+    }
+})
+
+app.get("/profile/:summonerName/:region", (req, res) => {
+    res.send(header + profile + footer);
+})
+
+app.get("/messenger", (req, res) => {
+    res.send(header + messenger + footer);
 })
 
 // intercept all incoming requests with login check except above, as they are allowed for all users
@@ -201,22 +222,7 @@ app.get("/*", (req, res, next) => {
     if (!paths.includes(req.path)) {
         res.status(404).send(header + "<h4>Sorry the page doesnt exist</h1>");
     }
-    // check if user is authorized
-    else if (!(req.session.loggedIn === true)) {
-        res.status(401).send(header + "<h4>Please login to view this page</h1>")
-    }
-    else {
-        next();
-    }
-})
 
-// paths allowed for logged in users only
-app.get("/profile", (req, res) => {
-    res.send(header + profile + footer);
-})
-
-app.get("/messenger", (req, res) => {
-    res.send(header + messenger + footer);
 })
 
 // register all valid paths

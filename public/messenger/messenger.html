@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="messenger.css">
 
 <div class="container">
-    <div class="row py-5" >
+    <div class="row pt-5" >
         <div id="chats-div" class="col col-3">
             <h4>Chats</h4>
             <input type="text" id="new-conversation-input" class="form-control pt-2 mb-3 mt-3" placeholder="New chat: Type receiver name here" >
@@ -50,7 +50,7 @@
     const sendMessageInput = document.getElementById("message-input");
     sendMessageInput.addEventListener("keyup", (event) => {
         // e.keyCode for legacy browsers
-        if (event.keyCode === 13 || e.key === 'Enter') {
+        if (event.keyCode === 13 || event.key === 'Enter') {
             sendPrivateMessage();
         }
     })
@@ -98,10 +98,10 @@
     
     socket.on("private message", async (data) => {
         if (data.toSelf) {
-            listConversationDiv = document.getElementById("list-" + data.to );
+            listConversationDiv = document.getElementById("list-" + data.to);
         }
         else {
-            listConversationDiv = document.getElementById("list-" + data.from )
+            listConversationDiv = document.getElementById("list-" + data.from);
         }
 
         // if conversation element already exists - append message to chat
@@ -126,12 +126,9 @@
 
             const senderSummonerName = senderRegionAndSummonerName[0];
             const senderRegion = senderRegionAndSummonerName[1];
-            console.log(senderRegionAndSummonerName);
 
             // create conversation partner object
             const conversationPartner = await getUserFromDB(senderRegion, senderSummonerName);
-            console.log(conversationPartner);
-            
 
             // create lastMessage object
             let lastMessage = {

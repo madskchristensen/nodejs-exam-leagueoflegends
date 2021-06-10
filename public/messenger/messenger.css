@@ -2,12 +2,12 @@
   border: 1px solid;
   border-color: darkgray;
   background-color: white;  
-    min-height: calc(100vh - 230px);   
+    min-height: calc(100vh - 300px);   
 }
 
 #messenger-div {
-  min-height: calc(100vh - 230px);   
-  max-height: calc(100vh - 230px);   
+  min-height: calc(100vh - 300px);   
+  max-height: calc(100vh - 300px);   
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;

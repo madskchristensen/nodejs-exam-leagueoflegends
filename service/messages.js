@@ -4,11 +4,11 @@ async function saveMessages(data) {
     // get objectIds for sender/receiver
     const receiverUsername = data.receiver.summonerName;
     const receiverRegion = data.receiver.region;
-    const receiverFromDB = await mongo.find.byRegionAndSummoner(receiverRegion, receiverUsername);
+    const receiverFromDB = await mongo.findUsers.byRegionAndSummoner(receiverRegion, receiverUsername);
 
     const senderUsername = data.from.summonerName;
     const senderRegion = data.from.region;
-    const senderFromDB = await mongo.find.byRegionAndSummoner(senderRegion, senderUsername);
+    const senderFromDB = await mongo.findUsers.byRegionAndSummoner(senderRegion, senderUsername);
 
     // find if conversation between users were had
     const conversation = await mongo.findChats.sharedBetweenIds( receiverFromDB._id, senderFromDB._id);
@@ -63,7 +63,7 @@ async function combineAllChatParticipants(chats, user) {
         try {
             // filter own id 
             const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId.toString() !== user._id.toString() );
-            let conversationParticipant = await mongo.find.byId(conversationPartnerId.userObjectId);
+            let conversationParticipant = await mongo.findUsers.byId(conversationPartnerId.userObjectId);
 
             delete conversationParticipant.details;
             delete conversationParticipant.profile;

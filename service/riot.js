@@ -9,7 +9,7 @@ const headers = { "X-Riot-Token": process.env.RIOT_API_KEY };
 // All functions ideally return the result of the fetch call, usually containing an object with the value
 // Naming schemes have been kept consistent with Riots API where possible
 // If an error occours in the fetch call an error object will be returned
-    // containing the http status and response from riot
+    // containing the http status and response from service
 
 // fetches summonerDTO (containing encrypted id, level etc.)
 async function getSummonerDTO(region, summonerName) {
@@ -24,7 +24,7 @@ async function getSummonerDTO(region, summonerName) {
     return summonerDTO;
 }
 
-// fetches verification string that a user has entered in their riot client
+// fetches verification string that a user has entered in their service client
 async function getVerification(region, encryptedId) {
     const endPoint = "platform/v4/third-party-code/by-summoner/";
     const url = protocol + region + baseUrl + endPoint + encryptedId;
@@ -53,7 +53,7 @@ async function getLeagueEntryDTO(region, encryptedId) {
 }
 
 // matches value of selected option in the region <select> element
-// and returns a region code that can be used with the riot api
+// and returns a region code that can be used with the service api
 // https://developer.riotgames.com/docs/lol#_routing-values
 function translateRegion(region) {
     const lowerCaseRegion = region.toLowerCase();
@@ -74,6 +74,7 @@ function translateRegion(region) {
 
     if (lowerCaseRegion in regions) {
         return regions[lowerCaseRegion];
+
     } else {
         return undefined;
     }

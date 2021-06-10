@@ -11,7 +11,7 @@ router.get("/api/messages", async (req, res) => {
         const region = user.riot.region;
         const summonerName = user.riot.summonerName;
     
-        const userFromDB = await mongo.find.byRegionAndSummoner(region, summonerName);
+        const userFromDB = await mongo.findUsers.byRegionAndSummoner(region, summonerName);
         delete userFromDB.details;
         delete userFromDB.profile;
         
@@ -36,10 +36,10 @@ router.get("/api/messages", async (req, res) => {
         }
         else {
             // no chats found send null object
-            res.status(204).send( { message: "No conversations found" } );
+            res.status(204).send( { error: "No conversations found" } );
         }
     } else {
-        res.status(401).send( { message: "ERROR: You are not authorized to access this endpoint" });
+        res.status(401).send( { error: "You are not authorized to access this endpoint" } );
     }
 });
 

@@ -5,7 +5,7 @@
         <div>
             <h1 id="summoner-name" class="display-5 ms-4 ps-4">Profile</h1>
         </div>
-        <div id="left-section" class="col-2 d-flex flex-column text-center">
+        <div id="left-section" class="col-2 d-flex flex-column text-center squared-div">
             <img class="img img-thumbnail w-75 mx-auto d-block mt-3" id="summoner-icon">
             <p id="region" class="text-muted m-0">Region</p>
             <p id="summoner-level"></p>
@@ -23,27 +23,32 @@
         </div>
 
         <!-- Profile information -->
-        <div id="right-section" class="col-9 pt-3 text-center">
-            <form method="post" action="/api/profile">
-                <div class="form-group row">
+        <div id="right-section" class="col-9 pt-3 text-center squared-div">
+            <!-- Profile form -->
+            <form onsubmit="sendFormData(); return false;" id="profile-form" class="w-100">
+                <!-- Form group -->
+                <div id="form-age" class="form-group row justify-content-center">
                     <label class="col-2 col-form-label">Age: </label>
                     <div class="col-sm-6">
                         <input type="text" readonly class="form-control" id="age" name="age">
                     </div>
                 </div>
-                <div class="form-group row pt-3">
+                <!-- Form group -->
+                <div id="form-languages" class="form-group row pt-3 justify-content-center">
                     <label class="col-2 col-form-label">Languages: </label>
                     <div class="col-sm-6">
                         <input type="text" readonly class="form-control" id="languages" name="languages">
                     </div>
                 </div>
-                <div class="form-group row pt-3">
+                <!-- Form group -->
+                <div id="form-country" class="form-group row pt-3 justify-content-center">
                     <label class="col-2 col-form-label">Country: </label>
                     <div class="col-sm-6">
                         <input type="text" readonly class="form-control" id="country" name="country">
                     </div>
                 </div>
-                <div class="form-group row pt-3">
+                <!-- Form group -->
+                <div id="form-roles" class="form-group row pt-3 justify-content-center">
                     <label class="col-2 col-form-label">Preferred roles: </label>
                     <div class="col-sm-6">
                         <input type="text" readonly class="form-control" id="roles" name="roles">
@@ -51,20 +56,26 @@
                 </div>
                 <!--Atm. udvider begge divs sig når textarea bliver større. Skal lige fikses senere -->
                 <!--Se evt. https://stackoverflow.com/questions/5078239/how-do-i-remove-the-space-between-inline-inline-block-elements/5078297#5078297 -->
-                <div class="form-group row pt-3 mb-4">
+                <div id="form-description" class="form-group row pt-3 justify-content-center">
                     <label class="col-2 col-form-label">Description: </label>
                     <div class="col-sm-6">
-                        <textarea type="text" readonly class="form-control" rows="6" id="description" name="description"></textarea>
+                        <textarea type="text" readonly class="form-control" rows="6" id="description"
+                                  name="description"></textarea>
                     </div>
                 </div>
-                <input type="submit" value="Save"/>
+
+                <div id="form-save" class="form-group row pt-3 justify-content-center">
+                    <div id="form-save-col" class="col-sm-6 offset-2">
+
+                    </div>
+                </div>
             </form>
         </div>
     </div>
 
     <div class="row mt-5 text-left justify-content-end">
-        <div class="col-9" id="champion-stats">
-            <h2 class="pt-2">Season stats</h2>
+        <div class="col-9 squared-div" id="champion-stats">
+            <h2 class="pt-2 text-center">Season stats</h2>
 
         </div>
 
@@ -72,5 +83,5 @@
     </div>
 </div>
 
-<script src="/profile/profile.js"></script>
+<script src="/profile/profile.js" async></script>
 
