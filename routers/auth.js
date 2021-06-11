@@ -113,7 +113,7 @@ router.post("/auth/verify-summoner", async (req, res) => {
 
     // find user from db, if exists
     const user = await mongodb.findUsers.byRegionAndSummoner(region, summonerName);
-    console.log(user);
+
     // if user exists, show error
     if (user) {
         if (user.riot.summonerName === summonerName && user.riot.region === region) {
@@ -124,8 +124,7 @@ router.post("/auth/verify-summoner", async (req, res) => {
         // get summonerDTO and verification string from riot service
         const summonerDTO = await riot.getSummonerDTO(regionTranslated, summonerName);
         const verification = await riot.getVerification(regionTranslated, summonerDTO.id);
-        console.log(summonerDTO);
-        console.log(verification);
+
         // matches displayed uuid in front-end against the string entered in the league client of the given summoner
         // if they match it is certain the user trying to signup has access to the summoner name in question
         // therefore it is safe to set the newUser object to verified and add any remaining riot information

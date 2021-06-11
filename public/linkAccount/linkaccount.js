@@ -9,8 +9,6 @@ async function linkAccount() {
     // boolean describing whether verification of summoner was successful or not
     const verification = await verifySummoner().then(res => res);
 
-    console.log(verification);
-
     if (verification.result) {
         window.location.href = "/auth/create-user";
 

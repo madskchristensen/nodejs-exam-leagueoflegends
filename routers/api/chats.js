@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const mongo = require("../../mongodb/mongodb");
-const messageService = require("../../service/messages");
+const messageService = require("../../service/chats");
 
 // GET all conversations that logged in user is part of. Data is split up into two sections: 
 // CHATS: All conversations that logged in user is part of

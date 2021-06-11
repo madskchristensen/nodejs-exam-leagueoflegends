@@ -6,10 +6,8 @@
 
         // Get user data for the profile being viewed
         const userProfile = await getUserProfile();
-        console.log(userProfile);
         // Currently logged in user. Will be initialized later in the script if loggedIn is true
         let userLoggedIn = await getUser();
-        console.log(userLoggedIn);
         // Append hardcoded season stats to user as it has not been implemented yet
         userProfile.riot.seasonStats = [
             {
@@ -257,8 +255,6 @@ async function sendFormData() {
             if (!res.ok) {
                 throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
             }
-
-            console.log("save was ok");
 
             toastr.success("Profile saved!");
         })

@@ -39,7 +39,7 @@ const server = require("http").createServer(app);
 // atttach socket.io to http server
 const io = require("socket.io")(server);
 
-const messageService = require("./service/messages");
+const chatService = require("./service/chats");
 
 // register middleware in Socket.IO
 // reference: https://socket.io/docs/v3/faq/ - how to use socket.io with express-session
@@ -65,7 +65,7 @@ io.on("connection", (socket) => {
         data.from.summonerName = socket.data.summonerName;
         data.from.region = socket.data.region;
 
-        const response = await messageService.saveMessage(data);
+        const response = await chatService.saveMessage(data);
 
         if (response.data) {
             socket.to(data.receiver.summonerName + "-" + data.receiver.region).to(socket.data.username).emit("private message", {
@@ -212,8 +212,6 @@ app.get("/*", (req, res, next) => {
         next();
     }
 });
-
-
 
 app.get("/messenger", (req, res) => {
     res.send(header + messenger + footer);
