@@ -43,6 +43,7 @@
     
     // get session
     let loggedInUser;
+
     getUserFromSession().then((result) => {
         loggedInUser = result;
     });
@@ -66,25 +67,35 @@
         const messagesDiv = document.getElementById("messages-div");
 
         // get name of receiver
-        let receiver = { };
+        let receiver;
+
         // if nothing inside newConversationInput append message to chat
-        if (newConversationInput === "") {
+        if (!newConversationInput) {
             // get active conversation
             const activeConversationDiv = document.getElementsByClassName("list-group-item list-group-item-action conversation-link active")[0];
             const conversationIdentifierArr = activeConversationDiv.id.split("-");
 
-            receiver.summonerName = conversationIdentifierArr[0];
-            receiver.region = conversationIdentifierArr[1];
+            reciever = {
+                summonerName: conversationIdentifierArr[0],
+                region: conversationIdentifierArr[1]
+            }
+
         } else {
-            receiver.summonerName = newConversationInput;
-            receiver.region = newConversationRegion;
+            reciever = {
+                summonerName: newConversationInput,
+                region: newConversationRegion
+            }
         }
 
         const conversationPartner = await getUserFromDB(receiver.region, receiver.summonerName);
+
         if (!conversationPartner) {
             toastr.error("Summoner not found - please try again.");
-        } else if (conversationPartner.riot.summonerName === loggedInUser.riot.summonerName && conversationPartner.riot.region === loggedInUser.riot.region ) {
+
+        } else if (conversationPartner.riot.summonerName === loggedInUser.riot.summonerName
+            && conversationPartner.riot.region === loggedInUser.riot.region ) {
             toastr.error("You can't send messages to yourself. Get a life...");
+
         } else {
             socket.emit("private message", { receiver, message });
             // reset message and conversation inputs
@@ -92,10 +103,10 @@
         }
     }
 
-    
     socket.on("private message", async (data) => {
         if (data.toSelf) {
             listConversationDiv = document.getElementById("list-" + data.to);
+
         } else {
             listConversationDiv = document.getElementById("list-" + data.from);
         }
@@ -103,16 +114,20 @@
         // if conversation element already exists - append message to chat
         if (listConversationDiv) {
             if (data.toSelf) {
-                generateMessage (data.message, data.from, data.from, listConversationDiv);
+                generateMessage(data.message, data.from, data.from, listConversationDiv);
+
             } else {
-                generateMessage (data.message, data.from, data.to, listConversationDiv);
+                generateMessage(data.message, data.from, data.to, listConversationDiv);
             }
+
         // else create new conversation, chat and message
         } else {
             // get region and summoner name
             let senderRegionAndSummonerName;
+
             if (data.toSelf) {
                 senderRegionAndSummonerName = data.to.split("-");
+
             } else {
                 senderRegionAndSummonerName = data.from.split("-");
             }
@@ -130,6 +145,7 @@
 
             if (data.toSelf) {
                 lastMessage.from = conversationPartner.riot.summonerName;
+
             } else {
                 lastMessage.from = conversationPartner._id;
             }
@@ -138,7 +154,7 @@
             const messagesDiv = document.getElementById("messages-div");
 
             // create new conversation element to the left
-            generateConversation (conversationPartner, conversationPartner.riot.summonerName, lastMessage, messagesDiv); 
+            generateConversation(conversationPartner, conversationPartner.riot.summonerName, lastMessage, messagesDiv);
 
             // create messenger div
             const listConversationDiv = generateMessageContainer(conversationPartner.riot.summonerName, conversationPartner.riot.region);
@@ -147,8 +163,9 @@
 
             // get receiver summoner name
             const receiverSummonerName = data.to.split("-")[0];
+
             // attach message to messenger div
-            generateMessage (data.message, conversationPartner.riot.summonerName, receiverSummonerName, listConversationDiv);
+            generateMessage(data.message, conversationPartner.riot.summonerName, receiverSummonerName, listConversationDiv);
             messengerDiv.appendChild(listConversationDiv);
         }
     })

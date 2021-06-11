@@ -1,9 +1,11 @@
 {
-    "participants": [{
+    "participants": [
+        {
         "userObjectId": {
             "$oid": "60c2444ee88ffe763418401e"
         }
-    }, {
+        },
+        {
         "userObjectId": {
             "$oid": "60c24aa06c35bd4dacce98c1"
         }

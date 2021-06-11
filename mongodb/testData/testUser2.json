@@ -1,4 +1,7 @@
 {
+    "_id": {
+        "$oid": "60c24aa06c35bd4dacce98c1"
+    },
     "profile": {
         "age": "32",
         "languages": "English, Russian",

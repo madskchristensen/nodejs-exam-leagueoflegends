@@ -157,6 +157,7 @@ router.get("/auth/create-user", async (req, res) => {
 
     // get leagueEntryDTO array (containing solo 5v5, flex 5v5 tier, lp, wins/losses etc.)
     const leagueEntryDTO = await riot.getLeagueEntryDTO(regionTranslated, id);
+
     // find rankedSolo object from the array
     const rankedSolo = leagueEntryDTO.find(element => element.queueType === "RANKED_SOLO_5x5");
 
@@ -193,7 +194,7 @@ router.get("/auth/create-user", async (req, res) => {
                 wins: rankedSolo.wins,
                 losses: rankedSolo.losses
             }
-        };
+        }
 
         // save data object to db
         mongodb.insertUsers.user(data);

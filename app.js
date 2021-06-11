@@ -59,21 +59,28 @@ io.on("connection", (socket) => {
     // join room with username
     socket.join(socket.data.username);
 
+    // triggered when a new message is sent
     socket.on("private message", async (data) => {
         // send message to other user
-        data.from = {};
-        data.from.summonerName = socket.data.summonerName;
-        data.from.region = socket.data.region;
+        data.from = {
+            summonerName: socket.data.summonerName,
+            region: socket.data.region
+        };
 
+        // attempt to save message to existing chat or create new if one doesn't exist between participants (from/receiver)
         const response = await chatService.saveMessage(data);
 
+        // if there was an error saving the message
         if (response.data) {
-            socket.to(data.receiver.summonerName + "-" + data.receiver.region).to(socket.data.username).emit("private message", {
+            // emits the message/data to receiver
+            socket.to(data.receiver.summonerName + "-" + data.receiver.region).emit("private message", {
                 message: escapeHtml(data.message),
                 from: socket.data.username,
                 to: data.receiver.summonerName + "-" + data.receiver.region,
                 toSelf: false
             });
+
+            // emits the message/data to sender
             io.in(socket.data.username).emit("private message", {
                 message: escapeHtml(data.message),
                 from: socket.data.username,

@@ -1,17 +1,17 @@
-const mongo = require("../mongodb/mongodb");
+const mongodb = require("../mongodb/mongodb");
 
 async function saveMessage(data) {
     // get objectIds for sender/receiver
     const receiverUsername = data.receiver.summonerName;
     const receiverRegion = data.receiver.region;
-    const receiverFromDB = await mongo.findUsers.byRegionAndSummoner(receiverRegion, receiverUsername);
+    const receiverFromDB = await mongodb.findUsers.byRegionAndSummoner(receiverRegion, receiverUsername);
 
     const senderUsername = data.from.summonerName;
     const senderRegion = data.from.region;
-    const senderFromDB = await mongo.findUsers.byRegionAndSummoner(senderRegion, senderUsername);
+    const senderFromDB = await mongodb.findUsers.byRegionAndSummoner(senderRegion, senderUsername);
 
     // find if conversation between users were had
-    const conversation = await mongo.findChats.sharedBetweenIds( receiverFromDB._id, senderFromDB._id);
+    const conversation = await mongodb.findChats.sharedBetweenIds( receiverFromDB._id, senderFromDB._id);
 
     // if conversation exists ==> conversation was already had ==> append message to chat
     if (conversation) {
@@ -22,14 +22,16 @@ async function saveMessage(data) {
             timeStamp: new Date().toUTCString()
         };
 
-        const result = await mongo.updateChats.messages(conversation._id, messageData);
+        const result = await mongodb.updateChats.messages(conversation._id, messageData);
        
         // if 1 chat was found, 1 chat was modified and result is ok, update was successful
         if (result.n === 1 && result.nModified === 1 && result.ok === 1) {
             return { data: true, method: "update" };
+
         } else {
             return { data: false, method: "update" };
         }
+
     // if no conversation exists ==> create new chat
     } else {
         // create new conversation
@@ -50,7 +52,9 @@ async function saveMessage(data) {
                 }
             ]
         };
-        mongo.insertChats.chat(conversationData);
+
+        mongodb.insertChats.chat(conversationData);
+
         return { data: true, method: "create" };
     }    
 }
@@ -59,20 +63,23 @@ async function saveMessage(data) {
 async function combineAllChatParticipants(chats, user) {
     // combine all messagepartners
     let conversationPartners = [user];
+
     for (let conversation of chats) {
         try {
             // filter own id 
             const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId.toString() !== user._id.toString() );
-            let conversationParticipant = await mongo.findUsers.byId(conversationPartnerId.userObjectId);
+            let conversationParticipant = await mongodb.findUsers.byId(conversationPartnerId.userObjectId);
 
             delete conversationParticipant.details;
             delete conversationParticipant.profile;
 
             conversationPartners.push(conversationParticipant);
+
         } catch (error) {
             console.log(error);
         }
     }
+
     return conversationPartners;
 }
 
