@@ -7,7 +7,6 @@ router.get("/api/users/current", (req, res) => {
     if (loggedIn) {
         const user = req.session.user;
         delete user.details;
-        delete user._id;
 
         res.status(200).send(user);
 

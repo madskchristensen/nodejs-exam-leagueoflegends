@@ -249,6 +249,7 @@ db.connect(() => {
     server.listen(port, (err) => {
         if (err) {
             console.log(err);
+
         } else {
             console.log("[express] running in", process.env.NODE_ENV, "mode");
             console.log("[express] listening at port", port);

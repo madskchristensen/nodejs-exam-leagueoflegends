@@ -40,7 +40,7 @@ router.post("/auth/login", async (req, res) => {
 
             res.redirect(profileUrl);
 
-            // if passwords don't match, redirect to login page and don't log in user
+        // if passwords don't match, redirect to login page and don't log in user
         } else {
             console.log("Client login rejected (wrong password):", req.session.id);
 
@@ -147,7 +147,7 @@ router.post("/auth/verify-summoner", async (req, res) => {
     }
 });
 
-// endpoint called during sign-up process when a users summonerName is verified
+// endpoint called during sign-up process from link-account.js when a users summonerName is verified,
 // and the user should be saved to database
 router.get("/auth/create-user", async (req, res) => {
     const newUser = req.session.newUser;
