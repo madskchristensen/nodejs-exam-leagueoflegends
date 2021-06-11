@@ -70,8 +70,8 @@ io.on("connection", (socket) => {
         // attempt to save message to existing chat or create new if one doesn't exist between participants (from/receiver)
         const response = await chatService.saveMessage(data);
 
-        // if there was an error saving the message
-        if (response.data) {
+        // if there was no error saving the message
+        if (!response.error) {
             // emits the message/data to receiver
             socket.to(data.receiver.summonerName + "-" + data.receiver.region).emit("private message", {
                 message: escapeHtml(data.message),
@@ -91,7 +91,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", async () => {
-        console.log("A socket disconnected" + socket.data.username);
+        console.log("A socket disconnected:", socket.data.username);
     })
 });
 

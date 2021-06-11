@@ -75,13 +75,13 @@
             const activeConversationDiv = document.getElementsByClassName("list-group-item list-group-item-action conversation-link active")[0];
             const conversationIdentifierArr = activeConversationDiv.id.split("-");
 
-            reciever = {
+            receiver = {
                 summonerName: conversationIdentifierArr[0],
                 region: conversationIdentifierArr[1]
             }
 
         } else {
-            reciever = {
+            receiver = {
                 summonerName: newConversationInput,
                 region: newConversationRegion
             }

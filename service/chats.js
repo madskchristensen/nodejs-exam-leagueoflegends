@@ -26,10 +26,10 @@ async function saveMessage(data) {
        
         // if 1 chat was found, 1 chat was modified and result is ok, update was successful
         if (result.n === 1 && result.nModified === 1 && result.ok === 1) {
-            return { data: true, method: "update" };
+            return { action: "update", error: ""};
 
         } else {
-            return { data: false, method: "update" };
+            return { action: "update", error: "Error when updating chats in database." };
         }
 
     // if no conversation exists ==> create new chat
@@ -55,7 +55,7 @@ async function saveMessage(data) {
 
         mongodb.insertChats.chat(conversationData);
 
-        return { data: true, method: "create" };
+        return { action: "create", error: "" };
     }    
 }
 
