@@ -1,8 +1,9 @@
 const db = require("../db");
+const ObjectId = require('mongodb').ObjectId; 
 
 // find conversation between two Ids
 function sharedBetweenIds (objectId1, objectId2) {
-    const filter = { "participants.userObjectId" : { $all: [objectId1, objectId2] } };
+    const filter = { "participants.userObjectId" : { $all: [ObjectId(objectId1), ObjectId(objectId2) ] } };
 
     return db.query().collection("chats").findOne(filter)
         .then(conversation => conversation)

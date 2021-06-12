@@ -23,7 +23,6 @@ router.get("/api/users/:summonerName/:region", async (req, res) => {
     const user = await mongodb.findUsers.byRegionAndSummoner(region, summonerName);
 
     if (user) {
-        delete user._id;
         delete user.details;
 
         res.status(200).send(user);

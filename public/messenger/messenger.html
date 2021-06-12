@@ -80,13 +80,13 @@
             receiver.region = newConversationRegion;
         }
 
-        const conversationPartner = await getUserFromDB(receiver.region, receiver.summonerName);
-        if (!conversationPartner) {
+        const to = await getUserBySummonerNameAndRegion(receiver.region, receiver.summonerName);
+        if (!to) {
             toastr.error("Summoner not found - please try again.");
-        } else if (conversationPartner.riot.summonerName === loggedInUser.riot.summonerName && conversationPartner.riot.region === loggedInUser.riot.region ) {
+        } else if (to.riot.summonerName === loggedInUser.riot.summonerName && to.riot.region === loggedInUser.riot.region ) {
             toastr.error("You can't send messages to yourself. Get a life...");
         } else {
-            socket.emit("private message", { receiver, message });
+            socket.emit("private message", { to, message });
             // reset message and conversation inputs
             resetMessageInputs();
         }
@@ -94,61 +94,53 @@
 
     
     socket.on("private message", async (data) => {
-        if (data.toSelf) {
-            listConversationDiv = document.getElementById("list-" + data.to);
-        } else {
-            listConversationDiv = document.getElementById("list-" + data.from);
-        }
-
+        
+        listConversationDiv = document.getElementById("list-" + data.from.riot.summonerName + "-"  + data.from.riot.region);
+        
         // if conversation element already exists - append message to chat
         if (listConversationDiv) {
             if (data.toSelf) {
-                generateMessage (data.message, data.from, data.from, listConversationDiv);
+                generateMessage (data.message, data.from._id, data.from._id, listConversationDiv);
             } else {
-                generateMessage (data.message, data.from, data.to, listConversationDiv);
+                generateMessage (data.message, data.from._id, data.to._id, listConversationDiv);
             }
+
         // else create new conversation, chat and message
         } else {
-            // get region and summoner name
-            let senderRegionAndSummonerName;
-            if (data.toSelf) {
-                senderRegionAndSummonerName = data.to.split("-");
-            } else {
-                senderRegionAndSummonerName = data.from.split("-");
-            }
-
-            const senderSummonerName = senderRegionAndSummonerName[0];
-            const senderRegion = senderRegionAndSummonerName[1];
-
-            // create conversation partner object
-            const conversationPartner = await getUserFromDB(senderRegion, senderSummonerName);
 
             // create lastMessage object
             let lastMessage = {
-                body: data.message
+                body: data.message,
             };
 
+            // set sender of last message according to if data was sent to self or not
             if (data.toSelf) {
-                lastMessage.from = conversationPartner.riot.summonerName;
+                lastMessage.from = data.to._id;
+            
             } else {
-                lastMessage.from = conversationPartner._id;
+                lastMessage.from = data.from._id;
             }
+            
             
             // get wrapper divs for conversations (left) and messenger (right)             
             const messagesDiv = document.getElementById("messages-div");
 
             // create new conversation element to the left
-            generateConversation (conversationPartner, conversationPartner.riot.summonerName, lastMessage, messagesDiv); 
+            generateConversation (data.from, data.from.riot.summonerName, lastMessage, messagesDiv); 
 
             // create messenger div
-            const listConversationDiv = generateMessageContainer(conversationPartner.riot.summonerName, conversationPartner.riot.region);
+            const listConversationDiv = generateMessageContainer(data.from.riot.summonerName, data.from.riot.region);
             
             const messengerDiv = document.getElementById("messenger-div");
 
-            // get receiver summoner name
-            const receiverSummonerName = data.to.split("-")[0];
-            // attach message to messenger div
-            generateMessage (data.message, conversationPartner.riot.summonerName, receiverSummonerName, listConversationDiv);
+            // attach message to messenger div according to if data was sent to self or not
+            if (data.toSelf) {
+                generateMessage (data.message, data.from._id, data.from._id, listConversationDiv);
+
+            } else {
+                generateMessage (data.message, data.from._id, data.to._id, listConversationDiv);
+            }
+
             messengerDiv.appendChild(listConversationDiv);
         }
     })

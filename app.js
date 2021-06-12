@@ -56,28 +56,29 @@ io.on("connection", (socket) => {
 
     socket.data.username = socket.data.summonerName + "-" + socket.data.region;
     
+    // get user from session
+    const userFromSession = socket.request.session.user;
+
     // join room with username
     socket.join(socket.data.username);
 
     socket.on("private message", async (data) => {
         // send message to other user
-        data.from = {};
-        data.from.summonerName = socket.data.summonerName;
-        data.from.region = socket.data.region;
+        data.from = userFromSession;
 
         const response = await chatService.saveMessage(data);
 
         if (response.data) {
-            socket.to(data.receiver.summonerName + "-" + data.receiver.region).to(socket.data.username).emit("private message", {
+            socket.to(data.to.riot.summonerName + "-" + data.to.riot.region).emit("private message", {
                 message: escapeHtml(data.message),
-                from: socket.data.username,
-                to: data.receiver.summonerName + "-" + data.receiver.region,
+                from: socket.request.session.user,
+                to: data.to,
                 toSelf: false
             });
             io.in(socket.data.username).emit("private message", {
                 message: escapeHtml(data.message),
-                from: socket.data.username,
-                to: data.receiver.summonerName + "-" + data.receiver.region,
+                from: data.to,
+                to: socket.request.session.user,
                 toSelf: true
             });
         } 
@@ -140,7 +141,7 @@ app.use(express.urlencoded({
 app.use(express.json());
 
 // routers
-const sessionRouter = require("./routers/session");
+const sessionRouter = require("./routers/api/session");
 app.use(sessionRouter.router);
 
 const authRouter = require("./routers/auth");
@@ -184,8 +185,8 @@ app.get("/signup", (req, res) => {
     // check is user is already signed in
     if (req.session.loggedIn === true) {
         res.status(401).send(header + "<h4>You are already logged in. Please logout before signing up as a new user</h1>")
-    }
-    else {
+    
+    } else {
         res.send(header + signup + footer);
     }
 });
@@ -203,12 +204,12 @@ app.get("/*", (req, res, next) => {
     // check if path is valid
     if (!paths.includes(req.path)) {
         res.status(404).send(header + "<h4>Sorry the page doesnt exist</h1>");
-    }
-    // check if user is authorized
-    else if (!(req.session.loggedIn === true)) {
+    
+        // check if user is authorized
+    } else if (!(req.session.loggedIn === true)) {
         res.status(401).send(header + "<h4>Please login to view this page</h1>");
-    }
-    else {
+
+    } else {
         next();
     }
 });
@@ -242,6 +243,7 @@ db.connect(() => {
     server.listen(port, (err) => {
         if (err) {
             console.log(err);
+
         } else {
             console.log("[express] running in", process.env.NODE_ENV, "mode");
             console.log("[express] listening at port", port);

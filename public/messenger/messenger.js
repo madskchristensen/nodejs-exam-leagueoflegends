@@ -133,6 +133,7 @@ function generateConversation (conversationPartner, lastUserSummonerName, lastMe
     // Append You / sommonername dependant on who sent the last message
     if (lastMessage.from !== conversationPartner._id) {
         lastMessagePreview.innerText = "You: " + lastMessage.body;
+
     } else{
         lastMessagePreview.innerText = lastUserSummonerName + ": " + lastMessage.body;
     }
@@ -159,6 +160,14 @@ function generateMessageContainer(conversationPartnerSummonerName, conversationP
     return listConversationDiv;
 }
 
+// Generates a message container. Aligns left/right dependant sender and session info
+/**
+ * 
+ * @param {String} message message body 
+ * @param {String} from string formatted mongoDB ObjectId containing message sender ObjectId 
+ * @param {String} sessionIdentifier string formatted mongoDB ObjectId containing currently logged in user ObjectId 
+ * @param {HTMLCollection} divToAppendTo div to append message div to 
+ */
 function generateMessage (message, from,  sessionIdentifier, divToAppendTo ) {
     const wrapperMessageDiv = document.createElement("div");
     wrapperMessageDiv.classList.add("row");
@@ -174,8 +183,8 @@ function generateMessage (message, from,  sessionIdentifier, divToAppendTo ) {
     if (from === sessionIdentifier) {
         wrapperMessageDiv.classList.add("justify-content-end");
         messageDiv.classList.add("chat-right", "d-flex", "justify-content-end", "align-items-center");
-    }    
-    else{
+
+    } else{
         messageDiv.classList.add("chat-left", "d-flex", "justify-content-start");
     }
 
@@ -204,11 +213,11 @@ function generateConversationAndMessageContainer(conversationPartner, lastUserSu
 }
 
 async function getUserFromSession() {
-    const response = await fetch("/api/users/current");
+    const response = await fetch("/api/session/user");
     return await response.json();
 }
 
-async function getUserFromDB(region, summonerName) {
+async function getUserBySummonerNameAndRegion(region, summonerName) {
     const response = await fetch("/api/users/" + summonerName + "/" + region);
     if (response.ok === true){
         return await response.json();
@@ -218,7 +227,7 @@ async function getUserFromDB(region, summonerName) {
 }
 
 async function getMessagesFromDB() {
-    const response = await fetch("/api/chats/current");
+    const response = await fetch("/api/session/chats");
 
     return await response.json();
 }

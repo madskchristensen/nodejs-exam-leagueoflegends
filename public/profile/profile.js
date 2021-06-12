@@ -230,7 +230,7 @@ async function getUserProfile() {
 }
 
 async function getUser() {
-    const response = await fetch("/api/users/current");
+    const response = await fetch("/api/session/user");
 
     return await response.json();
 }
