@@ -1,55 +1,61 @@
 (async function getMessages() {
     try {
         const conversationsFromDb = await getMessagesFromDB();
-        const messages = conversationsFromDb.chats;
+        const chats = conversationsFromDb.chats;
 
-        // check if messages exists
-        if (messages) {
+        // check if user has any chats
+        if (chats) {
             const participants = conversationsFromDb.participants;
             const loggedInUserId = conversationsFromDb.userID.toString();
-            const messagesDiv = document.getElementById("messages-div");
+
+            // div containing conversations
+            const conversationsDiv = document.getElementById("messages-div");
+
+            // div containing the messages shown for selected conversation
             const messengerDiv = document.getElementById("messenger-div");
-            
-            messages.forEach(conversation => {
-                // get conversation partner data
+
+            chats.forEach(conversation => {
+                // get conversation partner data, containing id, summonerName etc.
                 const conversationPartner = findConversationPartner(conversation, loggedInUserId, participants);
                 // get last messageObject that sent message
                 const lastMessage = conversation.messages[conversation.messages.length - 1];
-    
-                // find user that sent last message 
+
+                // find user that sent last message
                 let lastUser;
                 participants.forEach(user => {
                     if (user._id === lastMessage.from) {
                         lastUser = user;
                     }
-                });   
+                });
 
-                // create left side conversation entry
-                generateConversation(conversationPartner, lastUser.riot.summonerName, lastMessage, messagesDiv);
-    
-                // Create chat
-                // div container and classes
-                const listConversationDiv = generateMessageContainer (conversationPartner.riot.summonerName, conversationPartner.riot.region);
+                // create left side conversation entry (list-group-item)
+                generateConversation(conversationPartner, lastUser.riot.summonerName, lastMessage, conversationsDiv);
+
+                // Creates the message container/div containing all the messages for a chat
+                const messageContainer = generateMessageContainer(conversationPartner.riot.summonerName, conversationPartner.riot.region);
                 
                 // loop through messages in conversation and append them to list
                 conversation.messages.forEach(message => {
-                    generateMessage (message.body, message.from, loggedInUserId, listConversationDiv)
+                    generateMessage(message.body, message.from, loggedInUserId, messageContainer)
                 });
 
-                messengerDiv.appendChild(listConversationDiv);
+                // Append the message container to the wrapping messengerDiv
+                messengerDiv.appendChild(messageContainer);
             })
         }
     }
+
     catch(error) {
         console.log(error);
     }
+
 })();   
 
 function findConversationPartner(conversation, loggedInUserId, participants) {
-    // find user that itsn't the logged in user
+    // go through the participants of a single chat and find the user that isn't currently logged in user
     const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId.toString() !== loggedInUserId );
 
-    // get conversation partner object from id
+    // get conversation partner object from id containing the user data like summonerName etc.
     const conversationPartner = participants.find( ({ _id }) => _id.toString() === conversationPartnerId.userObjectId.toString() );
 
     return conversationPartner;
@@ -134,7 +140,7 @@ function generateConversation (conversationPartner, lastUserSummonerName, lastMe
     if (lastMessage.from !== conversationPartner._id) {
         lastMessagePreview.innerText = "You: " + lastMessage.body;
 
-    } else{
+    } else {
         lastMessagePreview.innerText = lastUserSummonerName + ": " + lastMessage.body;
     }
 
@@ -146,7 +152,6 @@ function generateConversation (conversationPartner, lastUserSummonerName, lastMe
     // append conversation to div
     link.appendChild(conversationDiv);
     divToAppendTo.appendChild(link);
-
 }
 
 function generateMessageContainer(conversationPartnerSummonerName, conversationPartnerRegion) {

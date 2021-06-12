@@ -14,14 +14,14 @@ async function saveMessage(data) {
             timeStamp: new Date().toUTCString()
         };
 
-        const result = await mongo.updateChats.messages(conversation._id, messageData);
+        const result = await mongodb.updateChats.messages(conversation._id, messageData);
        
         // if 1 chat was found, 1 chat was modified and result is ok, update was successful
         if (result.n === 1 && result.nModified === 1 && result.ok === 1) {
-            return { data: true, method: "update" };
+            return { data: true, action: "update", error: ""};
 
         } else {
-            return { data: false, method: "update" };
+            return { data: false, action: "update", error: "Error when updating chats in database." };
         }
         
     // if no conversation exists ==> create new chat
@@ -44,8 +44,10 @@ async function saveMessage(data) {
                 }
             ]
         };
-        mongo.insertChats.chat(conversationData);
-        return { data: true, method: "create" };
+
+        mongodb.insertChats.chat(conversationData);
+
+        return { data: true, action: "create", error: "" };
     }    
 }
 
@@ -53,11 +55,13 @@ async function saveMessage(data) {
 async function combineAllChatParticipants(chats, user) {
     // combine all messagepartners
     let conversationPartners = [user];
+
     for (let conversation of chats) {
         try {
             // filter own id 
             const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId.toString() !== user._id.toString() );
             let conversationParticipant = await mongo.findUsers.byId(conversationPartnerId.userObjectId);
+            
             if (conversationParticipant) {
                 delete conversationParticipant.details;
                 delete conversationParticipant.profile;
@@ -68,6 +72,7 @@ async function combineAllChatParticipants(chats, user) {
             console.log(error);
         }
     }
+
     return conversationPartners;
 }
 

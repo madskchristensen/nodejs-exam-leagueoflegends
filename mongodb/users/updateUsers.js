@@ -1,5 +1,6 @@
 const db = require("../db");
 
+// updates a users profile information, by summoner name, region and data (the new data)
 function profile(summonerName, region, data) {
     const regex = new RegExp(`(${summonerName})`, "gi");
 

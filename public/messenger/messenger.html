@@ -2,7 +2,7 @@
 
 <div class="container">
     <div class="row pt-5" >
-        <div id="chats-div" class="col col-3 squared-div">
+        <div id="chats-div" class="col col-3 squared-div pt-3">
             <h4>Chats</h4>
             <input type="text" id="new-conversation-input" class="form-control pt-2 mb-3 mt-3" placeholder="New chat: Type receiver name here" >
             <div id="select-div">
@@ -43,6 +43,7 @@
     
     // get session
     let loggedInUser;
+
     getUserFromSession().then((result) => {
         loggedInUser = result;
     });
@@ -66,25 +67,34 @@
         const messagesDiv = document.getElementById("messages-div");
 
         // get name of receiver
-        let receiver = { };
+        let receiver;
+
         // if nothing inside newConversationInput append message to chat
-        if (newConversationInput === "") {
+        if (!newConversationInput) {
             // get active conversation
             const activeConversationDiv = document.getElementsByClassName("list-group-item list-group-item-action conversation-link active")[0];
             const conversationIdentifierArr = activeConversationDiv.id.split("-");
 
-            receiver.summonerName = conversationIdentifierArr[0];
-            receiver.region = conversationIdentifierArr[1];
+            receiver = {
+                summonerName: conversationIdentifierArr[0],
+                region: conversationIdentifierArr[1]
+            }
+
         } else {
-            receiver.summonerName = newConversationInput;
-            receiver.region = newConversationRegion;
+            receiver = {
+                summonerName: newConversationInput,
+                region: newConversationRegion
+            }
         }
 
+        // get receiver of message (to) from DB
         const to = await getUserBySummonerNameAndRegion(receiver.region, receiver.summonerName);
+
         if (!to) {
             toastr.error("Summoner not found - please try again.");
         } else if (to.riot.summonerName === loggedInUser.riot.summonerName && to.riot.region === loggedInUser.riot.region ) {
             toastr.error("You can't send messages to yourself. Get a life...");
+
         } else {
             socket.emit("private message", { to, message });
             // reset message and conversation inputs
@@ -92,7 +102,6 @@
         }
     }
 
-    
     socket.on("private message", async (data) => {
         
         listConversationDiv = document.getElementById("list-" + data.from.riot.summonerName + "-"  + data.from.riot.region);

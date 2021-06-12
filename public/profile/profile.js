@@ -1,40 +1,17 @@
+// run on page load
 (async function getProfile() {
     try {
-        // DATA SETUP //
         // Is user logged in?
         const loggedIn = await isLoggedIn().then(result => result.data);
 
         // Get user data for the profile being viewed
         const userProfile = await getUserProfile();
+
         // Currently logged in user. Will be initialized later in the script if loggedIn is true
         let userLoggedIn = await getUser();
+
         // Append hardcoded season stats to user as it has not been implemented yet
-        userProfile.riot.seasonStats = [
-            {
-                champion: "Alistar",
-                winRate: "55%",
-                gamesPlayed: "64",
-                KDA: "2.78"
-            },
-            {
-                champion: "Rell",
-                winRate: "64%",
-                gamesPlayed: "61",
-                KDA: "2.47"
-            },
-            {
-                champion: "Rammus",
-                winRate: "85%",
-                gamesPlayed: "99",
-                KDA: "10.78"
-            },
-            {
-                champion: "Ekko",
-                winRate: "45%",
-                gamesPlayed: "8",
-                KDA: "2.78"
-            }
-        ];
+        userProfile.riot.seasonStats = getSeasonStats();
 
         // LOAD PROFILE INFORMATION //
         loadProfile(userProfile);
@@ -97,10 +74,7 @@ function loadMessageButton(loggedIn, userProfile, userLoggedIn) {
 }
 
 function loadProfile(userProfile) {
-    // riot
-    document.getElementById("rank").innerText = userProfile.riot.rankedSolo5x5.tier + " " +
-        userProfile.riot.rankedSolo5x5.rank;
-    document.getElementById("lp").innerText = userProfile.riot.rankedSolo5x5.leaguePoints + " LP";
+    // safe riot information (should always exist)
     document.getElementById("summoner-name").innerText = userProfile.riot.summonerName;
     document.getElementById("region").innerText = userProfile.riot.region.toUpperCase();
     document.getElementById("summoner-level").innerText = "Level " + userProfile.riot.summonerLevel;
@@ -112,10 +86,24 @@ function loadProfile(userProfile) {
     document.getElementById("roles").value = userProfile.profile.roles;
     document.getElementById("description").value = userProfile.profile.description;
 
-    // summoner rank
-    const summonerRank = document.getElementById("summoner-rank-icon");
-    const summonerRankFromDB = userProfile.riot.rankedSolo5x5.tier.split(" ")[0];
-    summonerRank.src = "/assets/riot/ranked-emblems/" + summonerRankFromDB + ".png";
+    const isRankedSolo = Object.keys(userProfile.riot.rankedSolo5x5).length;
+
+    // unsafe riot information (rank picture, tier and league points.
+    // Not set if user doesn't have a solo rank
+    if (isRankedSolo) {
+        // show header describing the ranked type
+        document.getElementById("rank-type").innerText = "Ranked Solo";
+
+        // tier, rank and lp
+        document.getElementById("rank").innerText = userProfile.riot.rankedSolo5x5.tier + " " +
+            userProfile.riot.rankedSolo5x5.rank;
+        document.getElementById("lp").innerText = userProfile.riot.rankedSolo5x5.leaguePoints + " LP";
+
+        // ranked emblem
+        const summonerRank = document.getElementById("summoner-rank-icon");
+        const summonerRankFromDB = userProfile.riot.rankedSolo5x5.tier.split(" ")[0];
+        summonerRank.src = "/assets/riot/ranked-emblems/" + summonerRankFromDB + ".png";
+    }
 
     // summoner icon
     const summonerIcon = document.getElementById("summoner-icon");
@@ -261,4 +249,33 @@ async function sendFormData() {
         .catch(err => {
             toastr.error("Something went wrong. Try again");
         });
+}
+
+function getSeasonStats() {
+    return [
+        {
+            champion: "Alistar",
+            winRate: "55%",
+            gamesPlayed: "64",
+            KDA: "2.78"
+        },
+        {
+            champion: "Rell",
+            winRate: "64%",
+            gamesPlayed: "61",
+            KDA: "2.47"
+        },
+        {
+            champion: "Rammus",
+            winRate: "85%",
+            gamesPlayed: "99",
+            KDA: "10.78"
+        },
+        {
+            champion: "Ekko",
+            winRate: "45%",
+            gamesPlayed: "8",
+            KDA: "2.78"
+        }
+    ];
 }

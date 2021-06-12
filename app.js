@@ -62,10 +62,12 @@ io.on("connection", (socket) => {
     // join room with username
     socket.join(socket.data.username);
 
+    // triggered when a new message is sent
     socket.on("private message", async (data) => {
         // send message to other user
         data.from = userFromSession;
 
+        // attempt to save message to existing chat or create new if one doesn't exist between participants (from/receiver)
         const response = await chatService.saveMessage(data);
 
         if (response.data) {
@@ -75,6 +77,8 @@ io.on("connection", (socket) => {
                 to: data.to,
                 toSelf: false
             });
+
+            // emits the message/data to sender
             io.in(socket.data.username).emit("private message", {
                 message: escapeHtml(data.message),
                 from: data.to,
@@ -85,7 +89,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", async () => {
-        console.log("A socket disconnected" + socket.data.username);
+        console.log("A socket disconnected:", socket.data.username);
     })
 });
 
