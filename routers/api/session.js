@@ -27,6 +27,8 @@ router.get("api/session", (req, res) => {
     }
 });
 
+// TO BE REMOVED. HERE FOR REFERENCING PURPOSES AFTER REVIEW
+/*
 router.get("/api/session/chats", async (req, res) => {
     const loggedIn = req.session.loggedIn;
 
@@ -40,7 +42,7 @@ router.get("/api/session/chats", async (req, res) => {
         delete userFromDB.details;
         delete userFromDB.profile;
         
-        // get messages for given user
+        // get chats for given user
         const conversation = {};
         const chatsFromDB = await mongo.findChats.findAll(userFromDB._id);
 
@@ -61,7 +63,32 @@ router.get("/api/session/chats", async (req, res) => {
 
         } else {
             // no chats found send null object
-            res.status(204).send( { message: "No conversations found" } );
+            res.status(204).send( { message: "No chats found" } );
+        }
+        
+    } else {
+        res.status(401).send( { error: "You are not authorized to access this endpoint" } );
+    }
+});*/
+
+// returns chats that user from session is part of
+router.get("/api/session/chats/conversations", async (req, res) => {
+    const loggedIn = req.session.loggedIn;
+
+    if (loggedIn) {
+        // get ID for user from DB
+        const loggedInUserId = req.session.user._id;
+        
+        // get chats for given user
+        const chatsFromDB = await mongo.findChats.findAll(loggedInUserId);
+
+        // check if conversations were had
+        if (chatsFromDB.length) {
+            res.status(200).send(chatsFromDB);
+
+        } else {
+            // no chats found send null object
+            res.status(204).send( { message: "No chats found" } );
         }
         
     } else {
@@ -69,6 +96,32 @@ router.get("/api/session/chats", async (req, res) => {
     }
 });
 
+// returns the participants (user objects) of the chats that user from session is part of
+router.get("/api/session/chats/participants", async (req, res) => {
+    const loggedIn = req.session.loggedIn;
+
+    if (loggedIn) {
+        // get ID for user from DB
+        const loggedInUserId = req.session.user._id;
+        
+        // get chats for given user
+        const chatsFromDB = await mongo.findChats.findAll(loggedInUserId);
+
+        // check if conversations were had
+        if (chatsFromDB.length) {
+            // combine all messagepartners
+            const conversationPartners = await messageService.combineAllChatParticipants(chatsFromDB, req.session.user);
+            res.status(200).send(conversationPartners);
+
+        } else {
+            // no chats found send null object
+            res.status(204).send( { message: "No chats or conversation partners found found" } );
+        }
+        
+    } else {
+        res.status(401).send( { error: "You are not authorized to access this endpoint" } );
+    }
+});
 module.exports = {
     router
 }

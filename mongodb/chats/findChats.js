@@ -12,7 +12,7 @@ function sharedBetweenIds (objectId1, objectId2) {
 
 // get find conversations that Id is part of
 function findAll (objectId) {
-    const filter = { "participants.userObjectId": objectId };
+    const filter = { "participants.userObjectId": ObjectId(objectId) };
 
     return db.query().collection("chats").find(filter).toArray()
     .then(conversations => conversations)

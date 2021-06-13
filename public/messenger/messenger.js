@@ -1,17 +1,17 @@
 (async function getMessages() {
     try {
         // get conversations from DB according to logged in user
-        const conversationsFromDb = await getMessagesFromDB();
-
-        const chats = conversationsFromDb.chats;
-
+        const chats = await getChatsFromDB();
         // check if user has any chats
         if (chats) {
             // set participants of said chats
-            const participants = conversationsFromDb.participants;
+            const participants = await getConversationPartnersFromDB();
+            
+            // get logged in user from session
+            const loggedInUser = await getUserFromSession();
 
-            // set user ID
-            const loggedInUserId = conversationsFromDb.userID.toString();
+            // set logged in user id
+            const loggedInUserId = loggedInUser._id;
 
             // div containing conversations
             const conversationsDiv = document.getElementById("conversations-div");
@@ -240,11 +240,18 @@ async function getUserBySummonerNameAndRegion(region, summonerName) {
     }
 }
 
-async function getMessagesFromDB() {
-    const response = await fetch("/api/session/chats");
+async function getChatsFromDB() {
+    const response = await fetch("/api/session/chats/conversations");
 
     return await response.json();
 }
+
+async function getConversationPartnersFromDB() {
+    const response = await fetch("/api/session/chats/participants");
+
+    return await response.json();
+}
+
 
 function resetMessageInputs() {
     document.getElementById("new-conversation-input").value = "";
