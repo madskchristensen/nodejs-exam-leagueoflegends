@@ -1,22 +1,30 @@
 (async function getMessages() {
     try {
+        // get conversations from DB according to logged in user
         const conversationsFromDb = await getMessagesFromDB();
+
         const chats = conversationsFromDb.chats;
 
         // check if user has any chats
         if (chats) {
+            // set participants of said chats
             const participants = conversationsFromDb.participants;
+
+            // set user ID
             const loggedInUserId = conversationsFromDb.userID.toString();
 
             // div containing conversations
-            const conversationsDiv = document.getElementById("messages-div");
+            const conversationsDiv = document.getElementById("conversations-div");
 
             // div containing the messages shown for selected conversation
             const messengerDiv = document.getElementById("messenger-div");
 
+            // go through each conversation and generate html elements accordingly 
             chats.forEach(conversation => {
+
                 // get conversation partner data, containing id, summonerName etc.
                 const conversationPartner = findConversationPartner(conversation, loggedInUserId, participants);
+
                 // get last messageObject that sent message
                 const lastMessage = conversation.messages[conversation.messages.length - 1];
 
@@ -32,7 +40,7 @@
                 generateConversation(conversationPartner, lastUser.riot.summonerName, lastMessage, conversationsDiv);
 
                 // Creates the message container/div containing all the messages for a chat
-                const messageContainer = generateMessageContainer(conversationPartner.riot.summonerName, conversationPartner.riot.region);
+                const messageContainer = generateMessengerContainer(conversationPartner.riot.summonerName, conversationPartner.riot.region);
                 
                 // loop through messages in conversation and append them to list
                 conversation.messages.forEach(message => {
@@ -49,8 +57,9 @@
         console.log(error);
     }
 
-})();   
+})(); 
 
+// creates a 
 function findConversationPartner(conversation, loggedInUserId, participants) {
     // go through the participants of a single chat and find the user that isn't currently logged in user
     const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId.toString() !== loggedInUserId );
@@ -154,7 +163,7 @@ function generateConversation (conversationPartner, lastUserSummonerName, lastMe
     divToAppendTo.appendChild(link);
 }
 
-function generateMessageContainer(conversationPartnerSummonerName, conversationPartnerRegion) {
+function generateMessengerContainer(conversationPartnerSummonerName, conversationPartnerRegion) {
     const conversationPartnerIdentifier = conversationPartnerSummonerName + "-" + conversationPartnerRegion;
     const listConversationDiv = document.createElement("div");
     listConversationDiv.classList.add("tab-pane", "fade", "row");
@@ -206,13 +215,13 @@ function generateConversationAndMessageContainer(conversationPartner, lastUserSu
     };
 
     // get wrapper divs for conversations (left) and messenger (right)             
-    const messagesDiv = document.getElementById("messages-div");
+    const conversationsDiv = document.getElementById("conversations-div");
 
     // create new conversation element to the left
-    generateConversation (conversationPartner, lastUserSummonerName, lastMessage, messagesDiv); 
+    generateConversation (conversationPartner, lastUserSummonerName, lastMessage, conversationsDiv); 
 
     // create messenger div
-    const listConversationDiv = generateMessageContainer(receiver.summonerName, receiver.region);
+    const listConversationDiv = generateMessengerContainer(receiver.summonerName, receiver.region);
     
     return listConversationDiv;
 }

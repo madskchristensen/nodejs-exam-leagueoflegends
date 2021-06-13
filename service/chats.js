@@ -14,7 +14,7 @@ async function saveMessage(data) {
             timeStamp: new Date().toUTCString()
         };
 
-        const result = await mongodb.updateChats.messages(conversation._id, messageData);
+        const result = await mongo.updateChats.messages(conversation._id, messageData);
        
         // if 1 chat was found, 1 chat was modified and result is ok, update was successful
         if (result.n === 1 && result.nModified === 1 && result.ok === 1) {
@@ -45,7 +45,7 @@ async function saveMessage(data) {
             ]
         };
 
-        mongodb.insertChats.chat(conversationData);
+        mongo.insertChats.chat(conversationData);
 
         return { data: true, action: "create", error: "" };
     }    

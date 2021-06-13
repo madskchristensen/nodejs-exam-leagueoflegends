@@ -20,7 +20,7 @@
                     <option>jp</option>
                 </select>
             </div>
-            <div id="messages-div" class="list-group pt-3" role="tablist">
+            <div id="conversations-div" class="list-group pt-3" role="tablist">
 
             </div>
         </div>
@@ -48,41 +48,49 @@
         loggedInUser = result;
     });
 
+    // get message input 
     const sendMessageInput = document.getElementById("message-input");
+
+    // attach listerner to message input field on enter keypress
     sendMessageInput.addEventListener("keyup", (event) => {
         // e.keyCode for legacy browsers
         if (event.keyCode === 13 || event.key === 'Enter') {
             sendPrivateMessage();
         }
-    })
+    });
 
+    // gets receiver, checks if input is valid and emits private message back to server
     async function sendPrivateMessage() {
-        // save current user summoner name
+        // save get user summoner name
         const socketIdentifier = loggedInUser.riot.summonerName;
+
+        // get message body
         const message = document.getElementById("message-input").value;
 
         // get new conversation input field to check if new message
-        const newConversationInput = document.getElementById("new-conversation-input").value;
+        const newConversationSummonerName = document.getElementById("new-conversation-input").value;
         const newConversationRegion = document.getElementById("select-region").value;
-        const messagesDiv = document.getElementById("messages-div");
 
         // get name of receiver
         let receiver;
 
-        // if nothing inside newConversationInput append message to chat
-        if (!newConversationInput) {
-            // get active conversation
+        // if nothing inside newConversationInput ==> message sent to existing chat ==> append message to chat
+        if (!newConversationSummonerName) {
+            // get active conversation element
             const activeConversationDiv = document.getElementsByClassName("list-group-item list-group-item-action conversation-link active")[0];
+            
+            // extract reciver name and id from HTML element id
             const conversationIdentifierArr = activeConversationDiv.id.split("-");
 
             receiver = {
                 summonerName: conversationIdentifierArr[0],
                 region: conversationIdentifierArr[1]
             }
-
+        
+        // get new conversation receiver name from new conversation inputs (summonerName and region)
         } else {
             receiver = {
-                summonerName: newConversationInput,
+                summonerName: newConversationSummonerName,
                 region: newConversationRegion
             }
         }
@@ -90,13 +98,18 @@
         // get receiver of message (to) from DB
         const to = await getUserBySummonerNameAndRegion(receiver.region, receiver.summonerName);
 
+        // check if recveiver exists
         if (!to) {
             toastr.error("Summoner not found - please try again.");
+        
+        // check if receiver is identical to logged in user
         } else if (to.riot.summonerName === loggedInUser.riot.summonerName && to.riot.region === loggedInUser.riot.region ) {
             toastr.error("You can't send messages to yourself. Get a life...");
-
+        
+        // emit message to server
         } else {
             socket.emit("private message", { to, message });
+
             // reset message and conversation inputs
             resetMessageInputs();
         }
@@ -104,20 +117,21 @@
 
     socket.on("private message", async (data) => {
         
-        listConversationDiv = document.getElementById("list-" + data.from.riot.summonerName + "-"  + data.from.riot.region);
+        // get messenger div from data
+        messengerDiv = document.getElementById("list-" + data.from.riot.summonerName + "-"  + data.from.riot.region);
         
-        // if conversation element already exists - append message to chat
-        if (listConversationDiv) {
+        // if messenger element already exists ==> conversation already had ==> append message to existing chat
+        if (messengerDiv) {
             if (data.toSelf) {
-                generateMessage (data.message, data.from._id, data.from._id, listConversationDiv);
+                generateMessage (data.message, data.from._id, data.from._id, messengerDiv);
+
             } else {
-                generateMessage (data.message, data.from._id, data.to._id, listConversationDiv);
+                generateMessage (data.message, data.from._id, data.to._id, messengerDiv);
             }
 
-        // else create new conversation, chat and message
+        // else create new conversation, messenger and message
         } else {
-
-            // create lastMessage object
+            // create lastMessage for conversation element
             let lastMessage = {
                 body: data.message,
             };
@@ -130,27 +144,26 @@
                 lastMessage.from = data.from._id;
             }
             
-            
-            // get wrapper divs for conversations (left) and messenger (right)             
-            const messagesDiv = document.getElementById("messages-div");
-
-            // create new conversation element to the left
-            generateConversation (data.from, data.from.riot.summonerName, lastMessage, messagesDiv); 
-
-            // create messenger div
-            const listConversationDiv = generateMessageContainer(data.from.riot.summonerName, data.from.riot.region);
-            
+            // get wrapper div for conversations (left) and messenger (right)
+            const conversationsDiv = document.getElementById("conversations-div");
             const messengerDiv = document.getElementById("messenger-div");
 
+            // create new conversation element (left)
+            generateConversation (data.from, data.from.riot.summonerName, lastMessage, conversationsDiv); 
+
+            // create messenger container for new chat (right)
+            const messengerContainer = generateMessengerContainer(data.from.riot.summonerName, data.from.riot.region);
+            
             // attach message to messenger div according to if data was sent to self or not
             if (data.toSelf) {
-                generateMessage (data.message, data.from._id, data.from._id, listConversationDiv);
+                generateMessage (data.message, data.from._id, data.from._id, messengerContainer);
 
             } else {
-                generateMessage (data.message, data.from._id, data.to._id, listConversationDiv);
+                generateMessage (data.message, data.from._id, data.to._id, messengerContainer);
             }
 
-            messengerDiv.appendChild(listConversationDiv);
+            // append messengerContainer to messenger wrapper
+            messengerDiv.appendChild(messengerContainer);
         }
     })
 </script>
