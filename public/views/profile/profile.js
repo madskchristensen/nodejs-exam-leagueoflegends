@@ -1,14 +1,16 @@
 // run on page load
+import {isLoggedIn, getUserFromUrl, getLoggedInUser} from "../../js/api";
+
 (async function getProfile() {
     try {
         // Is user logged in?
-        const loggedIn = await isLoggedIn().then(result => result.data);
+        const loggedIn = await isLoggedIn();
 
         // Get user data for the profile being viewed
-        const userProfile = await getUserProfile();
+        const userProfile = await getUserFromUrl();
 
         // Currently logged in user. Will be initialized later in the script if loggedIn is true
-        let userLoggedIn = await getUser();
+        let userLoggedIn = await getLoggedInUser();
 
         // Append hardcoded season stats to user as it has not been implemented yet
         userProfile.riot.seasonStats = getSeasonStats();
@@ -194,33 +196,6 @@ function enableProfileEditing() {
     formData.forEach((value, key) => {
         document.getElementById(key).readOnly = false;
     })
-}
-
-async function isLoggedIn() {
-    const response = await fetch("/auth/is-logged-in");
-
-    return await response.json();
-}
-
-async function getUserProfile() {
-    const splitUrl = location.pathname.split("/");
-
-    const data = {
-        summonerName: splitUrl[2],
-        region: splitUrl[3]
-    };
-
-    const userUrl = "/api/users/" + data.summonerName + "/" + data.region;
-
-    const response = await fetch(userUrl);
-
-    return await response.json();
-}
-
-async function getUser() {
-    const response = await fetch("/api/session/user");
-
-    return await response.json();
 }
 
 async function sendFormData() {

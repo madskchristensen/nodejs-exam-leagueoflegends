@@ -1,3 +1,5 @@
+import { getUser } from "/js/api.js";
+
 (function initializeSearchListener() {
     const searchInput = document.getElementById("search-input");
     const regionSelect = document.getElementById("select-region");
@@ -9,7 +11,7 @@
         const summonerName = searchInput.value;
         const currentUrl = location.href;
 
-        const user = await getUserProfile(summonerName, region);
+        const user = await getUser(summonerName, region);
 
         if (user.error) {
             toastr.error("User " + summonerName + " not found.");
@@ -21,11 +23,3 @@
     });
 
 })();
-
-async function getUserProfile(summonerName, region) {
-    const userUrl = "/api/users/" + summonerName + "/" + region;
-
-    const response = await fetch(userUrl);
-
-    return await response.json();
-}

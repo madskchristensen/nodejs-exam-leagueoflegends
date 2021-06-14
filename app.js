@@ -10,12 +10,53 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 8080;
 
-// allow static content to be served
-app.use(express.static("public"));
+// socket.io setup
+// wrap express in plain node.js http server
+const server = require("http").createServer(app);
+
+// atttach socket.io to http server
+const io = require("socket.io")(server);
+
+// attach rootSocket to socket.io attached to server
+require('./socketio')(io);
+
+// save helmet to const
+const helmet = require("helmet");
+
+// assign express-session to session const
+const session = require("express-session");
+
+// set sessionOptions
+const sessionOptions = session({
+    secret: process.env.SESSION_SECRET.split(","), // used to compute hash. split to process dotenv variable as array
+    name: process.env.SESSION_NAME, // hidden custom name to avoid fingerprinting
+    resave: false,
+    saveUninitialized: true,
+    cookie: { 
+        secure: false, // dont require HTTPS connection
+        httpOnly: false, // cookie inaccessible to the JavaScript Document.cookie API. Cookie is only sent to server
+        sameSite: true, // block CORS req
+        maxAge: 600000, // Time in miliseconds - 10 minutes
+    }
+});
+
+// middleware that sets needed variables in the session
+const sessionInitializer = function (req, res, next) {
+    if (!req.session.loggedIn) {
+        req.session.loggedIn = false;
+    }
+
+    next();
+}
+
+// register session in Socket.IO, so we can get session in socket.io functions
+// reference: https://socket.io/docs/v3/faq/ - how to use socket.io with express-session
+io.use((socket, next) => {
+    sessionOptions(socket.request, {}, next);
+});
 
 // use helmet for better security
 // contentSecurityPolicy needs to be configured, otherwise scripts, styles etc. wont be allowed from cdns
-const helmet = require ("helmet");
 app.use(
     helmet.contentSecurityPolicy({
         useDefaults: true,
@@ -29,51 +70,14 @@ app.use(
         }
     }));
 
-// socket.io setup
-// wrap express in plain node.js http server
-const server = require("http").createServer(app);
+// apply sessionOptions to the app
+app.use(sessionOptions);
 
-// atttach socket.io to http server
-const io = require("socket.io")(server);
-
-// attach rootSocket to socket.io attached to server
-require('./socketio')(io);
-
-// register middleware in Socket.IO
-// reference: https://socket.io/docs/v3/faq/ - how to use socket.io with express-session
-io.use((socket, next) => {
-    sessionMiddleware(socket.request, {}, next);
-});
-
-// session setup
-// create session 
-const session = require("express-session");
-
-const sessionMiddleware = session({
-    secret: process.env.SESSION_SECRET.split(","), // used to compute hash. split to process dotenv variable as array
-    name: process.env.SESSION_NAME, // hidden custom name to avoid fingerprinting
-    resave: false,
-    saveUninitialized: true,
-    cookie: { 
-        secure: false, // dont require HTTPS connection
-        httpOnly: false, // cookie inaccessible to the JavaScript Document.cookie API. Cookie is only sent to server
-        sameSite: true, // block CORS req
-        maxAge: 600000, // Time in miliseconds - 10 minutes
-    }
-});
-
-app.use(sessionMiddleware);
-
-// middleware that sets needed variables in the session
-const sessionInitializer = async function (req, res, next) {
-    if (!req.session.loggedIn) {
-        req.session.loggedIn = false;
-    }
-
-    next();
-}
-
+// make app use the sessionInitializer
 app.use(sessionInitializer);
+
+// allow static content to be served
+app.use(express.static("public"));
 
 // allow express to parse form data from requests
 app.use(express.urlencoded({
@@ -97,20 +101,22 @@ app.use(userRouter.router);
 const fs = require('fs');
 
 // mongodb util module.
-// Can be called with .query() to perform operations like insert, find etc.
+// allows us to create a single connection that the app will use
 const db = require("./mongodb/db");
 
-// pages
-const frontpage = fs.readFileSync(__dirname + "/public/frontpage/frontpage.html", "utf-8");
-const login = fs.readFileSync(__dirname + "/public/login/login.html", "utf-8");
-const signup = fs.readFileSync(__dirname + "/public/signup/signup.html", "utf-8");
-const linkAccount = fs.readFileSync(__dirname + "/public/linkAccount/linkaccount.html");
-const profile = fs.readFileSync(__dirname + "/public/profile/profile.html");
-const messenger = fs.readFileSync(__dirname + "/public/messenger/messenger.html");
+const views = "/public/views/";
 
-// components
-const header = fs.readFileSync(__dirname + "/public/header/header.html", "utf-8");
-const footer = fs.readFileSync(__dirname + "/public/footer/footer.html", "utf-8");
+// html pages
+const frontpage = fs.readFileSync(__dirname + views + "frontpage/frontpage.html", "utf-8");
+const login = fs.readFileSync(__dirname + views +  "/login/login.html", "utf-8");
+const signup = fs.readFileSync(__dirname + views +  "/signup/signup.html", "utf-8");
+const linkAccount = fs.readFileSync(__dirname + views + "/linkAccount/linkaccount.html", "utf-8");
+const profile = fs.readFileSync(__dirname + views +  "/profile/profile.html", "utf-8");
+const messenger = fs.readFileSync(__dirname + views +  "/messenger/messenger.html", "utf-8");
+
+// html components
+const header = fs.readFileSync(__dirname + views +  "/header/header.html", "utf-8");
+const footer = fs.readFileSync(__dirname + views +  "/footer/footer.html", "utf-8");
 
 // paths for all users to access
 app.get("/", (req, res) => {
@@ -123,8 +129,8 @@ app.get("/login", (req, res, next) => {
 
 app.get("/signup", (req, res) => {
     // check is user is already signed in
-    if (req.session.loggedIn === true) {
-        res.status(401).send(header + "<h4>You are already logged in. Please logout before signing up as a new user</h1>")
+    if (req.session.loggedIn) {
+        res.status(401).send(header + "<h4 class='text-center'>You are already logged in. Please logout before signing up as a new user</h1>")
     
     } else {
         res.send(header + signup + footer);
@@ -143,11 +149,11 @@ app.get("/profile/:summonerName/:region", (req, res) => {
 app.get("/*", (req, res, next) => {
     // check if path is valid
     if (!paths.includes(req.path)) {
-        res.status(404).send(header + "<h4>Sorry the page doesnt exist</h1>");
+        res.status(404).send(header + "<h4 class='text-center'>Sorry the page doesnt exist</h1>");
     
         // check if user is authorized
-    } else if (!(req.session.loggedIn === true)) {
-        res.status(401).send(header + "<h4>Please login to view this page</h1>");
+    } else if (!req.session.loggedIn) {
+        res.status(401).send(header + "<h4 class='text-center'>Please login to view this page</h1>");
 
     } else {
         next();
@@ -157,15 +163,6 @@ app.get("/*", (req, res, next) => {
 app.get("/messenger", (req, res) => {
     res.send(header + messenger + footer);
 });
-
-// intercept all incoming requests with login check except above, as they are allowed for all users
-app.get("/*", (req, res, next) => {
-    // check if path is valid
-    if (!paths.includes(req.path)) {
-        res.status(404).send(header + "<h4>Sorry the page doesnt exist</h1>");
-    }
-
-})
 
 // register all valid paths
 const paths = [];

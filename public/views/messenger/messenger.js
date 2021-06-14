@@ -1,14 +1,17 @@
+import { getChatParticipants, getChats, getLoggedInUser } from "/public/js/api";
+
 (async function getMessages() {
     try {
         // get conversations from DB according to logged in user
-        const chats = await getChatsFromDB();
+        const chats = await getChats();
+
         // check if user has any chats
         if (chats) {
             // set participants of said chats
-            const participants = await getConversationPartnersFromDB();
+            const participants = await getChatParticipants();
             
             // get logged in user from session
-            const loggedInUser = await getUserFromSession();
+            const loggedInUser = await getLoggedInUser();
 
             // set logged in user id
             const loggedInUserId = loggedInUser._id;
@@ -197,51 +200,6 @@ function generateMessage (message, from,  sessionIdentifier, divToAppendTo ) {
     messageDiv.appendChild(messageText);
     wrapperMessageDiv.appendChild(messageDiv);
     divToAppendTo.appendChild(wrapperMessageDiv);
-}
-
-function generateConversationAndMessageContainer(conversationPartner, lastUserSummonerName, message, receiver) {
-    // create lastMessage object
-    const lastMessage = {
-        from: lastUserSummonerName,
-        body: message
-    };
-
-    // get wrapper divs for conversations (left) and messenger (right)             
-    const conversationsDiv = document.getElementById("conversations-div");
-
-    // create new conversation element to the left
-    generateConversation (conversationPartner, lastUserSummonerName, lastMessage, conversationsDiv); 
-
-    // create messenger div
-    const listConversationDiv = generateMessengerContainer(receiver.summonerName, receiver.region);
-    
-    return listConversationDiv;
-}
-
-async function getUserFromSession() {
-    const response = await fetch("/api/session/user");
-    return await response.json();
-}
-
-async function getUserBySummonerNameAndRegion(region, summonerName) {
-    const response = await fetch("/api/users/" + summonerName + "/" + region);
-    if (response.ok === true){
-        return await response.json();
-    } else {
-        return null;
-    }
-}
-
-async function getChatsFromDB() {
-    const response = await fetch("/api/session/chats/conversations");
-
-    return await response.json();
-}
-
-async function getConversationPartnersFromDB() {
-    const response = await fetch("/api/session/chats/participants");
-
-    return await response.json();
 }
 
 function resetMessageInputs() {

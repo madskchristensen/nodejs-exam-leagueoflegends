@@ -6,12 +6,6 @@ const saltRounds = 10;
 
 const router = require("express").Router();
 
-router.get("/auth/is-logged-in", (req, res) => {
-    const loggedIn = req.session.loggedIn;
-    
-    res.send( { data: loggedIn } );
-});
-
 // endpoint that is called when a user tries to log in
 router.post("/auth/login", async (req, res) => {
     const password = req.body.password;

@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="messenger.css">
+<link rel="stylesheet" href="/views/messenger/messenger.css">
 
 <div class="container">
     <div class="row pt-5" >
@@ -35,16 +35,18 @@
     </div>
 </div>
 
-<script src="/messenger/messenger.js"></script>
+<script src="/views/messenger/messenger.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
+    import { getLoggedInUser, getUser } from "../../js/api";
+
     const socket = io();
     
     // get session
     let loggedInUser;
 
-    getUserFromSession().then((result) => {
+    getLoggedInUser().then((result) => {
         loggedInUser = result;
     });
 
@@ -96,7 +98,7 @@
         }
 
         // get receiver of message (to) from DB
-        const to = await getUserBySummonerNameAndRegion(receiver.region, receiver.summonerName);
+        const to = await getUser(receiver.region, receiver.summonerName);
 
         // check if recveiver exists
         if (!to) {
@@ -118,7 +120,7 @@
     socket.on("private message", async (data) => {
         
         // get messenger div from data
-        messengerDiv = document.getElementById("list-" + data.from.riot.summonerName + "-"  + data.from.riot.region);
+        const messengerDiv = document.getElementById("list-" + data.from.riot.summonerName + "-"  + data.from.riot.region);
         
         // if messenger element already exists ==> conversation already had ==> append message to existing chat
         if (messengerDiv) {

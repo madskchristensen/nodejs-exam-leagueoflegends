@@ -2,6 +2,12 @@ const router = require("express").Router();
 const mongo = require("../../mongodb/mongodb");
 const messageService = require("../../service/chats");
 
+router.get("/api/session/logged-in", (req, res) => {
+    const loggedIn = req.session.loggedIn;
+
+    res.send( { data: loggedIn } );
+});
+
 // returns logged in user in session
 router.get("/api/session/user", (req, res) => {
     const loggedIn = req.session.loggedIn;
@@ -18,7 +24,7 @@ router.get("/api/session/user", (req, res) => {
 });
 
 // returns session element if NODE_ENV is set to development
-router.get("api/session", (req, res) => {
+router.get("/api/session", (req, res) => {
     if (process.env.NODE_ENV === "development") {
         res.send( { session: req.session } );
 
@@ -28,7 +34,7 @@ router.get("api/session", (req, res) => {
 });
 
 // returns chats that user from session is part of
-router.get("/api/session/chats/conversations", async (req, res) => {
+router.get("/api/session/chats", async (req, res) => {
     const loggedIn = req.session.loggedIn;
 
     if (loggedIn) {
@@ -40,11 +46,11 @@ router.get("/api/session/chats/conversations", async (req, res) => {
 
         // check if conversations were had
         if (chatsFromDB.length) {
-            res.status(200).send(chatsFromDB);
+            res.status(200).send({ error: "", chats: chatsFromDB });
 
         } else {
             // no chats found send null object
-            res.status(204).send( { message: "No chats found" } );
+            res.status(204).send( { error: "" } );
         }
         
     } else {
@@ -70,14 +76,15 @@ router.get("/api/session/chats/participants", async (req, res) => {
             res.status(200).send(conversationPartners);
 
         } else {
-            // no chats found send null object
-            res.status(204).send( { message: "No chats or conversation partners found found" } );
+            // no chats found send error
+            res.status(204).send( { message: "No chats or conversation partners found" } );
         }
         
     } else {
         res.status(401).send( { error: "You are not authorized to access this endpoint" } );
     }
 });
+
 module.exports = {
     router
 }

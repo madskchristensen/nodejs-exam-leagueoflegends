@@ -1,20 +1,6 @@
 const router = require("express").Router();
 const mongodb = require("../../mongodb/mongodb");
 
-router.get("/api/users/current", (req, res) => {
-    const loggedIn = req.session.loggedIn;
-
-    if (loggedIn) {
-        const user = req.session.user;
-        delete user.details;
-
-        res.status(200).send(user);
-
-    } else {
-        res.status(404).send( { error: "Logged in user not found" } );
-    }
-});
-
 router.get("/api/users/:summonerName/:region", async (req, res) => {
     const summonerName = req.params.summonerName;
     const region = req.params.region;

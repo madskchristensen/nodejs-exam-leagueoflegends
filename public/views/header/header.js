@@ -1,3 +1,5 @@
+import { isLoggedIn, getLoggedInUser } from "/js/api.js";
+
 (function toastrSettings() {
     toastr.options.closeButton = true;
     toastr.options.timeOut = 5000;
@@ -22,8 +24,7 @@
 
 (async function getNavbarItemsFromSession() {
     try {
-        const response = await fetch("/auth/is-logged-in");
-        const loggedIn = await response.json().then(res => res.data);
+        const loggedIn = await isLoggedIn();
 
         // create navbar
         const navbarItems = document.getElementById("navbarItems");
@@ -36,7 +37,7 @@
             const profileLink = document.createElement("a");
             profileLink.classList.add("nav-link");
 
-            const user = await getUser();
+            const user = await getLoggedInUser();
 
             profileLink.href = "/profile/" + user.riot.summonerName + "/" + user.riot.region;
             profileLink.innerText = user.riot.summonerName;
@@ -92,9 +93,3 @@
     }
 
 })();
-
-async function getUser() {
-    const response = await fetch("/api/session/user");
-
-    return response.json();
-}
