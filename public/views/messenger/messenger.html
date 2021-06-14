@@ -35,11 +35,12 @@
     </div>
 </div>
 
-<script src="/views/messenger/messenger.js"></script>
+<script type="module" src="/views/messenger/messenger.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 
-<script>
-    import { getLoggedInUser, getUser } from "../../js/api";
+<script type="module">
+    import { getLoggedInUser, getUser } from "/js/api.js";
+    import { generateConversation, generateMessengerContainer, generateMessage, resetMessageInputs } from "/views/messenger/messenger.js";
 
     const socket = io();
     
@@ -98,7 +99,7 @@
         }
 
         // get receiver of message (to) from DB
-        const to = await getUser(receiver.region, receiver.summonerName);
+        const to = await getUser(receiver.summonerName, receiver.region);
 
         // check if recveiver exists
         if (!to) {

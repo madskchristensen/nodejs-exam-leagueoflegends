@@ -1,4 +1,4 @@
-import { getChatParticipants, getChats, getLoggedInUser } from "/public/js/api";
+import { getChatParticipants, getChats, getLoggedInUser } from "/js/api.js";
 
 (async function getMessages() {
     try {
@@ -206,3 +206,11 @@ function resetMessageInputs() {
     document.getElementById("new-conversation-input").value = "";
     document.getElementById("message-input").value = "";
 }
+
+export {
+    generateConversation,
+    generateMessengerContainer,
+    generateMessage,
+    resetMessageInputs
+}
+

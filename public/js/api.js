@@ -15,7 +15,12 @@ async function getUser(summonerName, region) {
 
     const response = await fetch(userUrl);
 
-    return await response.json();
+    if (response.ok) {
+        return await response.json();
+
+    } else {
+        return null;
+    }
 }
 
 async function getUserFromUrl() {
