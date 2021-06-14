@@ -107,7 +107,7 @@ const db = require("./mongodb/db");
 const views = "/public/views/";
 
 // html pages
-const frontpage = fs.readFileSync(__dirname + views + "frontpage/frontpage.html", "utf-8");
+const frontpage = fs.readFileSync(__dirname + views + "/frontpage/frontpage.html", "utf-8");
 const login = fs.readFileSync(__dirname + views +  "/login/login.html", "utf-8");
 const signup = fs.readFileSync(__dirname + views +  "/signup/signup.html", "utf-8");
 const linkAccount = fs.readFileSync(__dirname + views + "/linkAccount/linkaccount.html", "utf-8");
@@ -147,8 +147,20 @@ app.get("/profile/:summonerName/:region", (req, res) => {
 
 // intercept all incoming requests with login check except above, as they are allowed for all users
 app.get("/*", (req, res, next) => {
+
+    // print the path that endpoint sees
+    console.log("looking at", req.path);
+
+    // save path to variable where it can be changed
+    let newPath = req.path;
+
+    // remove trailin slash from messenger --- temp fix until we fix bug
+    if (req.path.charAt(req.path.length - 1) === "/") {
+        newPath = req.path.slice(0, -1);
+    }
+
     // check if path is valid
-    if (!paths.includes(req.path)) {
+    if (!paths.includes(newPath)) {
         res.status(404).send(header + "<h4 class='text-center'>Sorry the page doesnt exist</h1>");
     
         // check if user is authorized
@@ -170,7 +182,9 @@ const paths = [];
 // loop through all defined paths and add to array
 app._router.stack.forEach( (router) => {
     if (router.route && router.route.path){
-        paths.push(router.route.path + "/");
+        console.log("from router loop", router.route.path)
+
+        paths.push(router.route.path);
     }
 })
 
