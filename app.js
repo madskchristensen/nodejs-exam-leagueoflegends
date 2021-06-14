@@ -29,9 +29,6 @@ app.use(
         }
     }));
 
-// escapeHtml
-const escapeHtml = require("html-escaper").escape;
-
 // socket.io setup
 // wrap express in plain node.js http server
 const server = require("http").createServer(app);
@@ -40,19 +37,13 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 
 // attach rootSocket to socket.io attached to server
-const rootSocket = require('./service/socketio')(io);
+require('./socketio')(io);
 
 // register middleware in Socket.IO
 // reference: https://socket.io/docs/v3/faq/ - how to use socket.io with express-session
 io.use((socket, next) => {
     sessionMiddleware(socket.request, {}, next);
 });
-
-// escapehtml setup
-const escapeHTML = require("html-escaper");
-
-// node-fetch setup
-const fetch = require("node-fetch");
 
 // session setup
 // create session 
@@ -75,13 +66,6 @@ app.use(sessionMiddleware);
 
 // middleware that sets needed variables in the session
 const sessionInitializer = async function (req, res, next) {
-    /*if (process.env.NODE_ENV === "development") {
-        const mongodb = require("./mongodb/mongodb");
-
-        req.session.user = await mongodb.findUsers.byEmail("michael@fuglo.com");
-        req.session.loggedIn = true;
-    }*/
-
     if (!req.session.loggedIn) {
         req.session.loggedIn = false;
     }

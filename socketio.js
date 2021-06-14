@@ -1,6 +1,5 @@
-const chatService = require("./chats");
+const chatService = require("./service/chats");
 const escapeHTML = require("html-escaper").escape;
-
 
 const rootSocket = (io) => {
     io.on("connection", (socket) => {
@@ -49,4 +48,5 @@ const rootSocket = (io) => {
         })
     });    
 }
+
 module.exports = rootSocket;
