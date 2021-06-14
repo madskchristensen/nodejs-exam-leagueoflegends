@@ -79,12 +79,12 @@
             // get active conversation element
             const activeConversationDiv = document.getElementsByClassName("list-group-item list-group-item-action conversation-link active")[0];
             
-            // extract reciver name and id from HTML element id
-            const conversationIdentifierArr = activeConversationDiv.id.split("-");
+            // extract reciver name and id ("summonerName"-"region") from HTML element id
+            const receiverSummonerNameAndRegion = activeConversationDiv.id.split("-");
 
             receiver = {
-                summonerName: conversationIdentifierArr[0],
-                region: conversationIdentifierArr[1]
+                summonerName: receiverSummonerNameAndRegion[0],
+                region: receiverSummonerNameAndRegion[1]
             }
         
         // get new conversation receiver name from new conversation inputs (summonerName and region)
@@ -122,6 +122,7 @@
         
         // if messenger element already exists ==> conversation already had ==> append message to existing chat
         if (messengerDiv) {
+            // attach message to messenger div according to if data was sent to self or not
             if (data.toSelf) {
                 generateMessage (data.message, data.from._id, data.from._id, messengerDiv);
 
