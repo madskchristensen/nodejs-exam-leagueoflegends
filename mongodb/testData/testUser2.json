@@ -5,7 +5,7 @@
     "profile": {
         "age": "32",
         "languages": "English, Russian",
-        "country": "Russia",
+        "country": "Latvia",
         "roles": "Top, Jungle",
         "description": "Cool gamer from Russia even though I'm still just a test"
     },
@@ -13,7 +13,7 @@
         "summonerName": "TestUser2",
         "profileIconId": 559,
         "summonerLevel": 237,
-        "region": "ru",
+        "region": "euw",
         "rankedSolo5x5": {
             "tier": "Grandmaster",
             "rank": "I",
