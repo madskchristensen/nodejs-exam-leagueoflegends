@@ -59,7 +59,6 @@
 
 })(); 
 
-// creates a 
 function findConversationPartner(conversation, loggedInUserId, participants) {
     // go through the participants of a single chat and find the user that isn't currently logged in user
     const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId.toString() !== loggedInUserId );
@@ -175,13 +174,6 @@ function generateMessengerContainer(conversationPartnerSummonerName, conversatio
 }
 
 // Generates a message container. Aligns left/right dependant sender and session info
-/**
- * 
- * @param {String} message message body 
- * @param {String} from string formatted mongoDB ObjectId containing message sender ObjectId 
- * @param {String} sessionIdentifier string formatted mongoDB ObjectId containing currently logged in user ObjectId 
- * @param {HTMLCollection} divToAppendTo div to append message div to 
- */
 function generateMessage (message, from,  sessionIdentifier, divToAppendTo ) {
     const wrapperMessageDiv = document.createElement("div");
     wrapperMessageDiv.classList.add("row");
@@ -251,7 +243,6 @@ async function getConversationPartnersFromDB() {
 
     return await response.json();
 }
-
 
 function resetMessageInputs() {
     document.getElementById("new-conversation-input").value = "";
