@@ -25,7 +25,7 @@
         <!-- Profile information -->
         <div id="right-section" class="col-9 pt-3 text-center squared-div">
             <!-- Profile form -->
-            <form onsubmit="sendFormData(); return false;" id="profile-form" class="w-100">
+            <form id="profile-form" class="w-100">
                 <!-- Form group -->
                 <div id="form-age" class="form-group row justify-content-center">
                     <label class="col-2 col-form-label">Age: </label>
@@ -76,12 +76,9 @@
     <div class="row mt-5 text-left justify-content-end">
         <div class="col-9 squared-div" id="champion-stats">
             <h2 class="pt-2 text-center">Season stats</h2>
-
         </div>
-
-
     </div>
 </div>
 
-<script src="/views/profile/profile.js" async></script>
+<script type="module" src="/views/profile/profile.js"></script>
 

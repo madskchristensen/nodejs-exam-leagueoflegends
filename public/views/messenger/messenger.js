@@ -1,4 +1,4 @@
-import { getChatParticipants, getChats, getLoggedInUser } from "/public/js/api";
+import { getChatParticipants, getChats, getLoggedInUser } from "/js/api.js";
 
 (async function getMessages() {
     try {
