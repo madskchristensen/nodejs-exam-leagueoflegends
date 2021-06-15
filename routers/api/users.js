@@ -34,9 +34,9 @@ router.get("/api/users/", async (req, res) => {
 });
 
 router.put("/api/users/profile", async (req, res) => {
-    const user = req.session.user;
-
     if (req.session.loggedIn) {
+        const user = req.session.user;
+
         // will return result of the update containing n modified, n found and ok fields
         const result = await mongodb.updateUsers.profile(user.riot.summonerName, user.riot.region, req.body);
 

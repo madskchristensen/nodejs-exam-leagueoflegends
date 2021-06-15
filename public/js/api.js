@@ -15,12 +15,7 @@ async function getUser(summonerName, region) {
 
     const response = await fetch(userUrl);
 
-    if (response.ok) {
-        return await response.json();
-
-    } else {
-        return null;
-    }
+    return await response.json();
 }
 
 async function getUserFromUrl() {
@@ -39,13 +34,13 @@ async function getUserFromUrl() {
 }
 
 async function getChats() {
-    const response = await fetch("/api/session/chats/");
+    const response = await fetch("/api/session/chats");
 
     return await response.json().then(res => res.chats);
 }
 
 async function getChatParticipants() {
-    const response = await fetch("/api/session/chats/participants/");
+    const response = await fetch("/api/session/chats/participants");
 
     return await response.json();
 }

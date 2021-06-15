@@ -1,5 +1,5 @@
 // run on page load
-import {isLoggedIn, getUserFromUrl, getLoggedInUser} from "../../js/api";
+import { isLoggedIn, getUserFromUrl, getLoggedInUser } from "/js/api.js";
 
 (async function getProfile() {
     try {
@@ -183,9 +183,10 @@ function loadProfile(userProfile) {
 function enableProfileEditing() {
     // set up save profile button
     const saveProfileButton = document.createElement("button");
-    saveProfileButton.type = "submit";
+    saveProfileButton.type = "button";
     saveProfileButton.classList.add("btn", "btn-success", "w-25", "mt-3");
     saveProfileButton.innerText = "Save";
+    saveProfileButton.addEventListener("click", sendFormData);
 
     const saveCol = document.getElementById("form-save-col");
     saveCol.appendChild(saveProfileButton);
@@ -224,6 +225,8 @@ async function sendFormData() {
         .catch(err => {
             toastr.error("Something went wrong. Try again");
         });
+
+    return false;
 }
 
 function getSeasonStats() {
