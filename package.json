@@ -5,8 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test":"echo \"Error: no test specified\" && exit 1",
-    "start-dev":"cross-env NODE_ENV=development nodemon app.js",
-    "start":"cross-env NODE_ENV=production PORT=80 node app.js"
+    "start-dev":"cross-env NODE_ENV=development nodemon app.js"
   },
   "repository": {
     "type": "git",
