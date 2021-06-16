@@ -1,10 +1,11 @@
 // dotenv setup
-
+/*
 const dotenvResult = require("dotenv").config();
+    console.log(dotenvResult);    
 
 if (dotenvResult.error) {
     throw dotenvResult.error;
-}
+}*/
 
 // express setup
 const express = require("express");
