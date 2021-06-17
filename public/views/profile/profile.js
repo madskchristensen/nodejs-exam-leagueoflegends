@@ -47,7 +47,7 @@ function loadMessageButton(loggedIn, userProfile, userLoggedIn) {
     // by default make messageLink go to nothing
     messageLink.href = "#";
 
-    messageButton.appendChild(messageLink);
+    messageLink.appendChild(messageButton);
 
     // CONDITIONS FOR MESSAGE BUTTON //
     // if logged in and not viewing own profile -> show message button
@@ -63,7 +63,7 @@ function loadMessageButton(loggedIn, userProfile, userLoggedIn) {
             messageButton.classList.add("btn-success");
             messageButton.innerText = "Message";
 
-            buttonWrapper.appendChild(messageButton);
+            buttonWrapper.appendChild(messageLink);
         }
 
     // if user is not logged in -> don't allow to message
@@ -72,7 +72,7 @@ function loadMessageButton(loggedIn, userProfile, userLoggedIn) {
         messageButton.innerText = "Login to message";
         messageButton.classList.add("btn-secondary");
 
-        buttonWrapper.appendChild(messageButton);
+        buttonWrapper.appendChild(messageLink);
     }
 }
 
