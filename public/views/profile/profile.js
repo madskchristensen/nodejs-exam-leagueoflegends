@@ -54,10 +54,11 @@ function loadMessageButton(loggedIn, userProfile, userLoggedIn) {
     // if logged in and viewing own profile -> don't show message button
     // if not logged in -> show disabled message button
     if (loggedIn) {
+        const userProfileSummonerRegion = userProfile.riot.summonerName + userProfile.riot.region;
+        const userLoggedInSummonerRegion = userLoggedIn.riot.summonerName + userLoggedIn.riot.region;
 
         // if logged in user is not same as user being viewed -> allow to message
-        if (userProfile.riot.summonerName !== userLoggedIn.riot.summonerName &&
-            userProfile.riot.region !== userLoggedIn.riot.region) {
+        if (userProfileSummonerRegion !== userLoggedInSummonerRegion) {
             messageLink.href = "/messenger";
             messageButton.classList.add("btn-success");
             messageButton.innerText = "Message";
