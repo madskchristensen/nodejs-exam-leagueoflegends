@@ -1,8 +1,8 @@
-#chats-div {
+#chats-div-wrapper {
   min-height: calc(100vh - 300px);   
 }
 
-#messenger-div {
+#messenger {
   min-height: calc(100vh - 300px);   
   max-height: calc(100vh - 300px);   
   overflow-y: auto;
@@ -11,16 +11,16 @@
   flex-direction: column-reverse;
 }
 
-.conversation-container {
+.chat-container {
   overflow-y: auto;
 }
 
-.chat-left{
+.message-left {
   background: #eee;
   margin-left: 1em;
 }
 
-.chat-right{
+.message-right {
   background: #0084ff;
   color: #fff;
   padding-right: 0;

@@ -2,7 +2,7 @@ import { getChatParticipants, getChats, getLoggedInUser } from "/js/api.js";
 
 (async function getMessages() {
     try {
-        // get conversations from DB according to logged in user
+        // get chats from DB according to logged in user
         const chats = await getChats();
 
         // check if user has any chats
@@ -13,23 +13,23 @@ import { getChatParticipants, getChats, getLoggedInUser } from "/js/api.js";
             // get logged in user from session
             const loggedInUser = await getLoggedInUser();
 
-            // set logged in user id
-            const loggedInUserId = loggedInUser._id;
+            // div containing chats
+            const chatsDiv = document.getElementById("chats");
 
-            // div containing conversations
-            const conversationsDiv = document.getElementById("conversations-div");
+            // div containing the messages shown for selected chat
+            const messengerDiv = document.getElementById("messenger");
 
-            // div containing the messages shown for selected conversation
-            const messengerDiv = document.getElementById("messenger-div");
+            // go through each chat and generate html elements accordingly
+            chats.forEach(chat => {
+                console.log("chat", chat);
 
-            // go through each conversation and generate html elements accordingly 
-            chats.forEach(conversation => {
+                // get chat partner data, containing id, summonerName etc.
+                const chatPartner = findChatPartner(chat, loggedInUser._id, participants);
 
-                // get conversation partner data, containing id, summonerName etc.
-                const conversationPartner = findConversationPartner(conversation, loggedInUserId, participants);
+                console.log("chat partner:", chatPartner);
 
                 // get last messageObject that sent message
-                const lastMessage = conversation.messages[conversation.messages.length - 1];
+                const lastMessage = chat.messages[chat.messages.length - 1];
 
                 // find user that sent last message
                 let lastUser;
@@ -39,24 +39,24 @@ import { getChatParticipants, getChats, getLoggedInUser } from "/js/api.js";
                     }
                 });
 
-                // create left side conversation entry (list-group-item)
-                generateConversation(conversationPartner, lastUser.riot.summonerName, lastMessage, conversationsDiv);
+                // create left side chat entry (list-group-item)
+                generateChat(chatPartner, lastUser.riot.summonerName, lastMessage, chatsDiv);
 
                 // Creates the message container/div containing all the messages for a chat
-                const messageContainer = generateMessengerContainer(conversationPartner.riot.summonerName, conversationPartner.riot.region);
+                const messagesContainer = generateMessagesContainer(chatPartner.riot.summonerName, chatPartner.riot.region);
                 
-                // loop through messages in conversation and append them to list
-                conversation.messages.forEach(message => {
-                    if (message.from === conversationPartner._id) {
-                        generateMessage(message.body, conversationPartner, loggedInUser, messageContainer)
+                // loop through messages in chat and append them to list
+                chat.messages.forEach(message => {
+                    if (message.from === chatPartner._id) {
+                        generateMessage(message.body, chatPartner, loggedInUser, messagesContainer)
 
                     } else if (message.from === loggedInUser._id) {
-                        generateMessage(message.body, loggedInUser, loggedInUser, messageContainer)
+                        generateMessage(message.body, loggedInUser, loggedInUser, messagesContainer)
                     }
                 });
 
                 // Append the message container to the wrapping messengerDiv
-                messengerDiv.appendChild(messageContainer);
+                messengerDiv.appendChild(messagesContainer);
             })
         }
     }
@@ -67,51 +67,53 @@ import { getChatParticipants, getChats, getLoggedInUser } from "/js/api.js";
 
 })(); 
 
-function findConversationPartner(conversation, loggedInUserId, participants) {
+function findChatPartner(chat, loggedInUserId, participants) {
     // go through the participants of a single chat and find the user that isn't currently logged in user
-    const conversationPartnerId = conversation.participants.find( ({ userObjectId }) => userObjectId.toString() !== loggedInUserId );
+    const chatPartnerId = chat.participants.find( ({ userObjectId }) => userObjectId.toString() !== loggedInUserId );
 
-    // get conversation partner object from id containing the user data like summonerName etc.
-    const conversationPartner = participants.find( ({ _id }) => _id.toString() === conversationPartnerId.userObjectId.toString() );
+    console.log("in findChatPartner: ", chatPartnerId);
 
-    return conversationPartner;
+    // get chat partner object from id containing the user data like summonerName etc.
+    const chatPartner = participants.find( ({ _id }) => _id.toString() === chatPartnerId.userObjectId.toString() );
+
+    return chatPartner;
 }
 
-// create left side conversation element
-function generateConversation(conversationPartner, lastUserSummonerName, lastMessage, divToAppendTo) {
+// create left side chat element
+function generateChat(chatPartner, lastUserSummonerName, lastMessage, divToAppendTo) {
     // summoner name
-    const conversationPartnerSummonerName = conversationPartner.riot.summonerName;
+    const chatPartnerSummonerName = chatPartner.riot.summonerName;
 
     // region
-    const conversationPartnerRegion = conversationPartner.riot.region;
+    const chatPartnerRegion = chatPartner.riot.region;
     // outside link
     const link = document.createElement("a");
-    link.classList.add("list-group-item", "list-group-item-action", "conversation-link", "conversation-container");
+    link.classList.add("list-group-item", "list-group-item-action", "chat-link", "chat-container");
     link.setAttribute("data-bs-toggle", "list");
     link.setAttribute("role", "tab");
 
     // wrapper div
-    const conversationDiv = document.createElement("div");
-    conversationDiv.classList.add("row");
+    const chatDiv = document.createElement("div");
+    chatDiv.classList.add("row");
 
     // div for summoner icon
     const iconDiv = document.createElement("div");
     iconDiv.classList.add("col", "col-4", "py-3");
     
     // add id to user link
-    link.href="#list-" + conversationPartnerSummonerName + "-" + conversationPartnerRegion;
-    link.setAttribute("aria-controls", conversationPartnerSummonerName + "-" + conversationPartnerRegion);
-    link.id = conversationPartnerSummonerName + "-" + conversationPartnerRegion;
+    link.href="#list-" + chatPartnerSummonerName + "-" + chatPartnerRegion;
+    link.setAttribute("aria-controls", chatPartnerSummonerName + "-" + chatPartnerRegion);
+    link.id = chatPartnerSummonerName + "-" + chatPartnerRegion;
 
     // summoner icon
-    // display icon of conversation partner
+    // display icon of chat partner
     const summonerIcon = document.createElement("img");
     summonerIcon.classList.add("img", "w-100");   
-    summonerIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/" + conversationPartner.riot.profileIconId + ".png";
+    summonerIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/" + chatPartner.riot.profileIconId + ".png";
 
     // append summoner icon to div
     iconDiv.appendChild(summonerIcon);
-    conversationDiv.appendChild(iconDiv);
+    chatDiv.appendChild(iconDiv);
 
     // wrapper div for name and message
     const textDiv = document.createElement("div");
@@ -124,8 +126,8 @@ function generateConversation(conversationPartner, lastUserSummonerName, lastMes
     // summoner name
     const summonerName = document.createElement("h5");
     summonerName.classList.add("pt-3");
-    summonerName.id = "summonerName-" + conversationPartnerSummonerName + "-" + conversationPartnerRegion;
-    summonerName.innerText = conversationPartnerSummonerName;
+    summonerName.id = "summonerName-" + chatPartnerSummonerName + "-" + chatPartnerRegion;
+    summonerName.innerText = chatPartnerSummonerName;
 
     // append summoner name to div
     nameDiv.appendChild(summonerName);
@@ -137,8 +139,8 @@ function generateConversation(conversationPartner, lastUserSummonerName, lastMes
 
     // region
     const region = document.createElement("p");
-    region.id = "region-" + conversationPartnerSummonerName + "-" + conversationPartnerRegion;
-    region.innerText = conversationPartner.riot.region;
+    region.id = "region-" + chatPartnerSummonerName + "-" + chatPartnerRegion;
+    region.innerText = chatPartner.riot.region;
 
     // append region to div
     regionDiv.appendChild(region);
@@ -152,8 +154,8 @@ function generateConversation(conversationPartner, lastUserSummonerName, lastMes
     const lastMessagePreview = document.createElement("p");
     lastMessagePreview.classList.add("fw-light");
 
-    // Append You / sommonername dependant on who sent the last message
-    if (lastMessage.from !== conversationPartner._id) {
+    // Append You / summoner name dependant on who sent the last message
+    if (lastMessage.from !== chatPartner._id) {
         lastMessagePreview.innerText = "You: " + lastMessage.body;
 
     } else {
@@ -163,28 +165,29 @@ function generateConversation(conversationPartner, lastUserSummonerName, lastMes
     // apppend last message to div
     lastMessagePreviewDiv.appendChild(lastMessagePreview);
     textDiv.appendChild(lastMessagePreviewDiv);
-    conversationDiv.appendChild(textDiv);
+    chatDiv.appendChild(textDiv);
 
-    // append conversation to div
-    link.appendChild(conversationDiv);
+    // append chat to div
+    link.appendChild(chatDiv);
     divToAppendTo.appendChild(link);
 }
 
-function generateMessengerContainer(conversationPartnerSummonerName, conversationPartnerRegion) {
-    const conversationPartnerIdentifier = conversationPartnerSummonerName + "-" + conversationPartnerRegion;
-    const listConversationDiv = document.createElement("div");
-    listConversationDiv.classList.add("tab-pane", "fade", "row");
-    listConversationDiv.setAttribute("role", "tabpanel");
-    listConversationDiv.setAttribute("aria-labelledby", conversationPartnerIdentifier);
-    listConversationDiv.id = "list-" + conversationPartnerIdentifier;
+function generateMessagesContainer(chatPartnerSummonerName, chatPartnerRegion) {
+    const chatPartnerUsername = chatPartnerSummonerName + "-" + chatPartnerRegion;
 
-    return listConversationDiv;
+    const messagesContainer = document.createElement("div");
+    messagesContainer.classList.add("tab-pane", "fade", "row");
+    messagesContainer.setAttribute("role", "tabpanel");
+    messagesContainer.setAttribute("aria-labelledby", chatPartnerUsername);
+    messagesContainer.id = "list-" + chatPartnerUsername;
+
+    return messagesContainer;
 }
 
 // Generates a message container. Aligns left/right dependant sender and session info
-function generateMessage(message, from, sessionIdentifier, divToAppendTo) {
+function generateMessage(message, from, loggedInUser, divToAppendTo) {
     console.log("(js) from:", from)
-    console.log("(js) sessionIdentifier:", sessionIdentifier)
+    console.log("(js) loggedInUser:", loggedInUser)
 
     const wrapperMessageDiv = document.createElement("div");
     wrapperMessageDiv.classList.add("row");
@@ -197,12 +200,12 @@ function generateMessage(message, from, sessionIdentifier, divToAppendTo) {
     messageText.innerText = from.riot.summonerName + ": " + message;
     
     // display messages left/right dependent on sender
-    if (from._id === sessionIdentifier._id) {
+    if (from._id === loggedInUser._id) {
         wrapperMessageDiv.classList.add("justify-content-end");
-        messageDiv.classList.add("chat-right", "d-flex", "justify-content-end", "align-items-center");
+        messageDiv.classList.add("message-right", "d-flex", "justify-content-end", "align-items-center");
 
     } else {
-        messageDiv.classList.add("chat-left", "d-flex", "justify-content-start");
+        messageDiv.classList.add("message-left", "d-flex", "justify-content-start");
     }
 
     messageDiv.appendChild(messageText);
@@ -211,13 +214,13 @@ function generateMessage(message, from, sessionIdentifier, divToAppendTo) {
 }
 
 function resetMessageInputs() {
-    document.getElementById("new-conversation-input").value = "";
+    document.getElementById("new-chat-input").value = "";
     document.getElementById("message-input").value = "";
 }
 
 export {
-    generateConversation,
-    generateMessengerContainer,
+    generateChat,
+    generateMessagesContainer,
     generateMessage,
     resetMessageInputs
 }
