@@ -36,8 +36,8 @@ const rootSocket = (io) => {
                 // emits the message/data to sender
                 io.in(socket.data.username).emit("private message", {
                     message: escapeHTML(data.message),
-                    from: data.to,
-                    to: socket.request.session.user,
+                    from: socket.request.session.user,
+                    to: data.to,
                     toSelf: true
                 });
             } 

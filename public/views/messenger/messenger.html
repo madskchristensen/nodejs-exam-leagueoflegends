@@ -119,51 +119,71 @@
     }
 
     socket.on("private message", async (data) => {
-        
+        console.log("data", data);
+
+        let messengerDiv;
+
         // get messenger div from data
-        const messengerDiv = document.getElementById("list-" + data.from.riot.summonerName + "-"  + data.from.riot.region);
+        if (data.toSelf) {
+            messengerDiv = document.getElementById("list-" + data.to.riot.summonerName + "-"  + data.to.riot.region);
+
+        } else {
+            messengerDiv = document.getElementById("list-" + data.from.riot.summonerName + "-"  + data.from.riot.region);
+        }
+
+        console.log("(html) from:", data.from);
+        console.log("(html) to:", data.to);
         
         // if messenger element already exists ==> conversation already had ==> append message to existing chat
         if (messengerDiv) {
+            console.log("sending message to existing chat...");
+
             // attach message to messenger div according to if data was sent to self or not
             if (data.toSelf) {
-                generateMessage (data.message, data.from._id, data.from._id, messengerDiv);
+                console.log("message generated from own message");
+                generateMessage (data.message, data.from, data.from, messengerDiv);
 
             } else {
-                generateMessage (data.message, data.from._id, data.to._id, messengerDiv);
+                console.log("message generated from other user");
+                generateMessage (data.message, data.from, data.to, messengerDiv);
             }
 
         // else create new conversation, messenger and message
         } else {
+            console.log("creating new conversation, messenger and message...");
+
             // create lastMessage for conversation element
             let lastMessage = {
                 body: data.message,
+                from: data.from._id
             };
-
-            // set sender of last message according to if data was sent to self or not
-            if (data.toSelf) {
-                lastMessage.from = data.to._id;
-            
-            } else {
-                lastMessage.from = data.from._id;
-            }
             
             // get wrapper div for conversations (left) and messenger (right)
             const conversationsDiv = document.getElementById("conversations-div");
             const messengerDiv = document.getElementById("messenger-div");
 
-            // create new conversation element (left)
-            generateConversation (data.from, data.from.riot.summonerName, lastMessage, conversationsDiv); 
+            let messengerContainer;
 
-            // create messenger container for new chat (right)
-            const messengerContainer = generateMessengerContainer(data.from.riot.summonerName, data.from.riot.region);
+            if (data.toSelf) {
+                // create new conversation element (left)
+                generateConversation(data.to, data.to.riot.summonerName, lastMessage, conversationsDiv);
+
+                // create messenger container for new chat (right)
+                messengerContainer = generateMessengerContainer(data.to.riot.summonerName, data.to.riot.region);
+
+            } else {
+                generateConversation(data.from, data.from.riot.summonerName, lastMessage, conversationsDiv);
+
+                // create messenger container for new chat (right)
+                messengerContainer = generateMessengerContainer(data.from.riot.summonerName, data.from.riot.region);
+            }
             
             // attach message to messenger div according to if data was sent to self or not
             if (data.toSelf) {
-                generateMessage (data.message, data.from._id, data.from._id, messengerContainer);
+                generateMessage (data.message, data.from, data.from, messengerContainer);
 
             } else {
-                generateMessage (data.message, data.from._id, data.to._id, messengerContainer);
+                generateMessage (data.message, data.from, data.to, messengerContainer);
             }
 
             // append messengerContainer to messenger wrapper

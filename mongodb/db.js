@@ -18,7 +18,7 @@ db.query().collection("profiles").insertOne(
 
 // variables to be used
 const mongoClient = require("mongodb").MongoClient;
-const url = process.env.MONGODB_URI
+const url = "mongodb://" + process.env.db_host + ":" + process.env.DB_PORT;
 const dbName = process.env.DB_NAME;
 let mongodb;
 

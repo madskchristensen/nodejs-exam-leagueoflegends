@@ -47,7 +47,12 @@ import { getChatParticipants, getChats, getLoggedInUser } from "/js/api.js";
                 
                 // loop through messages in conversation and append them to list
                 conversation.messages.forEach(message => {
-                    generateMessage(message.body, message.from, loggedInUserId, messageContainer)
+                    if (message.from === conversationPartner._id) {
+                        generateMessage(message.body, conversationPartner, loggedInUser, messageContainer)
+
+                    } else if (message.from === loggedInUser._id) {
+                        generateMessage(message.body, loggedInUser, loggedInUser, messageContainer)
+                    }
                 });
 
                 // Append the message container to the wrapping messengerDiv
@@ -73,7 +78,7 @@ function findConversationPartner(conversation, loggedInUserId, participants) {
 }
 
 // create left side conversation element
-function generateConversation (conversationPartner, lastUserSummonerName, lastMessage, divToAppendTo) {
+function generateConversation(conversationPartner, lastUserSummonerName, lastMessage, divToAppendTo) {
     // summoner name
     const conversationPartnerSummonerName = conversationPartner.riot.summonerName;
 
@@ -177,7 +182,10 @@ function generateMessengerContainer(conversationPartnerSummonerName, conversatio
 }
 
 // Generates a message container. Aligns left/right dependant sender and session info
-function generateMessage (message, from,  sessionIdentifier, divToAppendTo ) {
+function generateMessage(message, from, sessionIdentifier, divToAppendTo) {
+    console.log("(js) from:", from)
+    console.log("(js) sessionIdentifier:", sessionIdentifier)
+
     const wrapperMessageDiv = document.createElement("div");
     wrapperMessageDiv.classList.add("row");
 
@@ -186,14 +194,14 @@ function generateMessage (message, from,  sessionIdentifier, divToAppendTo ) {
 
     const messageText = document.createElement("p");
     messageText.classList.add("message-text");
-    messageText.innerText = message;
+    messageText.innerText = from.riot.summonerName + ": " + message;
     
     // display messages left/right dependent on sender
-    if (from === sessionIdentifier) {
+    if (from._id === sessionIdentifier._id) {
         wrapperMessageDiv.classList.add("justify-content-end");
         messageDiv.classList.add("chat-right", "d-flex", "justify-content-end", "align-items-center");
 
-    } else{
+    } else {
         messageDiv.classList.add("chat-left", "d-flex", "justify-content-start");
     }
 
