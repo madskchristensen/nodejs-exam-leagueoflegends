@@ -181,8 +181,11 @@ router.get("/auth/create-user", async (req, res) => {
 
         // insert ranked data if summoner is ranked in 5v5 solo
         if (rankedSolo) {
+            // riot returns a full uppercase string. Lowercase all letters, but the first.
+            const tierLowerCase = rankedSolo.tier[0] + rankedSolo.tier.slice(1).toLowerCase()
+
             data.riot.rankedSolo5x5 = {
-                tier: rankedSolo.tier,
+                tier: tierLowerCase,
                 rank: rankedSolo.rank,
                 leaguePoints: rankedSolo.leaguePoints,
                 wins: rankedSolo.wins,
