@@ -150,13 +150,10 @@ app.get("/profile/:summonerName/:region", (req, res) => {
 // intercept all incoming requests with login check except above, as they are allowed for all users
 app.get("/*", (req, res, next) => {
 
-    // print the path that endpoint sees
-    console.log("looking at", req.path);
-
     // save path to variable where it can be changed
     let newPath = req.path;
 
-    // remove trailin slash from messenger --- temp fix until we fix bug
+    // remove trailing slash from messenger --- temp fix until we find and fix bug
     if (req.path.charAt(req.path.length - 1) === "/") {
         newPath = req.path.slice(0, -1);
     }
@@ -184,8 +181,6 @@ const paths = [];
 // loop through all defined paths and add to array
 app._router.stack.forEach( (router) => {
     if (router.route && router.route.path){
-        console.log("from router loop", router.route.path)
-
         paths.push(router.route.path);
     }
 })

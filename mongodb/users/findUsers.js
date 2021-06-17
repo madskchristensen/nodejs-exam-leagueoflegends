@@ -3,7 +3,7 @@ const ObjectId = require('mongodb').ObjectId;
 
 // returns a user, found by email
 function byEmail(email) {
-    const filter = { "details.email": email };
+    const filter = { "details.email": email.toLowerCase() };
 
     return db.query().collection("users").findOne(filter)
         .then(res => res);
