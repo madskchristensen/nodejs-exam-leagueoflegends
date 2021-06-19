@@ -106,32 +106,6 @@ function loadProfile(userProfile) {
         const summonerRank = document.getElementById("summoner-rank-icon");
         const summonerRankFromDB = userProfile.riot.rankedSolo5x5.tier.split(" ")[0];
         summonerRank.src = "/assets/riot/ranked-emblems/" + summonerRankFromDB + ".png";
-
-        // games played div containing all info relating to games played
-        const gamesStats = document.getElementById("games-stats");
-
-        const wins = Number(userProfile.riot.rankedSolo5x5.wins);
-        const losses = Number(userProfile.riot.rankedSolo5x5.losses);
-        const games = wins + losses;
-        const wR = wins / games * 100;
-
-        const winsLosses = document.createElement("p");
-        winsLosses.innerText = "W: " + wins + " L: " + losses;
-
-        const gamesAmount = document.createElement("p");
-        gamesAmount.innerText = "Total: " + games;
-
-        const winRate = document.createElement("p");
-        winRate.innerText = "Win rate: " + (wR.toFixed(2)) + "%";
-
-        gamesStats.append(winsLosses, gamesAmount, winRate);
-
-/*        // wins-losses
-        const wins = document.getElementById("wins-value");
-        wins.innerText = userProfile.riot.rankedSolo5x5.wins;
-
-        const losses = document.getElementById("losses-value");
-        losses.innerText = userProfile.riot.rankedSolo5x5.losses;*/
     }
 
     // summoner icon
@@ -139,8 +113,11 @@ function loadProfile(userProfile) {
     const summonerIconFromDB = userProfile.riot.profileIconId;
     summonerIcon.src = "http://ddragon.leagueoflegends.com/cdn/11.11.1/img/profileicon/" + summonerIconFromDB + ".png";
 
-    // summoner stats
+    // season stats
     const championStatsDiv = document.getElementById("champion-stats");
+
+
+
     userProfile.riot.seasonStats.forEach(champion => {
 
         // div
