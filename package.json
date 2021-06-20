@@ -4,9 +4,9 @@
   "description": "Exam project for Node.js elective. A social website for league of legends players.",
   "main": "app.js",
   "scripts": {
-    "test":"echo \"Error: no test specified\" && exit 1",
-    "start-dev":"cross-env NODE_ENV=development nodemon app.js",
-    "start":"cross-env NODE_ENV=production node app.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-dev": "cross-env NODE_ENV=development nodemon app.js",
+    "start": "cross-env NODE_ENV=production node app.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
   "homepage": "https://github.com/madskchristensen/nodejs-exam-leagueoflegends#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "cross-env": "^7.0.3",
     "dotenv": "^9.0.2",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
@@ -36,9 +37,7 @@
     "node-fetch": "^2.6.1",
     "socket.io": "^4.1.1",
     "toastr": "^2.1.4",
-    "uuid": "^8.3.2",
-    "cross-env": "^7.0.3"
+    "uuid": "^8.3.2"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

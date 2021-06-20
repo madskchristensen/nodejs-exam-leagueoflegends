@@ -99,7 +99,7 @@
         const to = await getUser(receiver.summonerName, receiver.region);
 
         // check if receiver exists
-        if (!to) {
+        if (!to.length) {
             toastr.error("Summoner not found - please try again.");
 
         // check if receiver is identical to logged in user
