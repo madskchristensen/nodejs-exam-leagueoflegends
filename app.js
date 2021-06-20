@@ -20,7 +20,7 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 
 // attach rootSocket to socket.io attached to server
-require('./socketio')(io);
+require('./socketio').rootSocket(io);
 
 // save helmet to const
 const helmet = require("helmet");
@@ -52,7 +52,7 @@ const sessionInitializer = function (req, res, next) {
 }
 
 // register session in Socket.IO, so we can get session in socket.io functions
-// reference: https://socket.io/docs/v3/faq/ - how to use socket.io with express-session
+// reference: https://socket.io/docs/v4/faq/ - how to use socket.io with express-session
 io.use((socket, next) => {
     sessionOptions(socket.request, {}, next);
 });
@@ -190,12 +190,11 @@ app._router.stack.forEach( (router) => {
 db.connect(() => {
     server.listen(port, (err) => {
         if (err) {
-            console.log(err);
+            throw new Error(err);
 
         } else {
             console.log("[express] running in", process.env.NODE_ENV, "mode");
             console.log("[express] listening at port", port);
-            console.log("");
         }
     })
 })

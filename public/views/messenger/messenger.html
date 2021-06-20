@@ -116,8 +116,6 @@
     }
 
     socket.on("private message", async (data) => {
-        console.log("data", data);
-
         let messengerDiv;
 
         // get messenger div from data
@@ -128,26 +126,19 @@
             messengerDiv = document.getElementById("list-" + data.from.riot.summonerName + "-"  + data.from.riot.region);
         }
 
-        console.log("(html) from:", data.from);
-        console.log("(html) to:", data.to);
-
         // if messenger element already exists ==> chat already had ==> append message to existing chat
         if (messengerDiv) {
-            console.log("sending message to existing chat...");
 
             // attach message to messenger div according to if data was sent to self or not
             if (data.toSelf) {
-                console.log("message generated from own message");
                 generateMessage (data.message, data.from, data.from, messengerDiv);
 
             } else {
-                console.log("message generated from other user");
                 generateMessage (data.message, data.from, data.to, messengerDiv);
             }
 
         // else create new chat, messenger and message
         } else {
-            console.log("creating new chat, messenger and message...");
 
             // create lastMessage for chat element
             let lastMessage = {

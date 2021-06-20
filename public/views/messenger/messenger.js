@@ -21,12 +21,8 @@ import { getChatParticipants, getChats, getLoggedInUser } from "/js/api.js";
 
             // go through each chat and generate html elements accordingly
             chats.forEach(chat => {
-                console.log("chat", chat);
-
                 // get chat partner data, containing id, summonerName etc.
                 const chatPartner = findChatPartner(chat, loggedInUser._id, participants);
-
-                console.log("chat partner:", chatPartner);
 
                 // get last messageObject that sent message
                 const lastMessage = chat.messages[chat.messages.length - 1];
@@ -70,8 +66,6 @@ import { getChatParticipants, getChats, getLoggedInUser } from "/js/api.js";
 function findChatPartner(chat, loggedInUserId, participants) {
     // go through the participants of a single chat and find the user that isn't currently logged in user
     const chatPartnerId = chat.participants.find( ({ userObjectId }) => userObjectId.toString() !== loggedInUserId );
-
-    console.log("in findChatPartner: ", chatPartnerId);
 
     // get chat partner object from id containing the user data like summonerName etc.
     const chatPartner = participants.find( ({ _id }) => _id.toString() === chatPartnerId.userObjectId.toString() );
@@ -186,9 +180,6 @@ function generateMessagesContainer(chatPartnerSummonerName, chatPartnerRegion) {
 
 // Generates a message container. Aligns left/right dependant sender and session info
 function generateMessage(message, from, loggedInUser, divToAppendTo) {
-    console.log("(js) from:", from)
-    console.log("(js) loggedInUser:", loggedInUser)
-
     const wrapperMessageDiv = document.createElement("div");
     wrapperMessageDiv.classList.add("row");
 

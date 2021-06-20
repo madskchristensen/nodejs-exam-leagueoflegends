@@ -3,37 +3,40 @@ const escapeHTML = require("html-escaper").escape;
 
 const rootSocket = (io) => {
     io.on("connection", (socket) => {
-        console.log("A socket connected with id" + socket.id);
-    
-        // create username from session
-        socket.data.summonerName = socket.request.session.user.riot.summonerName;
-        socket.data.region = socket.request.session.user.riot.region;
-    
-        socket.data.username = socket.data.summonerName + "-" + socket.data.region;
-        
+
         // get user from session
         const userFromSession = socket.request.session.user;
+
+        // create username from session
+        socket.data.summonerName = userFromSession.riot.summonerName;
+        socket.data.region = userFromSession.riot.region;
+
+        socket.data.username = socket.data.summonerName + "-" + socket.data.region;
+
+        console.log("Socket connected:", socket.data.username);
     
         // join room with username
         socket.join(socket.data.username);
     
-        // triggered when a new message is sent
+        // triggered when a new message is sent in front-end
         socket.on("private message", async (data) => {
             // send message to other user
             data.from = userFromSession;
     
             // attempt to save message to existing chat or create new if one doesn't exist between participants (from/receiver)
             const response = await chatService.saveMessage(data);
-    
+
+            // if saveMessage operation went ok
             if (response.data) {
-                socket.to(data.to.riot.summonerName + "-" + data.to.riot.region).emit("private message", {
+                // emit message to receiver
+                io.in(data.to.riot.summonerName + "-" + data.to.riot.region).emit("private message", {
                     message: escapeHTML(data.message),
-                    from: socket.request.session.user,
+                    from: userFromSession,
                     to: data.to,
                     toSelf: false
                 });
     
-                // emits the message/data to sender
+                // emit message to sender
                 io.in(socket.data.username).emit("private message", {
                     message: escapeHTML(data.message),
                     from: socket.request.session.user,
@@ -44,9 +47,11 @@ const rootSocket = (io) => {
         });
     
         socket.on("disconnect", async () => {
-            console.log("A socket disconnected:", socket.data.username);
+            console.log("Socket disconnected:", socket.data.username);
         })
     });    
 }
 
-module.exports = rootSocket;
+module.exports = {
+    rootSocket
+};
